@@ -56,21 +56,6 @@
 
 \section{Introduction}
     
-    - Large Scale engineered systems 
-    - Complex problems that are not obvious to set up
-    - need for a formal and consistent way to represent the problem
-      - contains *all* the information needed to formulate a solution method
-    - Previous attempts to provide problem formulation
- 
-      \begin{itemize}
-        \item Structural Matrix, 
-        \item DSM
-        \item Functional Dependence Table
-        \item XDSM
-        \item Flow Chart
-        \item Adjacency Matrix
-      \end{itemize}
-
     As the size and complexity of engineering systems grows the time and expense for setting up 
     analysis models grows with them. Multidisciplinary Design Analysis and Optimization (MDAO)
     frameworks such as OpenMDAO\cite{Gray2012} and ModelCenter have enabled a new level of analysis tool integration 
@@ -98,7 +83,7 @@
     In this work we proposed a graph based syntax for the specification of the FPF. This graph based syntax provides several key
     features that make it useful for working with large scale MDAO problems. It provides a rigid structure that can be easily manipulated 
     in with a wide range of well establish graph-theory algorithms. By taking advantage of that structure it is possible to test 
-    any given problem specification to determine if it is in fact complete and general. It can be used to describe more specific problem 
+    any given problem specification to determine if it is complete and general. It can be used to describe more specific problem 
     setups, and given one can be used to derive the FPF from it. Lastly, a graph based specification for problem formulation lends itself
     well to interacting with MDAO frameworks which makes it particularly powerful for integrating problem formulation analysis techniques 
     into those frameworks. 
@@ -111,7 +96,7 @@
         min &\ \ f\left(X\right) \notag
         \\ w.r.t. &\ \  X \notag
         \\ s.t. &\ \ G\left(X\right) \leq 0
-        \\      &\ \ C\left(X\right) \leq 0
+        \\      &\ \ C\left(X\right) = 0
     \end{align}
 
     Where $f(X)$ is the objective function, $X$ is the vector of design variables, $G(X)$ are the optimization constraints, 
@@ -124,16 +109,46 @@
     The challenge with using this traditional mathematical syntax is that it is not easily manipulated or analyzed algorithmically. 
     A number of matrix based methods have been used successfully to manipulate problem formulations in a programmatic manner. Steward's 
     Design Structure Matrix (DSM) is a form of an adjacency matrix which captures the relationship between design elements and 
-    design variables where off diagonal elments of the matrix indicate coupling\cite{Steward1981}. 
+    design variables where off diagonal elements of the matrix indicate coupling\cite{Steward1981}. 
     Although it does not have to provide a specific solution path, the DSM has been successfully 
     applied to allow selection of an optimal ordering for analysis tools in a complex system. Rogers et. al developed DeMAID to manipulate a
     DSM to minimizing the computational costs of solving highly coupled systems\cite{Rogers1996}. 
-    Since these matrix based methods operate on some form of an adjacency matrix, they can all be represented in an equivalent graph. 
+    Since the DSM is essentially adjacency matrix, they can be represented in an equivalent graph. One major challenge with the DSM and similar 
+    approaches is that they lack the capability to fully describe the problem formulation. For example, the DSM deals with variables and analysis tools, 
+    but ignored objectives and constraints. An alternate matrix based representation, called a Functional Dependence Table (FTD), represents the relationship
+    between variables, objectives, and constraints but ignores the discipline analyses\cite{Michelena1997}. Both DSM and FTD have been used 
+    successfully to implement problem decomposition techniques, but neither by itself is sufficient to provide a syntax to describe a FPF. 
 
+\section{Graph Based Problem Formulation Syntax}
+    \subsection{Formulation Graph Syntax}
+    Rather than start with an adjacency, we chose to work directly with a directed cyclic graph to develop a syntax for the FPF. 
+    \begin{itemize}
+        \item Specify analyses
+        \item Connections between analyses 
+            \begin{itemize}
+                \item local variables
+                \item global variables? Use "fake" node that broadcasts out to the rest of the graph? 
+            \end{itemize}
+        \item Cycles indicate coupling
+        \item Cycles for design variables->objectives/constraints
+        \item Objectives/constraints are just outputs? Special nodes? 
+        \item Residuals are just outputs? Special nodes? 
+        \item Parameters are just input nodes that are not design variables (use identifies these)
+        \item FPF no solvers/optimizers anywhere in it
+    \end{itemize}
 
+    \subsection{Solution Graph Syntax}
+    What is the difference between a problem formulation and a problem solution method? Convert from a cyclic graph, to an acyclic graph
+    \begin{itemize}
+        \item cycles indicate convergence loops or design varaible loops
+        \item Problem can't be solved until all loops are *removed* by adding in solvers/optimizers
+        \item *special* nodes for solvers and optimizers that *break* loops (from an algorithmic point of view)
+        \item FPF represents the minimal amount of information necessary to define a problem
+        \item Any solution path grows the graph complexity by adding edges and nodes (or possibly have an empty solution graph, which you build up 
+        as you remove edges from problem formulation graph?)
+    \end{itemize}
 
-\section{Graph Based Problem Formulation}
-
+    
 \section{Example Problem}
 
 \section{Applications}
