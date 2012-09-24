@@ -5,10 +5,10 @@
 \author{
   David Pate, %
      \thanks{Georgia Tech}
-  Justin Gray,%
-     \thanks{Aerospace Engineer, MDAO Branch, Mail Stop 5-11, AIAA Member}
   Dr. Brian German 
      \thanks{Georgia Tech...}
+  Justin Gray,%
+     \thanks{Aerospace Engineer, MDAO Branch, Mail Stop 5-11, AIAA Member}   
  }
  
  
@@ -48,10 +48,9 @@
 \section*{Nomenclature}
 
 \begin{tabular}{l l} 
-    DOE      & Design of Experiments \\ 
-    IDF      & Individual Design Feasible  \\
-    MDF      & Multiple Design Feasible \\
+    AAO      & All-At- \\
     MDAO     & Multidisciplinary Design Analysis and Optimization \\
+    FPF      & Fundamental Problem Formulation \\
 \end{tabular}
 
 
@@ -72,10 +71,66 @@
         \item Adjacency Matrix
       \end{itemize}
 
-   As the size and complexity of engineering systems grows the time and expense for setting up 
-   analysis models grows with them. Multidisciplinary Design Analysis and Optimziation
-   frameworks such as OpenMDAO and ModelCenter have enabled a new level of analysis tool integration 
-   and paved the way for models of increasing integration and complexity. 
+    As the size and complexity of engineering systems grows the time and expense for setting up 
+    analysis models grows with them. Multidisciplinary Design Analysis and Optimization (MDAO)
+    frameworks such as OpenMDAO\cite{Gray2012} and ModelCenter have enabled a new level of analysis tool integration 
+    and paved the way for models of with more analysis tools and increasing numbers of multidisciplinary couplings. 
+    Such large models present a distinct challenge to properly set up in a manner that allows for an efficient solution. 
+    In fact as the size of a problem grows very large just determining what the proper solution strategy can be a daunting 
+    task. 
+
+    What is needed, in order to address the complexity problem, is a method of specifying an engineering problem 
+    in a complete and totally general manner. A complete specification needs to include the following information: 
+    \begin{itemize}
+       \item Discipline Analyses 
+       \item Discipline State Variables and Residuals
+       \item Local \& Global Design Variables
+       \item Local \& Global Constraints
+       \item Objective or Objectives
+       \item Coupling Constraints
+       \item Local and Global Parameters
+    \end{itemize}
+    A general specification is one that states nothing specific about a problem solution path. It does not include any details about 
+    how an objective is to be minimized, how coupling constraints will be satisfied, or how residuals will managed. We 
+    define a complete and general problem specification to be the Fundamental Problem Formulation (FPF). By definition, the FPF for 
+    any given problem will be constant regardless of which MDAO framework or optimization architecture is used to solve the problem. 
+
+    In this work we proposed a graph based syntax for the specification of the FPF. This graph based syntax provides several key
+    features that make it useful for working with large scale MDAO problems. It provides a rigid structure that can be easily manipulated 
+    in with a wide range of well establish graph-theory algorithms. By taking advantage of that structure it is possible to test 
+    any given problem specification to determine if it is in fact complete and general. It can be used to describe more specific problem 
+    setups, and given one can be used to derive the FPF from it. Lastly, a graph based specification for problem formulation lends itself
+    well to interacting with MDAO frameworks which makes it particularly powerful for integrating problem formulation analysis techniques 
+    into those frameworks. 
+
+
+\section{Problem Formulation Syntax}
+    The most common problem formulation for an MDAO problem could be given as follows: 
+
+    \begin{align}
+        min &\ \ f\left(X\right) \notag
+        \\ w.r.t. &\ \  X \notag
+        \\ s.t. &\ \ G\left(X\right) \leq 0
+        \\      &\ \ C\left(X\right) \leq 0
+    \end{align}
+
+    Where $f(X)$ is the objective function, $X$ is the vector of design variables, $G(X)$ are the optimization constraints, 
+    and $C(X)$ are the coupling constraints. This does represent a general problem formulation, since it says nothing about 
+    how the problem should be solved. Tedford and Martins used this format to specify a set of test problems and derived specific formulations 
+    for solving them with a number of optimization architectures\cite{Tedford2009}. Lamb and Martins also used this basic mathematical 
+    syntax to describe the All-At-Once (AAO) architecture \cite{Lambe2011}. Although the AAO specification does specify a solution path 
+    including a single optimizer to solve the entire problem, in every other way it fills the criterion for a general problem specification. 
+
+    The challenge with using this traditional mathematical syntax is that it is not easily manipulated or analyzed algorithmically. 
+    A number of matrix based methods have been used successfully to manipulate problem formulations in a programmatic manner. Steward's 
+    Design Structure Matrix (DSM) is a form of an adjacency matrix which captures the relationship between design elements and 
+    design variables where off diagonal elments of the matrix indicate coupling\cite{Steward1981}. 
+    Although it does not have to provide a specific solution path, the DSM has been successfully 
+    applied to allow selection of an optimal ordering for analysis tools in a complex system. Rogers et. al developed DeMAID to manipulate a
+    DSM to minimizing the computational costs of solving highly coupled systems\cite{Rogers1996}. 
+    Since these matrix based methods operate on some form of an adjacency matrix, they can all be represented in an equivalent graph. 
+
+
 
 \section{Graph Based Problem Formulation}
 
