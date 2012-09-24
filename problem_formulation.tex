@@ -1,0 +1,88 @@
+\documentclass[]{aiaa-tc} % insert '[draft]' option to show overfull boxes
+
+ \title{An application of Graph Theory to MDAO problem formulation}
+        
+\author{
+  David Pate, %
+     \thanks{Georgia Tech}
+  Justin Gray,%
+     \thanks{Aerospace Engineer, MDAO Branch, Mail Stop 5-11, AIAA Member}
+  Dr. Brian German 
+     \thanks{Georgia Tech...}
+ }
+ 
+ 
+
+
+
+%\usepackage{setspace}
+%\doublespace
+
+\usepackage{graphicx}
+\usepackage{wrapfig}
+\usepackage{caption} 
+\usepackage{amsmath}
+\usepackage{lscape}
+\usepackage{hyperref}
+\usepackage{appendix}
+\usepackage[section]{placeins}
+
+\captionsetup[figure]{margin=5pt,font=small,labelfont=bf,textfont=bf,justification=justified,}
+%\captionsetup[wrapfigure]{margin=5pt,font=small,labelfont=bf,justification=justified,singlelinecheck=off}
+\captionsetup[table]{margin=5pt,font=small,labelfont=bf,textfont=bf,justification=justified,position=top}
+
+\bibliographystyle{aiaa}
+
+\usepackage{lettrine}
+\usepackage{verbatim}
+
+%\usepackage{hyperref} %allows for the creation of actual text links
+\begin{document}
+
+\maketitle
+ 
+\begin{abstract}
+   blah blah blah
+\end{abstract}
+
+\section*{Nomenclature}
+
+\begin{tabular}{l l} 
+    DOE      & Design of Experiments \\ 
+    IDF      & Individual Design Feasible  \\
+    MDF      & Multiple Design Feasible \\
+    MDAO     & Multidisciplinary Design Analysis and Optimization \\
+\end{tabular}
+
+
+\section{Introduction}
+    
+    - Large Scale engineered systems 
+    - Complex problems that are not obvious to set up
+    - need for a formal and consistent way to represent the problem
+      - contains *all* the information needed to formulate a solution method
+    - Previous attempts to provide problem formulation
+ 
+      \begin{itemize}
+        \item Structural Matrix, 
+        \item DSM
+        \item Functional Dependence Table
+        \item XDSM
+        \item Flow Chart
+        \item Adjacency Matrix
+      \end{itemize}
+
+   As the size and complexity of engineering systems grows the time and expense for setting up 
+   analysis models grows with them. Multidisciplinary Design Analysis and Optimziation
+   frameworks such as OpenMDAO and ModelCenter have enabled a new level of analysis tool integration 
+   and paved the way for models of increasing integration and complexity. 
+
+\section{Graph Based Problem Formulation}
+
+\section{Example Problem}
+
+\section{Applications}
+
+\section{Conclusions}
+
+\end{document}

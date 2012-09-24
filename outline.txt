@@ -1,0 +1,55 @@
+2================================================
+#stream of consciousness 
+================================================
+Fundamental Problem Formulation
+
+General Problem Formulation represented as a Network Graph
+
+Tie into Complex Design? 
+
+Ideas: 
+    - Problem Formulation as a minimal directed cyclic graph
+    - Derive specific problem formulation for solution methods, increasing number of nodes and edges in graph
+    - Cycles show up for necessary convergence
+    - Collisions require engineering decisions 
+
+Global vs Local Variables in the Network Graph? I have not thought of this issue before and I'm not sure how it would show up... 
+
+
+========================================================================
+#slightly more structured outline for a paper
+========================================================================
+
+- Introduction/Motivation
+    - Need to fully describe the problem in a way that provides all the necessary information to solve the problem using ANY solution method
+    - Should be able to take the problem definition and manipulate it to include solution information
+    - Need to be able to build up the definition, or add to it to represent additions to the problem 
+    - History of using graphs to represent problem definition 
+        - DSM, and others
+        - XDSM 
+        - Ken Moore's Work on derivatives
+
+- Theory
+    - Describe graph syntax, 
+        - Variables and Components are nodes
+        - Edges represent connectivity
+        - Describe Cycles
+        - Graph weights? Edges or Nodes? 
+
+    - Simple, but instructive test cases that include
+        - Conflicts 
+        - Cycles 
+        - Paths
+        - Questions: 
+            - How to represent design variables, Residuals, constraints, objectives in the graph
+
+- Examples: Demonstrate the fundamental formulation and specific derived formulations for solution methods
+    - Sellar Problem
+    - Scalable Problem
+    - ASAT Problem
+
+- Usefulness beyond problem definition: 
+    - Implementation of a Graph based problem formulation into an MDAO framework?
+    - Algorithmic Manipulation of the problem formulation graph to find effective solution paths? 
+    - Addition of new analyses to an existing problem? 
+
