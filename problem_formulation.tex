@@ -112,19 +112,23 @@
     The challenge with using this traditional mathematical syntax is that it is not easily manipulated or analyzed by computer programs. 
     A number of matrix based methods have been used successfully to translate the mathematical syntax into a more useful computational form. 
     Steward's Design Structure Matrix (DSM) is a form of an adjacency matrix which captures the relationship between analysis tools where off 
-    diagonal elements of the matrix indicate coupling\cite{Steward1981}. 
+    diagonal elements of the matrix indicate coupling\cite{Steward1981}. Figure \ref{fig:dsm_simple} shows a simple notional example of a DSM. 
+    The DSM has been successfully applied in a number of ways to algorithmically modify problem formulations to 
+    improve computational efficiency. Rogers et. al developed DeMAID to manipulate a
+    DSM  minimizing the computational costs of solving highly coupled systems\cite{Rogers1996}. Lu and Martins demonstrated 
+    the use of a weighted DSM to make partitioning and coordinating choices that dramatically reduced the 
+    cost of solving a specific kind of optimization problem as the scale of the problem grew. 
+    They applied weights to both the nodes (diagonal terms) and the edges (off diagonal terms) of the 
+    DSM to indicated computational cost and coupling strength respectively.
 
-    [[insert cartoon figure here of DSM]]
+    \begin{figure}[!hbp]
+        \begin{center}
+        \includegraphics[width=.75\textwidth]{images/dsm_simple}
+        \caption{Graph and matrix based DSM specifications for a notional analysis \label{fig:dsm_simple}}
+        \end{center}
+    \end{figure}
 
-    The DSM has been widely adopted within the engineering and optimization fields, and even outside of it. The DSM
-    syntax has been successfully applied to allow selection of beneficial orderings for analysis 
-    tools in a complex system. Rogers et. al developed DeMAID to manipulate a
-    DSM to minimizing the computational costs of solving highly coupled systems\cite{Rogers1996}. 
-
-    [Need to cite more recent research on automatic paritioning, Peter's work was just published...]
-    [Include examples of DSM being used in the business world that Brian Talked about?]
-
-    Since a DSM essentially describes adjacency matrix, it can be represented in an equivalent directed graph where nodes represent analysis tools and 
+    Since a DSM describes a square adjacency matrix, it can be represented in an equivalent directed graph where nodes represent analysis tools and 
     edges represent information exchange between those tools. An alternate matrix based syntax, called a 
     Functional Dependence Table (FDT), was proposed by Michelena and Papalambros. 
     FDT represents the relationship between functions, including objectives and constraints, and their values\cite{Michelena1997}. Similar to DSM
@@ -133,8 +137,24 @@
     variable value. By searching the FDT graph for clusters of totally connected nodes Wagner and Papalambros were identify groups of 
     analysis tools that were all dependent on the same input variables and used that to make partitioning decisions \cite{Wagner1993}. 
 
-    [[insert cartoon figure of a FDT graph and matrix]]
+    It is possible to combine the syntax of an FDT and a DSM by making a subtle extension to a traditional DSM specification. Normally, a DSM is given 
+    with analysis tools as nodes and variable dependencies given as edges. Lamb and Martins included the variables, objectives, and constraint functions
+    as nodes in an Extented DSM (XDSM)\cite{Lambe2012} in order to capture a more complete problem formulation for MDAO problems. With XDSM 
+    it is possible to also encompass the relationships defined in an FDT. Figure \ref{fig:dsm_full} 
+    illustrates the same notional analysis as in Figure \ref{fig:dsm_simple} represented as an XDSM. 
+    The dashed boxes indicate groups of nodes that could be collapsed back down to retrieve the simpler 
+    DSM from above. Beyond specifying relationships between data in a problem formulation, XDSM also includes syntax to describe the
+    procedural order of any given solution path. Figure \ref{fig:xdsm_full} shows the full XDSM specification for solving the notional 
+    analysis with a traditional Multidisciplinary Design Feasible (MDF) architecture. 
 
+    \begin{figure}[!hbp]
+        \begin{center}
+        \includegraphics[width=.75\textwidth]{images/dsm_full}
+        \caption{Extended DSM graph for a notional analysis \label{fig:dsm_full}}
+        \end{center}
+    \end{figure}
+
+    
 \section{Graph Based Problem Formulation Syntax}
     \subsection{Formulation Graph Syntax}
     Rather than start with an adjacency, we chose to work directly with a directed cyclic graph to develop a syntax for the FPF. 
