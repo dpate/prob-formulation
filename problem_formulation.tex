@@ -60,12 +60,13 @@
     analysis models grows with them. Multidisciplinary Design Analysis and Optimization (MDAO)
     frameworks such as OpenMDAO\cite{Gray2012} and ModelCenter have enabled a new level of analysis tool integration 
     and paved the way for models of with more analysis tools and increasing numbers of multidisciplinary couplings. 
-    Such large models present a distinct challenge to properly set up in a manner that allows for an efficient solution. 
-    In fact as the size of a problem grows very large just determining what the proper solution strategy can be a daunting 
+    Such complex models present a distinct challenge proper implementation of any given solution strategy . 
+    In fact as the size of a problem grows very large even determining what the proper solution strategy can be a daunting 
     task. 
 
-    What is needed, in order to address the complexity problem, is a method of specifying an engineering problem 
-    in a complete and totally general manner. A complete specification needs to include the following information: 
+    What is needed, in order to address the complexity problem, is a syntax for specifying an engineering problem 
+    in a way that allows for both analysis of potential solution strategies and automated implementation of those strategies 
+    inside an MDAO framework. In order to serve that purpose, the problem formulation needs to include the following information: 
     \begin{itemize}
        \item Discipline Analyses 
        \item Discipline State Variables and Residuals
@@ -75,22 +76,25 @@
        \item Coupling Constraints
        \item Local and Global Parameters
     \end{itemize}
-    A general specification is one that states nothing specific about a problem solution path. It does not include any details about 
-    how an objective is to be minimized, how coupling constraints will be satisfied, or how residuals will managed. We 
-    define a complete and general problem specification to be the Fundamental Problem Formulation (FPF). By definition, the FPF for 
-    any given problem will be constant regardless of which MDAO framework or optimization architecture is used to solve the problem. 
+    Notably absent from the preceding list are any kind of solvers, optimizers, or other iterative solution finding tools. 
+    At it most basic, a problem formulation includes only information about what is being sought after in a given problem, or what the
+    goals of a given problem are. It need not contain any information about solution paths or strategies to reach those goals. 
+    A general specification is one that states nothing specific about a problem solution path. 
 
-    In this work we proposed a graph based syntax for the specification of the FPF. This graph based syntax provides several key
+    We define a complete and general problem specification striped down to it's most essential parts to be the 
+    Fundamental Problem Formulation (FPF). By definition, the FPF for any given problem will be constant regardless 
+    of which MDAO framework, optimization architecture, optimizer, or solver is used to solve the problem.
+
+    In this work we proposed a graph based syntax for the specification of problem formulation. This graph based syntax provides several key
     features that make it useful for working with large scale MDAO problems. It provides a rigid structure that can be easily manipulated 
-    in with a wide range of well establish graph-theory algorithms. By taking advantage of that structure it is possible to test 
-    any given problem specification to determine if it is complete and general. It can be used to describe more specific problem 
-    setups, and given one can be used to derive the FPF from it. Lastly, a graph based specification for problem formulation lends itself
-    well to interacting with MDAO frameworks which makes it particularly powerful for integrating problem formulation analysis techniques 
-    into those frameworks. 
+    with a wide range of well establish graph-theory algorithms for the purposes of problem decomposition. The graph syntax also 
+    provides a means for algorithmically testing a given problem formulation to check if it is the FPF, and if not, to reduce it to the FPF. 
+    Lastly, a graph based specification for problem formulation lends itself well to interacting with MDAO frameworks which dramatically 
+    increases it's utility for real world applications. 
 
 
 \section{Problem Formulation Syntax}
-    The most common problem formulation for an MDAO problem could be given as follows: 
+    The most common problem formulation syntax for an MDAO problem could be given as follows: 
 
     \begin{align}
         min &\ \ f\left(X\right) \notag
@@ -101,23 +105,35 @@
 
     Where $f(X)$ is the objective function, $X$ is the vector of design variables, $G(X)$ are the optimization constraints, 
     and $C(X)$ are the coupling constraints. This does represent a general problem formulation, since it says nothing about 
-    how the problem should be solved. Tedford and Martins used this format to specify a set of test problems and derived specific formulations 
-    for solving them with a number of optimization architectures\cite{Tedford2009}. Lamb and Martins also used this basic mathematical 
-    syntax to describe the All-At-Once (AAO) architecture \cite{Lambe2011}. Although the AAO specification does specify a solution path 
-    including a single optimizer to solve the entire problem, in every other way it fills the criterion for a general problem specification. 
+    how the problem should be solved. Tedford and Martins used this format to specify the FPF for a set of test problems and 
+    also to describe specific formulations for solving them with a number of optimization architectures\cite{Tedford2009}. Their
+    work demonstrates clearly how multiple specific problem formulations can all relate back to a common FPF. 
 
-    The challenge with using this traditional mathematical syntax is that it is not easily manipulated or analyzed algorithmically. 
-    A number of matrix based methods have been used successfully to manipulate problem formulations in a programmatic manner. Steward's 
-    Design Structure Matrix (DSM) is a form of an adjacency matrix which captures the relationship between design elements and 
-    design variables where off diagonal elements of the matrix indicate coupling\cite{Steward1981}. 
-    Although it does not have to provide a specific solution path, the DSM has been successfully 
-    applied to allow selection of an optimal ordering for analysis tools in a complex system. Rogers et. al developed DeMAID to manipulate a
+    The challenge with using this traditional mathematical syntax is that it is not easily manipulated or analyzed by computer programs. 
+    A number of matrix based methods have been used successfully to translate the mathematical syntax into a more useful computational form. 
+    Steward's Design Structure Matrix (DSM) is a form of an adjacency matrix which captures the relationship between analysis tools where off 
+    diagonal elements of the matrix indicate coupling\cite{Steward1981}. 
+
+    [[insert cartoon figure here of DSM]]
+
+    The DSM has been widely adopted within the engineering and optimization fields, and even outside of it. The DSM
+    syntax has been successfully applied to allow selection of beneficial orderings for analysis 
+    tools in a complex system. Rogers et. al developed DeMAID to manipulate a
     DSM to minimizing the computational costs of solving highly coupled systems\cite{Rogers1996}. 
-    Since the DSM is essentially adjacency matrix, they can be represented in an equivalent graph. One major challenge with the DSM and similar 
-    approaches is that they lack the capability to fully describe the problem formulation. For example, the DSM deals with variables and analysis tools, 
-    but ignored objectives and constraints. An alternate matrix based representation, called a Functional Dependence Table (FTD), represents the relationship
-    between variables, objectives, and constraints but ignores the discipline analyses\cite{Michelena1997}. Both DSM and FTD have been used 
-    successfully to implement problem decomposition techniques, but neither by itself is sufficient to provide a syntax to describe a FPF. 
+
+    [Need to cite more recent research on automatic paritioning, Peter's work was just published...]
+    [Include examples of DSM being used in the business world that Brian Talked about?]
+
+    Since a DSM essentially describes adjacency matrix, it can be represented in an equivalent directed graph where nodes represent analysis tools and 
+    edges represent information exchange between those tools. An alternate matrix based syntax, called a 
+    Functional Dependence Table (FDT), was proposed by Michelena and Papalambros. 
+    FDT represents the relationship between functions, including objectives and constraints, and their values\cite{Michelena1997}. Similar to DSM
+    FDT also describes an adjacency matrix of a graph. Unlike the DSM graph, however, a FDT graph is an undirected 
+    graph where nodes can represent analysis tools, objectives, or constraints. Edges between nodes represent a dependence on the same 
+    variable value. By searching the FDT graph for clusters of totally connected nodes Wagner and Papalambros were identify groups of 
+    analysis tools that were all dependent on the same input variables and used that to make partitioning decisions \cite{Wagner1993}. 
+
+    [[insert cartoon figure of a FDT graph and matrix]]
 
 \section{Graph Based Problem Formulation Syntax}
     \subsection{Formulation Graph Syntax}
