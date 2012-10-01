@@ -61,20 +61,20 @@
     frameworks such as OpenMDAO\cite{Gray2012} and ModelCenter have enabled a new level of analysis tool integration 
     and paved the way for models of with more analysis tools and increasing numbers of multidisciplinary couplings. 
     Such complex models present a distinct challenge proper implementation of any given solution strategy . 
-    In fact as the size of a problem grows very large even determining what the proper solution strategy can be a daunting 
+    In fact as the size of a problem grows very large even selecting an appropriate solution strategy can be a daunting 
     task. 
 
-    What is needed, in order to address the complexity problem, is a syntax for specifying an engineering problem 
+    To help address in order to address the complexity problem we propose the use of graph based problem formulation 
     in a way that allows for both analysis of potential solution strategies and automated implementation of those strategies 
-    inside an MDAO framework. In order to serve that purpose, the problem formulation needs to include the following information: 
+    inside an MDAO framework. In order to serve that purpose, the problem  needs to include the following information: 
     \begin{itemize}
        \item Discipline Analyses 
        \item Discipline State Variables and Residuals
-       \item Local \& Global Design Variables
-       \item Local \& Global Constraints
+       \item Design Variables
+       \item Constraints
        \item Objective or Objectives
        \item Coupling Constraints
-       \item Local and Global Parameters
+       \item Parameters
     \end{itemize}
     Notably absent from the preceding list are any kind of solvers, optimizers, or other iterative solution finding tools. 
     At it most basic, a problem formulation includes only information about what is being sought after in a given problem, or what the
@@ -93,33 +93,92 @@
     increases it's utility for real world applications. 
 
 
-\section{Problem Formulation Syntax}
-    The most common problem formulation syntax for an MDAO problem could be given as follows: 
+\section{Fundamental Problem Formulation}
+    Problem formulation is most commonly given in a mathematical syntax. For a simple, notional problem the problem formulation
+    can be given as follows:  
 
     \begin{align}
-        min &\ \ f\left(X\right) \notag
-        \\ w.r.t. &\ \  X \notag
-        \\ s.t. &\ \ G\left(X\right) \leq 0
-        \\      &\ \ C\left(X\right) = 0
+        given & \ \ A.f\left(A.x,A.y\right) \notag
+        \\ & \ \  B.f\left(B.x,B.z\right) \notag
+        \\ & \ \  C.f1\left(A.f,B.f,C.s\right) \notag
+        \\ & \ \  C.f2\left(A.f,B.f,C.s\right) \notag
+        \\min &\ \ F\left(C.f1\right) \notag
+        \\ w.r.t. &\ \  A.x,A.y,B.x,B.z \notag
+        \\ s.t. &\ \ G1\left(A.x,B.z\right) \leq 0 \notag
+        \\      &\ \ G2\left(A.y\right) \leq 0 \notag
+        \\      &\ \ E\left(A.y,C.f1\right) = 0 \notag
+        \\      &\ \ R\left(C.s,C.f2\right) = 0 
+        \label{eqn:simple}
     \end{align}
 
-    Where $f(X)$ is the objective function, $X$ is the vector of design variables, $G(X)$ are the optimization constraints, 
-    and $C(X)$ are the coupling constraints. This does represent a general problem formulation, since it says nothing about 
-    how the problem should be solved. Tedford and Martins used this format to specify the FPF for a set of test problems and 
-    also to describe specific formulations for solving them with a number of optimization architectures\cite{Tedford2009}. Their
-    work demonstrates clearly how multiple specific problem formulations can all relate back to a common FPF. 
+    Where $A,B,C$ represent analysis tools, $F,G1,G2,E,R$ are objective and constraint functions, and each analysis tool 
+    has a set of input and output variables. While this does represent a complete problem formulation, some assumptions have
+    inherently been made about the solution strategy. A coupling constraint, $E$, and $C$ is directly dependent
+    $A.f$ and $B.f$ as it's inputs. This implies that first you must run $A$ and $B$, then $C$ and
+    iterate on the design variables in $A$ and $B$ until you satisfy $E$. However, a different solution could be equally valid and still represent
+    the same fundamental problem: 
 
-    The challenge with using this traditional mathematical syntax is that it is not easily manipulated or analyzed by computer programs. 
+    \begin{align}
+        given & \ \ A.f\left(A.x,C.f1\right) \notag
+        \\ & \ \  B.f\left(B.x,B.z\right) \notag
+        \\ & \ \  C.f1\left(C.y,B.f,C.s\right) \notag
+        \\ & \ \  C.f2\left(C.q,B.f,C.s\right) \notag
+        \\min &\ \ F\left(C.f1\right) \notag
+        \\ w.r.t. &\ \  A.x,A.y,B.x,B.z \notag
+        \\ s.t. &\ \ G1\left(A.x,B.z\right) \leq 0 \notag
+        \\      &\ \ G2\left(A.y\right) \leq 0 \notag
+        \\      &\ \ E\left(A.f,C.q\right) = 0 \notag
+        \\      &\ \ R\left(C.s,C.f2\right) = 0 
+        \label{eqn:simple_2}
+    \end{align}
+
+    Equation \ref{eqn:simple_2} differs only slightly from Eqn. \ref{eqn:simple}. $A$ is now directly dependent on the output of $C$, 
+    and the constraint $E$ has changed as well. Now the problem must be solved by running $B$ and $C$, then $A$ and iterating 
+    on the design variables in $B$ and $C$ until you satisfy $E$. Since the formulations in Eqn. \ref{eqn:simple} 
+    and \ref{eqn:simple_2} both describe the same problem there must be a more fundamental description of the problem that is common
+    between them. We present the FPF as follows: 
+
+    \begin{align}
+        given & \ \ A.f\left(A.x,A.y\right) \notag
+        \\ & \ \  B.f\left(B.x,B.z\right) \notag
+        \\ & \ \  C.f1\left(C.y,C.r,C.s\right) \notag
+        \\ & \ \  C.f2\left(C.q,C.r,C.s\right) \notag
+        \\min &\ \ F\left(C.f1\right) \notag
+        \\ w.r.t. &\ \  A.x,A.y,B.x,B.z \notag
+        \\ s.t. &\ \ G1\left(A.x,B.z\right) \leq 0 \notag
+        \\      &\ \ G2\left(A.y\right) \leq 0 \notag
+        \\      &\ \ E\left(A.f,C.\right) = 0 \notag
+        \\      &\ \ R\left(C.s,C.f2\right) = 0 
+        \label{eqn:simple_2}
+    \end{align}
+
+    \section{Problem Formulation Syntax}
+
+    The same mathematical syntax can be used to describe more complex problem formulations
+    such as ones that would decompose the FPF to a set of sub-problems. Tedford and Martins used this format to specify the 
+    FPF for a set of test problems and also to describe specific formulations for solving them with a 
+    number of optimization architectures\cite{Tedford2009}. Their work demonstrates clearly how multiple specific 
+    problem formulations can all relate back to a common FPF. 
+
+    In the above problem formulation, there is no explicit relationship definition of local and global features. Instead they are 
+    implicitly defined through variable naming conventions. For instance, $x$ is a global variable because it is used in $A.x$ and $B.x$. 
+    Simliarly, $A.y$ is a local variable because it only affects the of $A$. If such a naming convention is not in place, 
+    then a more explicit definition of the relation between variables must also be given in the form of additional equality constraints between 
+    input variables. Similarly, both the constraint, $C$ and the residual, $R$ are presented as equality constraints. They could be classified as 
+    a global and a local constraint on the problem respectively, with the only difference being the number of analysis tools that affect them.  
+    Hence, the distinction between local and global properties are not necessary to form a fundamental 
+    problem formulation. On the other hand, they are relevant when deriving a specific solution path for a problem, so any definition of problem 
+    formulation should include the capability to detect the weather a given property is local or global. 
+
+    The challenge with using this traditional mathematical syntax is that it is not easily manipulated or analyzed. 
     A number of matrix based methods have been used successfully to translate the mathematical syntax into a more useful computational form. 
-    Steward's Design Structure Matrix (DSM) is a form of an adjacency matrix which captures the relationship between analysis tools where off 
-    diagonal elements of the matrix indicate coupling\cite{Steward1981}. Figure \ref{fig:dsm_simple} shows a simple notional example of a DSM. 
+    Steward's Design Structure Matrix (DSM) is a square adjacency matrix which captures the relationship between analysis tools where off 
+    diagonal elements of the matrix indicate coupling\cite{Steward1981}. Figure \ref{fig:dsm_simple} shows a DSM for the above notional example. 
     The DSM has been successfully applied in a number of ways to algorithmically modify problem formulations to 
     improve computational efficiency. Rogers et. al developed DeMAID to manipulate a
-    DSM  minimizing the computational costs of solving highly coupled systems\cite{Rogers1996}. Lu and Martins demonstrated 
-    the use of a weighted DSM to make partitioning and coordinating choices that dramatically reduced the 
-    cost of solving a specific kind of optimization problem as the scale of the problem grew. 
-    They applied weights to both the nodes (diagonal terms) and the edges (off diagonal terms) of the 
-    DSM to indicated computational cost and coupling strength respectively.
+    DSM  minimizing the computational costs of solving highly coupled systems\cite{Rogers1996}. Notice however, that the DSM in 
+    Figure \ref{fig:dsm_simple} contains less information than the full problem formulation. Objective and constraint information 
+    is missing and it's not possible to distinguish individual variables.
 
     \begin{figure}[!hbp]
         \begin{center}
@@ -135,27 +194,26 @@
     FDT also describes an adjacency matrix of a graph. Unlike the DSM graph, however, a FDT graph is an undirected 
     graph where nodes can represent analysis tools, objectives, or constraints. Edges between nodes represent a dependence on the same 
     variable value. By searching the FDT graph for clusters of totally connected nodes Wagner and Papalambros were identify groups of 
-    analysis tools that were all dependent on the same input variables and used that to make partitioning decisions \cite{Wagner1993}. 
+    analysis tools that were all dependent on the same input variables and used that to make partitioning decisions \cite{Wagner1993}. FDT retains 
+    a greater portion of the information in the problem formulation, but it is still not complete. It ignores information about feedback coupling 
+    between codes. 
 
-    It is possible to combine the syntax of an FDT and a DSM by making a subtle extension to a traditional DSM specification. Normally, a DSM is given 
+    It is possible to combine the syntax of an FDT and a DSM by making a small extension to a traditional DSM specification. Normally, a DSM is given 
     with analysis tools as nodes and variable dependencies given as edges. Lamb and Martins included the variables, objectives, and constraint functions
-    as nodes in an Extented DSM (XDSM)\cite{Lambe2012} in order to capture a more complete problem formulation for MDAO problems. With XDSM 
-    it is possible to also encompass the relationships defined in an FDT. Figure \ref{fig:dsm_full} 
-    illustrates the same notional analysis as in Figure \ref{fig:dsm_simple} represented as an XDSM. 
-    The dashed boxes indicate groups of nodes that could be collapsed back down to retrieve the simpler 
-    DSM from above. Beyond specifying relationships between data in a problem formulation, XDSM also includes syntax to describe the
-    procedural order of any given solution path. Figure \ref{fig:xdsm_full} shows the full XDSM specification for solving the notional 
-    analysis with a traditional Multidisciplinary Design Feasible (MDF) architecture. 
+    as nodes in an Extended DSM (XDSM)\cite{Lambe2012} in order to capture a more complete problem formulation for MDAO problems. With XDSM 
+    it is possible to specify a complete problem formulation. Lu and Martins developed a process to perform ordering and partitioning on the fundamental 
+    problem formulation specified by XDSM in order to achieve significant reductions in computational costs for large scale optimization problems. 
+    Figure \ref{fig:dsm_full} illustrates the same notional analysis as in Figure \ref{fig:dsm_simple} represented as an XDSM.
 
     \begin{figure}[!hbp]
         \begin{center}
-        \includegraphics[width=.75\textwidth]{images/dsm_full}
-        \caption{Extended DSM graph for a notional analysis \label{fig:dsm_full}}
+        \includegraphics[width=.75\textwidth]{images/dsm_simple}
+        \caption{[TODO: Generate XDSM]Extended DSM graph for a notional analysis \label{fig:dsm_full}}
         \end{center}
     \end{figure}
 
     
-\section{Graph Based Problem Formulation Syntax}
+\section{Graph Based Problem Formulation Using XDSM}
     \subsection{Formulation Graph Syntax}
     Rather than start with an adjacency, we chose to work directly with a directed cyclic graph to develop a syntax for the FPF. 
     \begin{itemize}
