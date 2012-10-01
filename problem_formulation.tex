@@ -112,8 +112,9 @@
     \end{align}
 
     Where $A,B,C$ represent analysis tools, $F,G1,G2,E,R$ are objective and constraint functions, and each analysis tool 
-    has a set of input and output variables. While this does represent a complete problem formulation, some assumptions have
-    inherently been made about the solution strategy. A coupling constraint, $E$, and $C$ is directly dependent
+    has a set of input and output variables. While this does represent a complete problem formulation, 
+    it's not the fundamental one since some assumptions have inherently been made about the solution 
+    strategy. $C$ is directly dependent
     $A.f$ and $B.f$ as it's inputs. This implies that first you must run $A$ and $B$, then $C$ and
     iterate on the design variables in $A$ and $B$ until you satisfy $E$. However, a different solution could be equally valid and still represent
     the same fundamental problem: 
