@@ -1,0 +1,70 @@
+% IDF architecture diagram produced by the TikZ package
+\documentclass{article}
+\usepackage{geometry}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\usepackage{tikz}
+
+\input{diagram_border}
+
+\begin{document}
+
+% Style definition outside any picture
+\input{diagram_styles}
+
+\begin{tikzpicture}
+
+	% Use a matrix to line up all the nodes
+	\matrix[MatrixSetup]{
+		% First row
+		& 
+		\node [DataIO] (Input) {$x,y^{t}$}; & 
+		& 
+		\\
+		% Second row
+		\node [DataIO] (Output) {$x^*$}; & 
+		\node [Optimization] (Opt) {\MultilineComponent{2.3cm}{0,3$\rightarrow$1:}{Optimization}}; &
+		\node [DataInter_i] (Opt-DA1) {$1:x_0,x_i,y_{j \neq i}^t$}; & 
+		\node [DataInter] (Opt-Func) {$2:x,y^t$}; \\
+		\node [DataIO_i] (Output_y1) {$y_i^*$}; & 
+		&% Third row
+		\node [Analysis] (DA1) {\MultilineComponent{1.6cm}{1:}{A}}; &
+		\node [Analysis] (DA1) {\MultilineComponent{1.6cm}{1:}{A}}; &
+
+		\node [DataInter_i] (DA1-Func) {$2:y_i$}; \\
+		% Fourth row
+		& 
+		\node [DataInter] (Func-Opt) {$3:f,g,g^c$}; &
+		& 
+		\node [Function] (Obj) {\MultilineComponent{1.8cm}{2:}{f}}; \\
+		\node [Function] (Const) {\MultilineComponent{1.8cm}{2:}{G}}; \\
+	};
+	
+	% Now define edges to tie the nodes together, using chains	
+	{ [start chain=process]
+		\begin{pgfonlayer}{process}
+		\chainin (Input);
+		\chainin (Opt)		[join=by ProcessTip];
+		\chainin (DA1)		[join=by ProcessHV];
+		\chainin (Func)		[join=by ProcessHV];
+		\chainin (Opt)		[join=by ProcessHV];
+		\chainin (Output)	[join=by ProcessTip];
+		\end{pgfonlayer}
+	}
+	
+	\begin{pgfonlayer}{data}
+	% Vertical edges
+	\path (Input) edge [DataLine] (Func-Opt)
+	(Opt-DA1) edge [DataLine] (DA1)
+	(Opt-Func) edge [DataLine] (Func)
+	% Horizontal edges
+	(Output) edge [DataLine] (Opt-Func)
+	(Output_y1) edge [DataLine] (DA1-Func)
+	(Func-Opt) edge [DataLine] (Func);
+	\end{pgfonlayer}
+	
+\end{tikzpicture}
+
+\end{document}
