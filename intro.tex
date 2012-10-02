@@ -5,12 +5,10 @@
     frameworks such as OpenMDAO\cite{Gray2012} and ModelCenter have enabled a new level of analysis tool integration 
     and paved the way for models of with more analysis tools and increasing numbers of multidisciplinary couplings. 
     Such complex models present a distinct challenge proper implementation of any given solution strategy . 
-    In fact as the size of a problem grows very large even selecting an appropriate solution strategy can be a daunting 
-    task. 
-
-    To help address in order to address the complexity problem we propose the use of graph based problem formulation 
-    in a way that allows for both analysis of potential solution strategies and automated implementation of those strategies 
-    inside an MDAO framework. In order to serve that purpose, the problem  needs to include the following information: 
+    
+    We propose the use of graph based problem formulation that generally describes a
+    given problem, supports algorithmic manipulation to find beneficial solutions strategies, and enables automated 
+    implementation of those strategies inside an MDAO framework. In order to serve that purpose, the graph includes the following information: 
     \begin{itemize}
        \item Discipline Analyses 
        \item Discipline State Variables and Residuals
@@ -23,23 +21,20 @@
     Notably absent from the preceding list are any kind of solvers, optimizers, or other iterative solution finding tools. 
     At it most basic, a problem formulation includes only information about what is being sought after in a given problem, or what the
     goals of a given problem are. It need not contain any information about solution paths or strategies to reach those goals. 
-    A general specification is one that states nothing specific about a problem solution path. 
 
-    We define a complete and general problem specification striped down to it's most essential parts to be the 
+    We define a problem specification striped down to it's most essential parts to be the 
     Fundamental Problem Formulation (FPF). By definition, the FPF for any given problem will be constant regardless 
-    of which MDAO framework, optimization architecture, optimizer, or solver is used to solve the problem.
+    of which MDAO framework, optimization architecture, optimization algorithm, or iterative solver is used to solve the problem.
 
-    In this work we proposed a graph based syntax for the specification of problem formulation. This graph based syntax provides several key
-    features that make it useful for working with large scale MDAO problems. It provides a rigid structure that can be easily manipulated 
-    with a wide range of well establish graph-theory algorithms for the purposes of problem decomposition. The graph syntax also 
-    provides a means for algorithmically testing a given problem formulation to check if it is the FPF, and if not, to reduce it to the FPF. 
-    Lastly, a graph based specification for problem formulation lends itself well to interacting with MDAO frameworks which dramatically 
-    increases it's utility for real world applications. 
+    The graph based syntax used in this work is based on the Design Structure Matrix (DSM). 
+    This provides several key features that make it useful for working with large scale MDAO problems. 
+    It provides a rigid structure that can be easily manipulated with a wide range of well establish graph-theory algorithms 
+    for the purposes of problem decomposition. It also provides a means for testing a given 
+    problem formulation to check if it is the FPF, and if not to reduce it to the FPF. Lastly, it lends itself 
+    well to interacting with MDAO frameworks. 
 
-
-\subsection{Fundamental Problem Formulation}
-    Problem formulation is most commonly given in a mathematical syntax. For a simple, notional problem 
-    the problem formulation is as follows: 
+\section{Specific vs Fundamental Problem Formulation }
+    For a simple, notional problem  is given as follows: 
 
     \begin{align}
         given & \ \ A: {x,y} \rightarrow {m,z} \notag
@@ -51,10 +46,9 @@
     \end{align}
 
     Where $A$ and $B$ represent analysis tools, $f,g$ are the objective and constraint functions respectively. 
-    While this does represent a complete problem formulation, 
-    it's not the fundamental one since some assumptions have inherently been made about the solution 
-    strategy. Analysis $A$ outputs $z$ which is an input to $B$. Hence, $A$ should be run before $B$ with 
-    the $y$ being iterated on to convergence. However, a different solution could be equally valid and still represent
+    Equation \ref{eqn:simple} makes an inherent assumption about the solution strategy for the problem. 
+    Analysis $A$ outputs $z$ which is an input to $B$. Hence, $A$ should be run before $B$ with 
+    the $y$ being iterated on to convergence with $y^t$. However, a different solution could be equally valid and still represent
     the same fundamental problem: 
 
     \begin{align}
@@ -67,9 +61,9 @@
     \end{align}
 
     Equation \ref{eqn:simple2} differs only slightly from Eqn. \ref{eqn:simple}. $A$ is now dependent on the output of $B$, 
-    and $z$ will be iterated on to meet $g$. Now the problem can be solved by running $B$ first and then $A$.
-    Since the formulations in Eqn. \ref{eqn:simple} and \ref{eqn:simple2} both describe the same problem 
-    there must be a more fundamental description of the problem that is common between them. We present the FPF as follows: 
+    and $z$ will be iterated on to satisfy $g$. Now the problem can be solved by running $B$ first and then $A$.
+    Since the formulations in Eqn. \ref{eqn:simple} and \ref{eqn:simple2} both describe the same problem and neither can be the FPF. 
+    There must be a more fundamental description of the problem that is common between them. We present the FPF as follows: 
 
     \begin{align}
         given & \ \ A: {x,y} \rightarrow {m,z^t} \notag
@@ -84,9 +78,10 @@
     The FPF in Eqn. \ref{eqn:simple_fpf} differs from both Eqn. \ref{eqn:simple} and Eqn. \ref{eqn:simple2} because it has 
     two constraints which both must be met. The presence of both of these constraints fully decouples the problem so that 
     either $A$ or $B$ could be run first or both could be run simultaneously. By removing either constraint, and replacing 
-    it with a direct dependence between the two analyses you could regain the earlier two problem formulations. 
+    it with a direct dependence between the two analyses you could regain the earlier two problem formulations.     
 
-    \subsection{Problem Formulation Syntax}
+
+\section{Using DSM for Problem Formulation}
 
     As shown above, the mathematical language for specifying problem formulations is very general and can be used both for 
     fundamental and specific problem formulations. Tedford and Martins used the above mathematical syntax to specify the 
@@ -94,61 +89,41 @@
     number of optimization architectures\cite{Tedford2009}. Their work demonstrates clearly how multiple specific 
     problem formulations can all relate back to a common FPF. 
     
-    \begin{comment}
-    In the above problem formulation, there is no explicit relationship definition of local and global features. Instead they are 
-    implicitly defined through variable naming conventions. For instance, $x$ is a global variable because it is used in $A.x$ and $B.x$. 
-    Simliarly, $A.y$ is a local variable because it only affects the of $A$. If such a naming convention is not in place, 
-    then a more explicit definition of the relation between variables must also be given in the form of additional equality constraints between 
-    input variables. Similarly, both the constraint, $C$ and the residual, $R$ are presented as equality constraints. They could be classified as 
-    a global and a local constraint on the problem respectively, with the only difference being the number of analysis tools that affect them.  
-    Hence, the distinction between local and global properties are not necessary to form a fundamental 
-    problem formulation. On the other hand, they are relevant when deriving a specific solution path for a problem, so any definition of problem 
-    formulation should include the capability to detect the weather a given property is local or global. 
-    \end{comment}
-
     The challenge with using this traditional mathematical syntax is that it is not easily manipulated or analyzed. 
     A number of matrix based methods have been used successfully to translate the mathematical syntax into a more useful computational form. 
     Steward's Design Structure Matrix (DSM) is a square adjacency matrix which captures the relationship between analysis tools where off 
-    diagonal elements of the matrix indicate coupling\cite{Steward1981}. Figure \ref{fig:dsm_simple} shows a DSM for the above notional example 
-    with and without the coupling cycle identified. In order to derive the formulations in Eqn. \ref{eqn:simple} and Eq. \ref{eqn:simple2} 
-    you would remove one of the output target variables ($y^t$ or $z^t$) and replace it with a direct connection which would select either $A$
-    or $B$ to be executed first. For more complex problems, choosing the proper order to run analysis tools is a non-trival task. 
+    diagonal elements of the matrix indicate coupling\cite{Steward1981}. Since a DSM describes a square adjacency matrix, 
+    it can be represented in an equivalent directed graph where nodes represent analysis tools and 
+    edges represent information dependence between those tools. The ordering of elements in a DSM can be used to indicate 
+    execution order.  For more complex problems, choosing the proper order to run analysis tools is a non-trival task. 
     Rogers et. al developed DeMAID to manipulate a DSM to find an ordering for analysis tools that 
     reduces the cost of solving highly coupled systems\cite{Rogers1996}. This re-ordering yields multiple specific problem 
     formulations which all solve the same FPF. In other words, manipulation of the DSM does not fundamentally alter
-    the problem formulation, which makes DSM an excellent foundation for specifying the FPF itself. Notice however, that the DSM in 
-    Figure \ref{fig:dsm_simple} contains less information than the Eqn. \ref{eqn:simple_fpf}. While it does fully capture 
-    the coupling information, objective and constraint information is missing.
+    the problem formulation, which makes DSM an excellent foundation for specifying the FPF itself. Traditional DSM only captures information 
+    about data dependency between analyses. Objective and constraint information is missing from the description of the problem. 
     
-    \begin{figure}[!hbp]
-        \begin{center}
-        \includegraphics[height=.25\textheight]{images/dsm_simple}
-        \caption{DSM specifications for Eqn. \ref{eqn:simple_fpf}. Coupling cycle is identified by dashed lines. \label{fig:dsm_simple}}
-        \end{center}
-    \end{figure}
+    An alternate matrix based syntax, called a Functional Dependency Table (FDT), was proposed by Michelena and Papalambros. 
+    FDT represents the relationship between functions, including objectives and constraints, and specific variables that affect 
+    them\cite{Michelena1997}. Similar to DSM, FDT also describes an adjacency matrix of a graph. Unlike the DSM graph, 
+    however, the graph is undirected and nodes can represent analysis tools, objectives, 
+    or constraints. Edges between nodes represent a dependence on the same 
+    variable. Wagner and Papalambros made use of the FDT to solve a graph partitioning problem that yielded 
+    more efficient optimization problem decompositions\cite{Wagner1993}. While FDT succeeds at capturing the 
+    information about objectives and constraints, it neglects the data dependency captured by DSM. 
+    [TODO: There is more recent research to cite here, like Allison's Work.]
+
+    Lamb and Martins included the variables, objectives, and constraint functions as nodes in an Extended 
+    DSM (XDSM) in order to capture a more complete problem formulation for MDAO problems\cite{Lambe2012}. By adding in those 
+    elements, they partially combined a traditional DSM with an FDT. 
+    This allows XDSM to represent data dependency between multiple analysis tools as well as between analysis tools and
+    objective/constraint functions. With the additional information included in an XDSM Lu and Martins applied both ordering and partitioning 
+    algorithms on an MDAO test problem named the Scalable Problem \cite{Lu2012}. 
+
+    Although XDSM captures part of the FDT formulation, it still leaves out the variables themselves. As a result, all variable information is aggregated 
+    so that for the problem from Eqn. \ref{eqn:simple_fpf} you can say that $A$ depends on $B$ or vice versa, but you can't identify which 
+    individual variables are interacting in the dependency cycle. Without the detailed variable information, you can't construct the compatibility 
+    constraints necessary to implement the problem. Hence, to complete the DSM for use with a fundamental problem formulation you need 
+    to add in nodes for each variable in the analysis. In the following sections we describe the necessary syntax for specifying a 
+    problem formulation with DSM syntax and show how to make use of the resulting graph to find the FPF from any given graph. 
 
 
-    Since a DSM describes a square adjacency matrix, it can be represented in an equivalent directed graph where nodes represent analysis tools and 
-    edges represent information exchange between those tools. An alternate matrix based syntax, called a 
-    Functional Dependence Table (FDT), was proposed by Michelena and Papalambros. 
-    FDT represents the relationship between functions, including objectives and constraints, and their values\cite{Michelena1997}. Similar to DSM
-    FDT also describes an adjacency matrix of a graph. Unlike the DSM graph, however, a FDT graph is an undirected 
-    graph where nodes can represent analysis tools, objectives, or constraints. Edges between nodes represent a dependence on the same 
-    variable value. By searching the FDT graph for clusters of totally connected nodes Wagner and Papalambros identified groups of 
-    analysis tools that were all dependent on the same input variables and used that to make partitioning decisions \cite{Wagner1993}. FDT retains 
-    a greater portion of the information in the problem formulation, but it is still not complete. It ignores information about coupling 
-    between analyses. 
-
-    It is possible to combine the syntax of an FDT and a DSM by making a small extension to a traditional DSM specification. Normally, a DSM is given 
-    with analysis tools as nodes and variable dependencies given as edges. Lamb and Martins included the variables, objectives, and constraint functions
-    as nodes in an Extended DSM (XDSM)\cite{Lambe2012} in order to capture a more complete problem formulation for MDAO problems. Lu made use of 
-    XDSM to perform ordering and partitioning on the fundamental problem formulation specified by XDSM in order to achieve 
-    significant reductions in computational costs for large scale optimization problems. Figure \ref{fig:dsm_full} illustrates 
-    the same notional analysis as in Figure \ref{fig:dsm_simple} represented as an XDSM.
-
-    \begin{figure}[!hbp]
-        \begin{center}
-        \includegraphics[width=.75\textwidth]{images/dsm_simple}
-        \caption{[TODO: Generate XDSM]Extended DSM graph for Eqn. \ref{eqn:simple_fpf} \label{fig:dsm_full}}
-        \end{center}
-    \end{figure}
