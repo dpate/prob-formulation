@@ -42,9 +42,9 @@
     the problem formulation is as follows: 
 
     \begin{align}
-        given & \ \ A: {x,y} \rightarrow {z}
+        given & \ \ A: {x,y} \rightarrow {m,z}
         \\      & \ \ B: {x,z} \rightarrow {y^t}
-        \\min. &\ \ f(m,t) \notag
+        \\min. &\ \ f(m) \notag
         \\w.r.t. & \ \ x,y,z \notag
         \\s.t. & \ \ g(y^t,y) = 0
         \label{eqn:simple}
@@ -59,8 +59,8 @@
 
     \begin{align}
         given & \ \ B: {x,z} \rightarrow {y}
-        \\      & \ \ A: {x,y} \rightarrow {z^t}
-        \\min. &\ \ f(m,t) \notag
+        \\      & \ \ A: {x,y} \rightarrow {m,z^t}
+        \\min. &\ \ f(m) \notag
         \\w.r.t. & \ \ x,y,z \notag
         \\s.t. & \ \ g(z^t,z) = 0
         \label{eqn:simple2}
@@ -72,9 +72,9 @@
     there must be a more fundamental description of the problem that is common between them. We present the FPF as follows: 
 
     \begin{align}
-        given & \ \ A: {x,y} \rightarrow {z^t}
+        given & \ \ A: {x,y} \rightarrow {m,z^t}
         \\      & \ \ B: {x,z} \rightarrow {y^t}
-        \\min. &\ \ f(m,t) \notag
+        \\min. &\ \ f(m) \notag
         \\w.r.t. & \ \ x,y,z \notag
         \\s.t. & \ \ g1(z^t,z) = 0 \notag
         \\     & \ \ g2(y^t,y) = 0
