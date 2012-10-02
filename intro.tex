@@ -37,7 +37,7 @@
     increases it's utility for real world applications. 
 
 
-\section{Fundamental Problem Formulation}
+\subsection{Fundamental Problem Formulation}
     Problem formulation is most commonly given in a mathematical syntax. For a simple, notional problem 
     the problem formulation is as follows: 
 
@@ -86,14 +86,15 @@
     either $A$ or $B$ could be run first or both could be run simultaneously. By removing either constraint, and replacing 
     it with a direct dependence between the two analyses you could regain the earlier two problem formulations. 
 
-    \section{Problem Formulation Syntax}
+    \subsection{Problem Formulation Syntax}
 
-    The same mathematical syntax can be used to describe more complex problem formulations
-    such as ones that would decompose the FPF to a set of sub-problems. Tedford and Martins used this format to specify the 
+    As shown above, the mathematical language for specifying problem formulations is very general and can be used both for 
+    fundamental and specific problem formulations. Tedford and Martins used the above mathematical syntax to specify the 
     FPF for a set of test problems and also to describe specific formulations for solving them with a 
     number of optimization architectures\cite{Tedford2009}. Their work demonstrates clearly how multiple specific 
     problem formulations can all relate back to a common FPF. 
-
+    
+    \begin{comment}
     In the above problem formulation, there is no explicit relationship definition of local and global features. Instead they are 
     implicitly defined through variable naming conventions. For instance, $x$ is a global variable because it is used in $A.x$ and $B.x$. 
     Simliarly, $A.y$ is a local variable because it only affects the of $A$. If such a naming convention is not in place, 
@@ -103,6 +104,7 @@
     Hence, the distinction between local and global properties are not necessary to form a fundamental 
     problem formulation. On the other hand, they are relevant when deriving a specific solution path for a problem, so any definition of problem 
     formulation should include the capability to detect the weather a given property is local or global. 
+    \end{comment}
 
     The challenge with using this traditional mathematical syntax is that it is not easily manipulated or analyzed. 
     A number of matrix based methods have been used successfully to translate the mathematical syntax into a more useful computational form. 
@@ -110,14 +112,16 @@
     diagonal elements of the matrix indicate coupling\cite{Steward1981}. Figure \ref{fig:dsm_simple} shows a DSM for the above notional example. 
     The DSM has been successfully applied in a number of ways to algorithmically modify problem formulations to 
     improve computational efficiency. Rogers et. al developed DeMAID to manipulate a
-    DSM  minimizing the computational costs of solving highly coupled systems\cite{Rogers1996}. Notice however, that the DSM in 
-    Figure \ref{fig:dsm_simple} contains less information than the full problem formulation. Objective and constraint information 
+    DSM  to find an ordering for analysis tools that reduces the cost of solving highly coupled systems\cite{Rogers1996}. This re-ordering yields
+    multiple specific problem formulations which all solve the same FPF. In other words, manipulation of the DSM does not fundamentally alter
+    the problem formulation, which makes DSM an excellent foundation for specifying the FPF itself. Notice however, that the DSM in 
+    Figure \ref{fig:dsm_simple} contains less information than the Eqn. \ref{eqn:simple_fpf}. Objective and constraint information 
     is missing and it's not possible to distinguish individual variables.
 
     \begin{figure}[!hbp]
         \begin{center}
         \includegraphics[width=.75\textwidth]{images/dsm_simple}
-        \caption{Graph and matrix based DSM specifications for a notional analysis \label{fig:dsm_simple}}
+        \caption{Graph and matrix based DSM specifications for Eqn. \ref{eqn:simple_FPF} \label{fig:dsm_simple}}
         \end{center}
     \end{figure}
 
