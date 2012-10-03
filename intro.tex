@@ -110,20 +110,29 @@
     variable. Wagner and Papalambros made use of the FDT to solve a graph partitioning problem that yielded 
     more efficient optimization problem decompositions\cite{Wagner1993}. While FDT succeeds at capturing the 
     information about objectives and constraints, it neglects the data dependency captured by DSM. 
-    [TODO: There is more recent research to cite here, like Allison's Work.]
+    [TODO: There is more recent research to cite here. e.g. Allison's Work.]
+
+    [TODO: insert FDT of simple problem here]
 
     Lamb and Martins included the variables, objectives, and constraint functions as nodes in an Extended 
-    DSM (XDSM) in order to capture a more complete problem formulation for MDAO problems\cite{Lambe2012}. By adding in those 
+    DSM (XDSM) in order to capture a more complete description of solution strategies for MDAO problems\cite{Lambe2012}. By adding in those 
     elements, they partially combined a traditional DSM with an FDT. 
     This allows XDSM to represent data dependency between multiple analysis tools as well as between analysis tools and
     objective/constraint functions. With the additional information included in an XDSM Lu and Martins applied both ordering and partitioning 
     algorithms on an MDAO test problem named the Scalable Problem \cite{Lu2012}. 
 
-    Although XDSM captures part of the FDT formulation, it still leaves out the variables themselves. As a result, all variable information is aggregated 
+    [TODO: insert XDSM for simple problem solved with MDF here]
+
+    Although XDSM captures part functional aspects of FDT, it  leaves out the variables themselves. As a result, all variable information is aggregated 
     so that for the problem from Eqn. \ref{eqn:simple_fpf} you can say that $A$ depends on $B$ or vice versa, but you can't identify which 
     individual variables are interacting in the dependency cycle. Without the detailed variable information, you can't construct the compatibility 
-    constraints necessary to implement the problem. Hence, to complete the DSM for use with a fundamental problem formulation you need 
-    to add in nodes for each variable in the analysis. In the following sections we describe the necessary syntax for specifying a 
-    problem formulation with DSM syntax and show how to make use of the resulting graph to find the FPF from any given graph. 
+    constraints necessary to implement the problem. Additionally, XDSM requires the use of solver and optimizer blocks to represent 
+    the relationship between design variables and objectives/constraints. By introducing solver or optimizer blocks XDSM automatically provides
+    some kind of solution strategy. Hence XDSM is too specific for use with a fundamental problem formulation. 
+
+    By taking XDSM, removing the requirement for solver/optimizer nodes and adding in nodes for each variable we are able to fully describe 
+    the problem formulation for a general MDAO problem. In the following sections we describe the necessary syntax for specifying a 
+    problem formulation withing a DSM and show how to make use of the resulting graph to find the FPF from any given graph. For completeness we 
+    also present algorithms for converting between the general DSM and the more specific formulations discussed above. 
 
 
