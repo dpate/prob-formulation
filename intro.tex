@@ -109,10 +109,27 @@
     or constraints. Edges between nodes represent a dependence on the same 
     variable. Wagner and Papalambros made use of the FDT to solve a graph partitioning problem that yielded 
     more efficient optimization problem decompositions\cite{Wagner1993}. While FDT succeeds at capturing the 
-    information about objectives and constraints, it neglects the data dependency captured by DSM. 
+    information about objectives and constraints, it neglects the data dependency captured by DSM. For instance, 
+    although we know from the FPF in Eqn. \ref{eqn:simple_fpf} that the objective, $f$, is dependent on the 
+    output of analysis $A$, you could not determine that from the FDT in Fig. \ref{fig:FDT_simple} alone. 
+    
     [TODO: There is more recent research to cite here. e.g. Allison's Work.]
 
-    [TODO: insert FDT of simple problem here]
+    \begin{figure}
+        \begin{center}
+        \begin{tabular}{|c|c|c|c|c|c|c|}
+            \hline
+                 & $x$ & $y$ & $y^t$ & $z$ & $z^t$ & m \\ \hline
+            $A$  & 1  & 1    &       &     &       &   \\ \hline
+            $B$  & 1  &      &       & 1   &       &   \\ \hline
+            $f$  &    &      &       &     &       & 1 \\ \hline
+            $g1$ &    &      &       & 1   & 1     &   \\ \hline
+            $g2$ &    & 1    & 1     &     &       &   \\
+            \hline
+        \end{tabular}
+        \caption{Functional Dependency Table (FDT) for Eqn. \ref{eqn:simple_fpf} \label{fig:FDT_simple}}
+        \end{center}
+    \end{figure}
 
     Lamb and Martins included the variables, objectives, and constraint functions as nodes in an Extended 
     DSM (XDSM) in order to capture a more complete description of solution strategies for MDAO problems\cite{Lambe2012}. By adding in those 
