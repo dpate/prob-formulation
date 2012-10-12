@@ -19,64 +19,63 @@
 	% Use a matrix to line up all the nodes 
     \matrix[MatrixSetup]{
 		% First row
-		[DataIO](input_x){x^(0)};
-		& 
-		& [DataInter](input_y){y^(0)};
-		& [DataInter](input_z){z^(0)};
+		& \node [DataIO](input_x){$x^{(0)}$};
+		&
+		& \node [DataInter](input_y){$y^{(0)}$};
+		& \node [DataInter](input_z){$z^{(0)}$};
 		& 
 		&
-		& 
 		\\
 		% second row
-		[DataIO] (x_output) {$x^*$}
-		& [Optimization] (opt) {\MultilineComponent{2.3cm}{0,7$\rightarrow$1:}{Optimization}};
+		\node [DataIO] (x_output) {$x^*$};
+		& \node [Optimization] (opt) {\MultilineComponent{2.3cm}{0,7$\rightarrow$1:}{Optimization}};
 		& 
+		& \node [DataInter](opt-x1){$1:x$};
+		& \node [DataInter](opt-x2){$1:x$};
 		& 
-		& [DataInter](opt-y){$y$};
-		& [DataInter](opt-z){$z$};
-		& 
+		&
 		\\
 		% third row
 		& 
-		& [MDA] (mda) {\MultilineComponent{1.5cm}{1, 5$\rightarrow$2:}{MDA}};
+		& \node [MDA] (mda) {\MultilineComponent{1.5cm}{1, 5$\rightarrow$2:}{MDA}};
 		& 
 		& 
-		& [DataInter](opt-z){$y,z$};
+		& 
 		& 
 		\\
 		% fourth row
-		[DataIO] (y_output) {$y^*$}
+		\node [DataIO] (y_output) {$y^*$};
 		& 
 		& 
-		& [Analysis_i] (A) {\MultilineComponent{1.6cm}{2:}{A}
+		& \node [Analysis] (A) {\MultilineComponent{1.6cm}{2:}{A}};
 		& 
-		& 
-		& [DataInter](mda-m){$6:m$};
+		& \node [DataInter](mda-z){$2:z^t$};
+		& \node [DataInter](mda-m){$6:m$};
 		\\
 		% fifth row
-		[DataIO] (z_output) {$z^*$}
+		\node [DataIO] (z_output) {$z^*$};
 		& 
 		& 
 		& 
-		& [Analysis_i] (B) {\MultilineComponent{1.6cm}{3:}{B}
-		& 
+		& \node [Analysis] (B) {\MultilineComponent{1.6cm}{3:}{B}};
+		& \node [DataInter](mda-y){$3:y^t$};
 		& 
 		\\
 		% sixth row
 		& 
-		& [DataInter](opt-g){$5:g1,g2$};
+		& \node [DataInter](mda-g){$5:g1,g2$};
 		& 
 		& 
-		& [Function] (constraints) {\MultilineComponent{1.6cm}{4:}{Constraints}}; 
+		& \node [Function] (constraints) {\MultilineComponent{1.6cm}{4:}{Const.}}; 
 		& 
 		\\
 		% seventh row
-		& [DataInter](opt-f){$7:f$};
+		& \node [DataInter](opt-f){$7:f$};
 		& 
 		& 
 		& 
 		& 
-		& [Function] (objective) {\MultilineComponent{1.6cm}{6:}{Objective}}; 
+		& \node [Function] (objective) {\MultilineComponent{1.6cm}{6:}{Objective}}; 
 		\\
 	};
 	
@@ -91,6 +90,7 @@
 		\chainin (constraints)		[join=by ProcessHV];
 		\chainin (mda)		[join=by ProcessHV];
 		\chainin (objective)	[join=by ProcessHV];
+		\chainin (opt) [join=by ProcessHV];
 		\chainin (x_output)	[join=by ProcessTip];
 		\end{pgfonlayer}
 	}
@@ -100,11 +100,20 @@
 	\path (input_x) edge [DataLine] (opt-f)
 	(input_y) edge [DataLine] (A)
 	(input_z) edge [DataLine] (B)
-	(Opt-Func) edge [DataLine] (Func)
-	% Horizontal edges
-	(Output) edge [DataLine] (Opt-Func)
-	(Output_y1) edge [DataLine] (DA1-Func)
-	(Func-Opt) edge [DataLine] (Func);
+	(mda-z) edge [DataLine] (constraints)
+	(mda-m) edge [DataLine] (objective)
+	(input_x) edge [DataLine] (opt)
+	(opt) edge [DataLine] (opt-x1)
+	(opt) edge [DataLine] (opt-x2)
+	(A) edge [DataLine] (mda-z)
+	(A) edge [DataLine] (mda-m)
+	(B) edge [DataLine] (mda-y)
+	(constraints) edge [DataLine] (mda-g)
+	(mda-g) edge [DataLine] (mda)
+	(objective) edge [DataLine] (opt-f)
+	(y_output) edge [DataLine] (A)
+	(z_output) edge [DataLine] (B)
+;
 	\end{pgfonlayer}
 	
 \end{tikzpicture}
