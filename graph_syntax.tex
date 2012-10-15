@@ -1,4 +1,23 @@
 \section{Graph-based Problem Formulation Syntax}
+	For a large scale problem with many analyses, obtaining the FPF is likely to be a challenge. In general, at set of analysis codes will be given and the desired outputs will be specified as
+	    \begin{align}
+            given & \ \ A: \lbrace x_i \lvert i \in A_\textrm{input} \rbrace \rightarrow \lbrace x_i \lvert i \in A_\textrm{output} \rbrace \notag
+            \\    & \ \ B: \lbrace x_i \lvert i \in B_\textrm{input} \rbrace \rightarrow \lbrace x_i \lvert i \in B_\textrm{output} \rbrace \notag
+			\\    & \ \ \quad \quad \quad \quad \quad \quad  \quad \quad \vdots
+            \\min. &\ \ f(x_i), i \in \mathcal{O} \notag
+            \\w.r.t. & \ \ x_i, i \in \mathcal{I}, \notag
+            \label{eqn:preFPF}
+        \end{align}
+	where $\mathcal{O}$ is the index set of the global outputs and $\mathcal{I}$ is the index set of the global inputs. For this to be an FPF, there must be no \emph{conflicts} or \emph{holes}. A conflict arises when different analyses produce the same output; two analysis codes $A$ and $B$ are in conflict if
+		\begin{equation}
+			A_\textrm{output} \cap B_\textrm{output} \neq \emptyset.
+		\end{equation}
+	A hole arises when a local input to an analysis block is neither a global input nor a local output of any analysis block. If we let $\mathcal{H}$ denote the index set of local inputs which are holes
+		\begin{equation}
+			i \notin \bigcup (\mathcal{I},A_\textrm{output},B_\textrm{output},\ldots)  \implies  i \in \mathcal{H}.
+		\end{equation}
+	If the given set of analyses contains any holes, an FPF cannot be obtained. On the contrary, if there are conflicts multiple FPFs may be obtained. This is because every conflict represents a choice of which analysis to use and each choice could (potentially) yeild a different but valid FPF. The following section develops an application of graphy theory to obtain multiple FPFs from a set of analyses and desired outputs.
+		
     \subsection{Formulation Graph Syntax}
     Rather than start with an adjacency, we chose to work directly with a directed cyclic graph to develop a syntax for the FPF. 
     The following information must be provided to start:
