@@ -14,7 +14,7 @@
 		\end{equation}
 	A hole arises when a local input to an analysis block is neither a global input nor a local output of any analysis block. If we let $\mathcal{H}$ denote the index set of local inputs which are holes
 		\begin{equation}
-			i \notin \bigcup (\mathcal{I},A_\textrm{output},B_\textrm{output},\ldots)  \implies  i \in \mathcal{H}.
+			i \in \bigcup (A_\textrm{input},B_\textrm{input},\ldots) \textrm{ and } i \notin \bigcup (\mathcal{I},A_\textrm{output},B_\textrm{output},\ldots)  \implies  i \in \mathcal{H}.
 		\end{equation}
 	If the given set of analyses contains any holes, an FPF cannot be obtained. On the contrary, if there are conflicts multiple FPFs may be obtained. This is because every conflict represents a choice of which analysis to use and each choice could (potentially) yeild a different but valid FPF. The following section develops an application of graphy theory to obtain multiple FPFs from a set of analyses and desired outputs.
 		
