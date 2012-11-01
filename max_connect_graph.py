@@ -1,10 +1,8 @@
 import networkx as nx
 import matplotlib.pyplot as plt
-import set_ops as so
 import numpy
 import pylab
 import itertools
-import edmonds
 
 def cab(DG,s,m,n,w,p,pos):
 	# this function creates the nodes and edges associated with an analysis block
@@ -183,149 +181,6 @@ def create_sample_graph():
 		type='connection')
 	return[DG,pos];
 
-def dict2tree(Gx,DG1,DG2):
-	# this function converts a tree in dictionary form to networkx graph form
-    DG2.add_nodes_from(DG1.nodes())
-    nds=Gx.keys()
-    vls=Gx.values()
-    j=0
-    for i in nds:
-        if len(vls[j])>1:
-            nd=vls[j][-2]
-            DG2.add_weighted_edges_from([(nd,i,DG1[nd][i]['weight'])])
-        j+=1
-    return DG2;
-
-def tree2path(G,root,node):
-	# this function returns the path along a tree to the specified node
-    Gtree = nx.DiGraph()
-    Gtree.add_nodes_from(G.nodes())
-    nodes = [node]
-    cnode = node
-    reached_root = False
-    j = 1
-    while j < 2*len(G.nodes()):
-        j += 1
-        k = False
-        for i in G.edges():
-            if i[1]== cnode:
-                cnode = i[0]
-                nodes.append(cnode)
-                Gtree.add_edge(i[0],i[1],G[i[0]][i[1]])
-                k = True
-                break
-        if cnode == root:
-            k = False
-            reached_root = True
-        if k == False:
-            break
-    return [nodes,reached_root,Gtree];
-
-def minimum_spanning_directed_graph(DG,root,outs):
-	# this function exaustively finds the tree with the least weight that reaches the specified outputs
-    # DG = maximal connectivity graph
-    # root = root of the inputs
-    # outs = desired outputs
-    
-    # Build a list of the edges that have nonzero weighting
-    analysis_edges = []
-    for i in DG.edges():
-        w = DG[i[0]][i[1]]['weight']
-        if w != 0:
-            analysis_edges.append(i)
-
-    DG0 = nx.DiGraph()
-    DG0.add_nodes_from(DG.nodes())
-    DGs = []
-    weights = []
-    print 'analysis edges',analysis_edges
-    for x in itertools.product([0,1],repeat=len(analysis_edges)):
-        DG0.add_edges_from(DG.edges())
-        j = 0
-        for i in x:
-            if i == 0:
-                DG0.remove_edge(analysis_edges[j][0],analysis_edges[j][1])
-            j += 1
-        Gx=nx.single_source_dijkstra_path(DG0,root)
-        DG1=nx.DiGraph()
-        DG1=dict2tree(Gx,DG,DG1)
-        outcheck = [] ################ I also need to check to make sure all needed intermediate inputs are given
-        req_ins = []
-        for i in analysis_edges:
-            if x[analysis_edges.index(i)] == 0:
-                continue
-            pds = DG.predecessors(i[0])
-            for ii in pds:
-                req_ins.append(ii)
-        for i in outs+req_ins:
-            out = tree2path(DG1,root,i)
-            outcheck.append(out[1])
-        if all(outcheck):
-            total_graph_weight=0
-            for e in DG1.edges(data=True):
-                total_graph_weight=total_graph_weight+e[2]['weight'] #  e =[1,2,{weight=3.5}]
-            weights.append(total_graph_weight)
-            DGs.append(DG1)
-
-    if len(weights) == 0:
-        print 'no possible connecting tree'
-        least_weight = []
-        least_weight_graph = []
-    else:
-        least_weight = min(weights)
-        least_weight_graph = DGs[weights.index(least_weight)]
-##        # remove unused edges
-##        k = 0
-##        K = True
-##        while K:
-##            for i in least_weight_graph.edges():
-##                print i
-##                if i[1] in outs:
-##                    continue
-##                srs = least_weight_graph.successors(i[1])
-##                print srs
-##                if len(srs) == 0:
-##                    print 'removed',i
-##                    least_weight_graph.remove_edge(i[0],i[1])
-##                    continue
-##                K = False # exit while loop if there are no more edges to remove
-##            if k > len(DG.nodes())**2:
-##                break
-##            k += 1
-    return [least_weight,least_weight_graph];
-
-def dgraph2dict(DG):
-	DGdict = dict();
-	nds = DG.nodes();
-	for i in nds:
-		x = dict();
-		nghs = DG.neighbors(i)
-		if len(nghs) == 0:
-			continue
-		for j in nghs:
-			x[j] = DG[i][j]['weight']
-		DGdict[i] = x
-	return DGdict
-	
-def dict2dgraph(DGdict):
-	DG = nx.DiGraph()
-	for i in DGdict:
-		DG.add_node(i)
-		for j in DGdict[i]:
-			DG.add_node(j)
-			DG.add_edge(i,j,weight = DGdict[i][j])
-	return DG
-
-def edmonds_mst(root,DG):
-	# minimum spanning tree using Edmonds algorithm (downloaded from 
-	# https://github.com/mlbright/edmonds/tree/master/edmonds)
-	# DG = directed graph
-	# root = of the desired minimum spanning tree
-	DGdict = dgraph2dict(DG)
-	g = edmonds.mst(root,DGdict)
-	h = dict2dgraph(g)
-	return h;
-
 def remove_node(DG,i):
     analysis = DG.node[i]['analysis_block']
     DG.remove_nodes_from(DG.graph['analyses'][analysis]['local_inputs'])
@@ -351,6 +206,7 @@ def obtain_fpf(maxDG):
         if len(holes)==0:
             check = False
         for i in holes:
+            print 'removed',i
             DG = remove_node(DG,i)
     
     # -- find and remove any conflicts
@@ -360,6 +216,7 @@ def obtain_fpf(maxDG):
             ins = DG.in_edges(i)
             if len(ins)>1:
                 #ins.reverse()
+                print len(ins)
                 ins.remove(ins[0])
                 DG.remove_edges_from(ins)
     
@@ -447,6 +304,10 @@ pylab.figure(1)
 #nx.draw(FPF,pos,width=1.5,edge_color='b')
 #nx.draw_networkx_edges(CG,pos,width=0.75,edge_color='y')
 nx.draw(SG,pos,width=2)
+#nx.draw_networkx_edges(FPF,pos,width=1.25,edge_color='b')
 nx.draw_networkx_edges(CGSG,pos,width=0.75,edge_color='y')
+
+pylab.figure(2)
+nx.draw(maxDG,pos,width = 0.5)
 
 pylab.show()
