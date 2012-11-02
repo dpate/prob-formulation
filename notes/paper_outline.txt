@@ -1,0 +1,29 @@
+-There has been a lot of past work to describe MDO problems in terms of matrices and/or graphs, e.g.  DSM, XDSM, FDT, etc.
+ 
+-These methods are typically intended to characterize problems in terms of particular MDO architectures.
+ 
+-We would like to characterize MDO problems in a more fundamental way that is independent of the particular solution architecture. 
+ 
+-Here is our graph theoretic description of MDO problems that provides this more fundamental viewpoint…
+ 
+-With this new graph formalism, we would first like to address the following two contexts/questions: (1) Given several analysis codes, what are all the possible conflict-free ways that the codes can be composed/linked to produce a set of desired outputs?  What are several “good” ways to link the codes, in terms of goals such as minimizing expected computational cost or error?, (2) Given an existing data flow of connected analysis codes, what are all the possible conflict-free ways to add a new code to the data flow in order to produce a set of desired outputs?  What are several “good” ways to link in the new code, in terms of goals such as minimizing expected computational cost or error?
+ 
+-Here is our algorithm for answering the questions above….
+ 
+-Here are some example implementations of the algorithm…
+ 
+-The data flows suggested from our algorithm are now free of “conflicts”, i.e. no code has one of its inputs being provided by two or more outputs of other codes
+ 
+-With these data flows that are free from conflicts, we would now like to address the following question: How can we formally write down a general and fundamental problem statement that captures what the engineer really would like to optimize using this set of codes?  This problem statement should state only the true objective function and constraints that the engineer cares about enforcing based on the physical problem; it should neither predispose a particular solution schema nor introduce solution-specific constraints or elements in the objective function.
+ 
+-Here is our proposed way to write down this fundamental problem statement…
+ 
+-Here are some example problem statements…
+ 
+-Note that it is possible to infer the need for solvers and optimizers by inspecting the fundamental problem statements.
+ 
+-Here is a proof (or evidence by example) that the fundamental problem statement “works”  (Justin, will need your help here, as I didn’t follow your thoughts on this too well)
+ 
+-We anticipate that this fundamental problem statement can be used for two purposes in future work: (1) As the “generic” input to an algorithm that automatically generates architecture-specific MDO problem implementations (cite Justin’s thesis and related work here), (2) As the basis of a “verification algorithm” that compares two architecture-specific MDO problem formulations to determine if they share the same fundamental problem statement.  Purpose (1) will be very helpful/practical for allowing engineers to more easily set up MDO implementations.  Purpose (2) will be very useful for checking proposed MDO architecture-specific problem statements to make sure that they are correct or at least equivalent to other architecture-specific problem statements in the sense of a shared fundamental problem.
+ 
+-Conclusions
