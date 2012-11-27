@@ -3,9 +3,12 @@ import matplotlib.pyplot as plt
 import numpy
 import pylab
 import itertools
+import random
+
+random.seed(10)
 
 def cab(DG,s,m,n,w,p,pos):
-	# this function creates the nodes and edges associated with an analysis block
+    # this function creates the nodes and edges associated with an analysis block
     # sample input: cab(DG,'A',1,1,5,(2,3),pos);
     # DG = given directed graph
     # s = name of analysis block
@@ -48,138 +51,90 @@ def cab(DG,s,m,n,w,p,pos):
     return;
 
 def create_sample_graph():
-	# Build the sample graph. Treat x as the root of all inputs without loss of generality.
-	pos=dict() # for plotting
+    # Build the sample graph. Treat x as the root of all inputs without loss of generality.
+    pos=dict() # for plotting
 
-	w=0;
-	DG=nx.DiGraph(type='maximal_connectivity',analyses=dict())
-	DG.add_nodes_from(['x'],type='global_input',analysis_block='')
-	DG.add_nodes_from(['y1','y2','y3','y4'],type='global_output',analysis_block='')
-	pos.update({'x':numpy.array([1,2.5]),
-				'y1':numpy.array([5,4]),
-				'y2':numpy.array([5,3]),
-				'y3':numpy.array([5,2]),
-				'y4':numpy.array([5,1]),
-				'y':numpy.array([6,3])})
+    w=0;
+    DG=nx.DiGraph(type='maximal_connectivity',analyses=dict())
+    DG.add_nodes_from(['x'],type='global_input',analysis_block='')
+    DG.add_nodes_from(['y1','y2','y3','y4'],type='global_output',analysis_block='')
+    pos.update({'x':numpy.array([1,2.5]),
+                'y1':numpy.array([5,4]),
+                'y2':numpy.array([5,3]),
+                'y3':numpy.array([5,2]),
+                'y4':numpy.array([5,1]),
+                'y':numpy.array([6,3])})
 
-	cab(DG,'A',2,2,1,(2,4),pos);
-	a='x';
-	b='Ai1';
-	DG.add_weighted_edges_from([(a,b,w)],type='connection')
-	a='Ao1';
-	b='Ei1';
-	DG.add_weighted_edges_from([(a,b,w)],type='connection')
-	a='Ao1';
-	b='Fi1';
-	DG.add_weighted_edges_from([(a,b,w)],type='connection')
-	a='Ao2';
-	b='Ei2';
-	DG.add_weighted_edges_from([(a,b,w)],type='connection')
+    a = [];
+    b = [];
+    cab(DG,'A',2,2,1,(2,4),pos);
+    a.append('x');  b.append('Ai1');
+    a.append('Ao1');b.append('Ei1');
+    a.append('Ao1');b.append('Fi1');
+    a.append('Ao2');b.append('Ei2');
 
-	cab(DG,'B',1,2,1,(2,3),pos)
-	a='x';
-	b='Bi1';
-	DG.add_weighted_edges_from([(a,b,w)],type='connection')
-	a='Bo1';
-	b='Fi2';
-	DG.add_weighted_edges_from([(a,b,w)],type='connection')
-	a='Bo2';
-	b='Gi1';
-	DG.add_weighted_edges_from([(a,b,w)],type='connection')
+    cab(DG,'B',1,2,1,(2,3),pos)
+    a.append('x');  b.append('Bi1');
+    a.append('Bo1');b.append('Fi2');
+    a.append('Bo2');b.append('Gi1');
 
-	cab(DG,'C',1,1,1,(2,2),pos)
-	a='x';
-	b='Ci1';
-	DG.add_weighted_edges_from([(a,b,w)],type='connection')
-	a='Co1';
-	b='Gi1';
-	DG.add_weighted_edges_from([(a,b,w)],type='connection')
-	a='Co1';
-	b='Hi1';
-	DG.add_weighted_edges_from([(a,b,w)],type='connection')
+    cab(DG,'C',1,1,1,(2,2),pos)
+    a.append('x');  b.append('Ci1');
+    a.append('Co1');b.append('Gi1');
+    a.append('Co1');b.append('Hi1');
 
-	cab(DG,'D',3,1,1,(2,1),pos)
-	a='x';
-	b='Di1';
-	DG.add_weighted_edges_from([(a,b,w)],type='connection')
-	a='Do1';
-	b='Gi2';
-	DG.add_weighted_edges_from([(a,b,w)],type='connection')
-	a='Do1';
-	b='Hi2';
-	DG.add_weighted_edges_from([(a,b,w)],type='connection')
+    cab(DG,'D',3,1,1,(2,1),pos)
+    a.append('x');  b.append('Di1');
+    a.append('Do1');b.append('Gi2');
+    a.append('Do1');b.append('Hi2');
 
-	cab(DG,'E',2,2,1,(3,4),pos)
-	a='Eo1';
-	b='Ii1';
-	DG.add_weighted_edges_from([(a,b,w)],type='connection')
-	a='Eo2';
-	b='Ji1';
-	DG.add_weighted_edges_from([(a,b,w)],type='connection')
+    cab(DG,'E',2,2,1,(3,4),pos)
+    a.append('Eo1');b.append('Ii1');
+    a.append('Eo2');b.append('Ji1');
 
-	cab(DG,'F',2,3,1,(3,3),pos)
-	a='Fo1';
-	b='Ii2';
-	DG.add_weighted_edges_from([(a,b,w)],type='connection')
-	a='Fo1';
-	b='Ji1';
-	DG.add_weighted_edges_from([(a,b,w)],type='connection')
-	a='Fo1';
-	b='Ki1';
-	DG.add_weighted_edges_from([(a,b,w)],type='connection')
+    cab(DG,'F',2,3,1,(3,3),pos)
+    a.append('Fo1');b.append('Ii2');
+    a.append('Fo1');b.append('Ji1');
+    a.append('Fo1');b.append('Ki1');
 
-	cab(DG,'G',2,2,1,(3,2),pos)
-	a='Go1';
-	b='Ji1';
-	DG.add_weighted_edges_from([(a,b,w)],type='connection')
-	a='Go1';
-	b='Li1';
-	DG.add_weighted_edges_from([(a,b,w)],type='connection')
+    cab(DG,'G',2,2,1,(3,2),pos)
+    a.append('Go1');b.append('Ji1');
+    a.append('Go1');b.append('Li1');
 
-	cab(DG,'H',2,3,1,(3,1),pos)
-	a='Ho1';
-	b='Li2';
-	DG.add_weighted_edges_from([(a,b,w)],type='connection')
-	a='Ho1';
-	b='Ki1';
-	DG.add_weighted_edges_from([(a,b,w)],type='connection')
+    cab(DG,'H',2,3,1,(3,1),pos)
+    a.append('Ho1');b.append('Li2');
+    a.append('Ho1');b.append('Ki1');
 
-	cab(DG,'I',2,2,1,(4,4),pos)
-	a='Io1';
-	b='y1';
-	DG.add_weighted_edges_from([(a,b,w)],type='connection')
+    cab(DG,'I',2,2,1,(4,4),pos)
+    a.append('Io1');b.append('y1');
 
-	cab(DG,'J',3,1,1,(4,3),pos)
-	a='Jo1';
-	b='y2';
-	DG.add_weighted_edges_from([(a,b,w)],type='connection')
+    cab(DG,'J',3,1,1,(4,3),pos)
+    a.append('Jo1');b.append('y2');
 
-	cab(DG,'K',3,2,1,(4,2),pos)
-	a='Ko1';
-	b='y3';
-	DG.add_weighted_edges_from([(a,b,w)],type='connection')
+    cab(DG,'K',3,2,1,(4,2),pos)
+    a.append('Ko1');b.append('y3');
 
-	cab(DG,'L',2,2,1,(4,1),pos)
-	a='Lo1';
-	b='y3';
-	DG.add_weighted_edges_from([(a,b,w)],type='connection')
-	a='Lo2';
-	b='y4';
-	DG.add_weighted_edges_from([(a,b,w)],type='connection')
-	
-	# add a few more connections
-	DG.add_weighted_edges_from([('Io2','Ai2',w),
+    cab(DG,'L',2,2,1,(4,1),pos)
+    a.append('Lo1');b.append('y3');
+    a.append('Lo2');b.append('y4');
+    j=0;
+    for i in a:
+        DG.add_edge(i,b[j],weight=0,type='connection',fixed=False,rank=random.randint(1,10));
+        j+=1;
+    
+    # add a few more connections
+    DG.add_weighted_edges_from([('Io2','Ai2',w),
         ('Ao1','Hi1',w),
-		('Fo2','Gi2',w),
-		('Ko2','y1',w),
-		('Ho3','Di3',w),
-		('Co1','Ai2',w),
-		('Fo3','Di2',w),
-		('Io2','Ki2',w),
+        ('Fo2','Gi2',w),
+        ('Ko2','y1',w),
+        ('Ho3','Di3',w),
+        ('Co1','Ai2',w),
+        ('Fo3','Di2',w),
+        ('Io2','Ki2',w),
         ('Ho2','y2',w),
-		('Do1','Ji2',w)],
-		type='connection')
-	return[DG,pos];
+        ('Do1','Ji2',w)],
+        type='connection',fixed=True,rank=1)
+    return[DG,pos];
 
 def remove_node(DG,i):
     analysis = DG.node[i]['analysis_block']
@@ -189,6 +144,46 @@ def remove_node(DG,i):
     DG.remove_nodes_from(DG.graph['analyses'][analysis]['analysis_finish'])
     del DG.graph['analyses'][analysis]
     return DG;
+
+def resolve_conflict(edgs,DG):
+    print len(edgs)
+    print edgs
+    # We must determine which of the edges to choose from are fixed
+    fxd = [];
+    nfxd = 0;
+    for edg in edgs:
+        check = DG.edge[edg[0]][edg[1]]['fixed']
+        fxd.append(check);
+        if check==True:
+            nfxd=+1;
+    if nfxd>1:
+        print 'More than one edge at node',edg[1],'is fixed'
+        quit()
+    elif nfxd==1:
+        chosen_edge = edgs[fxd.index(True)] # choose the edge that is not fixed
+        print 'Edge',edg,'is fixed'
+    else:
+        # ---- A decision only needs to be made when none of the edges are fixed ----
+        choice = 'rank';
+        if choice=='rank':
+            rnk = [];
+            for edg in edgs:
+                rnk.append(DG.edge[edg[0]][edg[1]]['rank'])
+            hghst = max(rnk);
+            chosen_edge = edgs[rnk.index(hghst)];
+            print 'Edge',chosen_edge,'was chosen'
+        elif choice=='random':
+            print 'No edges are fixed'
+            chosen_edge = edgs[0]; # "randomly" choose the first element
+        elif choice=='user':
+            print 'user'
+        elif choice=='metric':
+            print 'metric'
+        else:
+            print 'Invalid choice for conflict resolution'
+            quit()
+    edgs.remove(chosen_edge)
+    DG.remove_edges_from(edgs) # Remove all the edges except for the one that was selected
     
 def obtain_fpf(maxDG):
     DG = maxDG.copy()
@@ -206,17 +201,16 @@ def obtain_fpf(maxDG):
         if len(holes)==0:
             check = False
         for i in holes:
+            print 'removed',i
             DG = remove_node(DG,i)
     
     # -- find and remove any conflicts
     nodes = DG.nodes()
     for i in nodes:
-        if DG.node[i]['type']=='local_input':
+        if (DG.node[i]['type']=='local_input') | (DG.node[i]['type']=='global_output'):
             ins = DG.in_edges(i)
             if len(ins)>1:
-                #ins.reverse()
-                ins.remove(ins[0])
-                DG.remove_edges_from(ins)
+                resolve_conflict(ins,DG)
     
     # -- delete any analyses with no used inputs (must iterate)
     check = True
@@ -296,12 +290,17 @@ CG = out[0]
 cycles = out[1]
 #print len(cycles)
 #print cycles
+#print FPF.edge['Co1']['Gi1']
 
 pylab.figure(1)
 #nx.draw(maxDG,pos,width=3)
 #nx.draw(FPF,pos,width=1.5,edge_color='b')
 #nx.draw_networkx_edges(CG,pos,width=0.75,edge_color='y')
 nx.draw(SG,pos,width=2)
+#nx.draw_networkx_edges(FPF,pos,width=1.25,edge_color='b')
 nx.draw_networkx_edges(CGSG,pos,width=0.75,edge_color='y')
+
+pylab.figure(2)
+nx.draw(maxDG,pos,width = 0.5)
 
 pylab.show()
