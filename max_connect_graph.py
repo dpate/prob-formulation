@@ -82,6 +82,7 @@ def create_sample_graph():
     a.append('x');  b.append('Ci1');
     a.append('Co1');b.append('Gi1');
     a.append('Co1');b.append('Hi1');
+    a.append('Co1');b.append('Ai2');
 
     cab(DG,'D',3,1,1,(2,1),pos)
     a.append('x');  b.append('Di1');
@@ -128,7 +129,6 @@ def create_sample_graph():
         ('Fo2','Gi2',w),
         ('Ko2','y1',w),
         ('Ho3','Di3',w),
-        ('Co1','Ai2',w),
         ('Fo3','Di2',w),
         ('Io2','Ki2',w),
         ('Ho2','y2',w),
@@ -146,8 +146,8 @@ def remove_node(DG,i):
     return DG;
 
 def resolve_conflict(edgs,DG):
-    print len(edgs)
-    print edgs
+    #print len(edgs)
+    print "Conflicted edges:",edgs
     # We must determine which of the edges to choose from are fixed
     fxd = [];
     nfxd = 0;
@@ -155,33 +155,35 @@ def resolve_conflict(edgs,DG):
         check = DG.edge[edg[0]][edg[1]]['fixed']
         fxd.append(check);
         if check==True:
-            nfxd=+1;
+            nfxd=nfxd+1;
+        #print 'nfxd',nfxd
     if nfxd>1:
-        print 'More than one edge at node',edg[1],'is fixed'
+        print '  More than one edge at node',edg[1],'is fixed'
         quit()
     elif nfxd==1:
         chosen_edge = edgs[fxd.index(True)] # choose the edge that is not fixed
-        print 'Edge',edg,'is fixed'
+        print '  Edge',edg,'is fixed'
     else:
         # ---- A decision only needs to be made when none of the edges are fixed ----
-        choice = 'rank';
+        choice = 'user';
         if choice=='rank':
             rnk = [];
             for edg in edgs:
                 rnk.append(DG.edge[edg[0]][edg[1]]['rank'])
             hghst = max(rnk);
             chosen_edge = edgs[rnk.index(hghst)];
-            print 'Edge',chosen_edge,'was chosen'
         elif choice=='random':
-            print 'No edges are fixed'
             chosen_edge = edgs[0]; # "randomly" choose the first element
         elif choice=='user':
-            print 'user'
+            print "Please enter the index of the connection to resolve the conflict: "
+            inp_int = int(raw_input())
+            chosen_edge = edgs[inp_int];
         elif choice=='metric':
             print 'metric'
         else:
             print 'Invalid choice for conflict resolution'
             quit()
+    print '  Edge',chosen_edge,'was chosen'
     edgs.remove(chosen_edge)
     DG.remove_edges_from(edgs) # Remove all the edges except for the one that was selected
     
@@ -201,7 +203,7 @@ def obtain_fpf(maxDG):
         if len(holes)==0:
             check = False
         for i in holes:
-            print 'removed',i
+            print 'Removed node',i
             DG = remove_node(DG,i)
     
     # -- find and remove any conflicts
