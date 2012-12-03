@@ -158,8 +158,7 @@ def resolve_conflict(edgs,DG):
             nfxd=nfxd+1;
         #print 'nfxd',nfxd
     if nfxd>1:
-        print '  More than one edge at node',edg[1],'is fixed'
-        quit()
+        raise  RuntimeError('More than one edge at node %s is fixed'%str(edg[1])
     elif nfxd==1:
         chosen_edge = edgs[fxd.index(True)] # choose the edge that is not fixed
         print '  Edge',edg,'is fixed'
@@ -181,8 +180,8 @@ def resolve_conflict(edgs,DG):
         elif choice=='metric':
             print 'metric'
         else:
-            print 'Invalid choice for conflict resolution'
-            quit()
+            raise RuntimeError('Invalid choice for conflict resolution')
+            
     print '  Edge',chosen_edge,'was chosen'
     edgs.remove(chosen_edge)
     DG.remove_edges_from(edgs) # Remove all the edges except for the one that was selected
@@ -275,7 +274,7 @@ def find_cycles(DG):
 
 
 if __name__== "__main__": 
-    
+
     out = create_sample_graph()
     maxDG = out[0]
     pos = out[1]
