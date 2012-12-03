@@ -273,36 +273,39 @@ def find_cycles(DG):
             CG.add_edge(i[j],i[j+1])
     return [CG,cycles];
 
-out = create_sample_graph()
-maxDG = out[0]
-pos = out[1]
 
-FPF = obtain_fpf(maxDG)
+if __name__== "__main__": 
+    
+    out = create_sample_graph()
+    maxDG = out[0]
+    pos = out[1]
 
-SG = extract_simple_graph(maxDG)
+    FPF = obtain_fpf(maxDG)
 
-out = find_cycles(SG) 
-CGSG = out[0]
-cyclesSG = out[1]
-print cyclesSG
-print CGSG.edges()
+    SG = extract_simple_graph(maxDG)
 
-out = find_cycles(FPF) 
-CG = out[0]
-cycles = out[1]
-#print len(cycles)
-#print cycles
-#print FPF.edge['Co1']['Gi1']
+    out = find_cycles(SG) 
+    CGSG = out[0]
+    cyclesSG = out[1]
+    print cyclesSG
+    print CGSG.edges()
 
-pylab.figure(1)
-#nx.draw(maxDG,pos,width=3)
-#nx.draw(FPF,pos,width=1.5,edge_color='b')
-#nx.draw_networkx_edges(CG,pos,width=0.75,edge_color='y')
-nx.draw(SG,pos,width=2)
-#nx.draw_networkx_edges(FPF,pos,width=1.25,edge_color='b')
-nx.draw_networkx_edges(CGSG,pos,width=0.75,edge_color='y')
+    out = find_cycles(FPF) 
+    CG = out[0]
+    cycles = out[1]
+    #print len(cycles)
+    #print cycles
+    #print FPF.edge['Co1']['Gi1']
 
-pylab.figure(2)
-nx.draw(maxDG,pos,width = 0.5)
+    pylab.figure(1)
+    #nx.draw(maxDG,pos,width=3)
+    #nx.draw(FPF,pos,width=1.5,edge_color='b')
+    #nx.draw_networkx_edges(CG,pos,width=0.75,edge_color='y')
+    nx.draw(SG,pos,width=2)
+    #nx.draw_networkx_edges(FPF,pos,width=1.25,edge_color='b')
+    nx.draw_networkx_edges(CGSG,pos,width=0.75,edge_color='y')
 
-pylab.show()
+    pylab.figure(2)
+    nx.draw(maxDG,pos,width = 0.5)
+
+    pylab.show()
