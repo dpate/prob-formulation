@@ -1,55 +1,156 @@
 \section{Graph-based Problem Formulation Syntax}
-	For a large scale problem with many analyses, obtaining the FPF is likely to be a challenge. In general, at set of analysis codes will be given and the desired outputs will be specified as
-	    \begin{align}
-            given & \ \ A: \lbrace x_i \lvert i \in A_\textrm{input} \rbrace \rightarrow \lbrace x_i \lvert i \in A_\textrm{output} \rbrace \notag
-            \\    & \ \ B: \lbrace x_i \lvert i \in B_\textrm{input} \rbrace \rightarrow \lbrace x_i \lvert i \in B_\textrm{output} \rbrace \notag
-			\\    & \ \ \quad \quad \quad \quad \quad \quad  \quad \quad \vdots
-            \\min. &\ \ f(x_i), i \in \mathcal{O} \notag
-            \\w.r.t. & \ \ x_i, i \in \mathcal{I}, \notag
-            \label{eqn:preFPF}
-        \end{align}
-	where $\mathcal{O}$ is the index set of the global outputs and $\mathcal{I}$ is the index set of the global inputs. For this to be an FPF, there must be no \emph{conflicts} or \emph{holes}. A conflict arises when different analyses produce the same output; two analysis codes $A$ and $B$ are in conflict if
-		\begin{equation}
-			A_\textrm{output} \cap B_\textrm{output} \neq \emptyset.
-		\end{equation}
-	A hole arises when a local input to an analysis block is neither a global input nor a local output of any analysis block. If we let $\mathcal{H}$ denote the index set of local inputs which are holes
-		\begin{equation}
-			i \in \bigcup \{A_\textrm{input},B_\textrm{input},\ldots\} \textrm{ and } i \notin \bigcup \{\mathcal{I},A_\textrm{output},B_\textrm{output},\ldots\}  \implies  i \in \mathcal{H}.
-		\end{equation}
-	If the given set of analyses contains any holes, an FPF cannot be obtained. On the contrary, if there are conflicts multiple FPFs may be obtained. This is because every conflict represents a choice of which analysis to use and each choice could (potentially) yeild a different but valid FPF. The following section develops an application of graphy theory to obtain multiple FPFs from a set of analyses and desired outputs.
+We begin by discussing the general syntax of graph theory and then expand upon this syntax to represent the data flow of an MDAO problem.
+A graph is a pair $G = (V,E)$ of sets such that $E \subseteq V \times V$, which means that the elements of $E$ are 2--element subsets of $V$ \cite{Diestel2010}. 
+For a directed graph we introduce two maps $S:E \to V$ and $F:E \to V$ to denote the starting and final nodes of each edge, respectively. 
+\begin{figure}[htb!]
+	\begin{center}
+	\includegraphics[width=1.5in]{images/example_directed_graph}
+	\end{center}
+	\vspace{-20pt}
+\caption{Example directed graph.}
+\label{f:example directed graph}
+\end{figure}
+As an example, for the directed graph shown in Fig.~\ref{f:example directed graph} we have
+\begin{IEEEeqnarray*}{rCl}
+V & = & \{1,2,3,4,5\}, \\
+E & = & \big\{\{1,2\},\{2,3\},\{1,3\},\{3,4\}\big\}, \\
+S & = & \Big\{ \big(\{1,2\},2\big),\big(\{2,3\},3\big),\big(\{1,3\},1\big),\big(\{3,4\},3\big) \Big\}, \\
+F & = & \Big\{ \big(\{1,2\},1\big),\big(\{2,3\},2\big),\big(\{1,3\},3\big),\big(\{3,4\},4\big) \Big\}.
+\end{IEEEeqnarray*}
+
+We now assign additional properties to the nodes and edges so that they may represent the data flow of an MDAO problem. 
+The first property assigned to nodes and edges is the \emph{type}. The possible node types are:
+\begin{itemize}
+\item global input
+\item global output
+\item local input
+\item local output
+\item analysis start
+\item analysis finish
+\end{itemize}
+and the possible edge types are
+\begin{itemize}
+\item connection
+\item in
+\item analysis
+\item out
+\end{itemize}
+Then, considering sets $T_\txt{node}$ and $T_\txt{edge}$ to be sets containing the possible node types and edge types, respectively, we use mappings $t_\txt{node}:V \to T_\txt{node}$ and $t_\txt{edge}:E \to T_\txt{edge}$ to assign a type to each node and edge. Nodes and edges are named according to their type (e.g. connection edge). Additional properties will be discussed is subsequent sections.
+
+Next, we introduce the graph $A$ which represents a single analysis block broken down into its individual inputs and outputs. An example graph is shown in Fig.~\ref{f:analysis block} to demonstrate the basic structure. This structure is derived from the need to represent each input and output individually while representing the actual analysis with a single node or edge. The `local input' nodes each represent a single input of the analysis block. Each of these nodes is connected to a single `analysis start' node via an `in' edge. Next the analysis start node is directed to the `analysis finish' node via the `analysis edge', which represents the actual analysis. Finally, the analysis finish node is directed to `local output' nodes via individual `out' edges.
+\begin{figure}[htb!]
+	\begin{center}
+	\includegraphics[width=4in]{images/analysis_block}
+	\end{center}
+	\vspace{-20pt}
+\caption{Example directed graph. The each node type and edge type is labeled, with nodes being label in italics.}
+\label{f:analysis block}
+\end{figure}
+`Connection' edges connect local output nodes from one analysis block to either the local input nodes of other analysis blocks or global output node. In this way, the analysis block graph is the fundamental building block of the MDAO problem data flow.
+
+\subsection{Maximal Connectivity Graph}
+Now we define the node property \emph{variable name}, which represents the unique identity of the variables passed between analysis blocks as represented by nodes of type local input, local output, global input, and global output. Let $N$ be the set containing each unique variable name (no multiplicity), and let $n:V \to N$ be a mapping that assigns a variable name to a node.
+
+Next, Consider an MDAO problem defined by a set of codes, global inputs, and global outputs, as represented by analysis blocks $A_i=(V_{A_i},E_{A_i}),i=1,\ldots,m$, the set of nodes $\mathcal I$, and the set of nodes $\mathcal O$, respectively. 
+Then we may construct the \emph{maximal connectivity graph} $M=(V_M,E_M)$ as
+\begin{IEEEeqnarray*}{rCl}
+V_M & = & \mathcal I \cup \mathcal O \cup \left( \bigcup_{i = 1}^m V_{A_i} \right), \\
+E_M & = & C \cup \left( \bigcup_{i=1}^m E_{A_i} \right),
+\end{IEEEeqnarray*}
+where $C$ is a set containing connection edges defined for $v_1,v_2 \in V_M$ as:
+\begin{IEEEeqnarray*}{rl}
+c = & \{v_1,v_2\} \in C \txt{ if:} \\
+& t_\txt{node}(v_1) = \txt{`local output' or `global input'}, \\
+& t_\txt{node}(v_2) = \txt{`local input' or `global output'},\txt{ and} \\
+& n(v_1) = n(v_2),
+\end{IEEEeqnarray*}
+in which case $S(c) = v_1$ and $F(c) = v_2$. The maximal connectivity graph contains all possible connections that may exist between the given analysis blocks, and these connections are made by connecting variables with the same name, which requires a consistent naming convention between analysis blocks.
+
+\subsection{Fundamental Problem Formulation Graph}
+We may now define the graph representing the fundamental problem formulation $P=(V_P,E_P)$ as a subgraph of $M$ such that there are no \emph{holes} or \emph{collisions}. 
+Before defining these terms, let us first define $\txt{deg}^-(v)$ as the \emph{indegree} $\txt{deg}^+(v)$ as the \emph{outdegree} of vertex $v$, where indegree and outdegree refer to the number of edges directed into vertex $v$ and the number of edges directed out of vertex $v$, respectively.
+Let $H$ be the set of all nodes which are holes in $M$ and define $H$ as
+\begin{equation}
+v \in H \txt{ if } t_\txt{node}(v) = \txt{`local input' or `global output'} \txt{ and } \txt{deg}^-(v) = 0.
+\end{equation}
+Next, let $L$ be the set of all nodes which are collisions in $M$ and define $L$ as
+\begin{equation}
+v \in L \txt{ if } t_\txt{node}(v) = \txt{`local input' or `global output'} \txt{ and } \txt{deg}^-(v) > 1.
+\end{equation}
+This means that exactly one edge must be directed into each local input node and each global output node. We also require $P$ to contain all of the global output nodes, meaning $P\subset M$ is a fundamental problem formulation if
+\begin{equation}
+\mathcal O \subset V_P \ \txt{ and } \ v \notin H, v \notin L \ \forall v \in V_P.
+\end{equation}
+
+\subsection{Obtaining the Fundamental Problem Formulation Graph}
+In general, the fundamental problem formulation graph $P$ may not exist, or there may be multiple different solutions. Then the first problem is to determine if there exists a graph $P$.
+In practice, it is likely that this definition will not produce a unique solution. 
+A collision represents a choice.
+
+
+
+
+
+% \begin{figure}[htb!]
+	% \begin{center}
+	% \includegraphics[width=2in]{images/hour_glass}
+	% \end{center}
+	% \vspace{-20pt}
+% \caption{(()).}
+% \label{f:our glass}
+% \end{figure}
+% \subsection{old}
+	% For a large scale problem with many analyses, obtaining the FPF is likely to be a challenge. In general, a set of analysis codes will be given and the desired outputs will be specified as
+	    % \begin{align}
+            % given & \ \ A: \lbrace x_i \lvert i \in A_\textrm{input} \rbrace \rightarrow \lbrace x_i \lvert i \in A_\textrm{output} \rbrace \notag
+            % \\    & \ \ B: \lbrace x_i \lvert i \in B_\textrm{input} \rbrace \rightarrow \lbrace x_i \lvert i \in B_\textrm{output} \rbrace \notag
+			% \\    & \ \ \quad \quad \quad \quad \quad \quad  \quad \quad \vdots
+            % \\min. &\ \ f(x_i), i \in \mathcal{O} \notag
+            % \\w.r.t. & \ \ x_i, i \in \mathcal{I}, \notag
+            % \label{eqn:preFPF}
+        % \end{align}
+	% where $\mathcal{O}$ is the index set of the global outputs and $\mathcal{I}$ is the index set of the global inputs. For this to be an FPF, there must be no \emph{conflicts} or \emph{holes}. A conflict arises when different analyses produce the same output; two analysis codes $A$ and $B$ are in conflict if
+		% \begin{equation}
+			% A_\textrm{output} \cap B_\textrm{output} \neq \emptyset.
+		% \end{equation}
+	% A hole arises when a local input to an analysis block is neither a global input nor a local output of any analysis block. If we let $\mathcal{H}$ denote the index set of local inputs which are holes
+		% \begin{equation}
+			% i \in \bigcup \{A_\textrm{input},B_\textrm{input},\ldots\} \textrm{ and } i \notin \bigcup \{\mathcal{I},A_\textrm{output},B_\textrm{output},\ldots\}  \implies  i \in \mathcal{H}.
+		% \end{equation}
+	% If the given set of analyses contains any holes, an FPF cannot be obtained. On the contrary, if there are conflicts multiple FPFs may be obtained. This is because every conflict represents a choice of which analysis to use and each choice could (potentially) yeild a different but valid FPF. The following section develops an application of graphy theory to obtain multiple FPFs from a set of analyses and desired outputs.
 		
-    \subsection{Formulation Graph Syntax}
-    Rather than start with an adjacency, we chose to work directly with a directed cyclic graph to develop a syntax for the FPF. 
-    The following information must be provided to start:
-    \begin{itemize}
-        \item Analysis blocks: an analysis block represents any calculation, and each comes with
-            \begin{itemize}
-                \item local inputs
-                \item local outputs 
-                \item execution properties: these are the properties associated with running the code, such as run time
-            \end{itemize}
-        \item Global parameters: these may serve as fixed inputs to the local inputs of analysis blocks
-        \item Global outputs: these may represent
-            \begin{itemize}
-                \item objectives
-                \item constraints
-                \item residuals: (not sure)
-            \end{itemize}
-    \end{itemize}
+    % \subsection{Formulation Graph Syntax}
+    % Rather than start with an adjacency, we chose to work directly with a directed cyclic graph to develop a syntax for the FPF. 
+    % The following information must be provided to start:
+    % \begin{itemize}
+        % \item Analysis blocks: an analysis block represents any calculation, and each comes with
+            % \begin{itemize}
+                % \item local inputs
+                % \item local outputs 
+                % \item execution properties: these are the properties associated with running the code, such as run time
+            % \end{itemize}
+        % \item Global parameters: these may serve as fixed inputs to the local inputs of analysis blocks
+        % \item Global outputs: these may represent
+            % \begin{itemize}
+                % \item objectives
+                % \item constraints
+                % \item residuals: (not sure)
+            % \end{itemize}
+    % \end{itemize}
 
-    The graph representation of a data flow is cast to utilize the extensive library of algorithms in graph theory to analyze a directed weighted graph. 
-    Edge weights are used to represent the metrics associated with a data flow:
-    \begin{itemize}
-        \item Run time: this metric is a property of an analysis block
-        \item Fidelity: this metric is a property of an individual local output
-        \item Expected Convergence
-    \end{itemize}
+    % The graph representation of a data flow is cast to utilize the extensive library of algorithms in graph theory to analyze a directed weighted graph. 
+    % Edge weights are used to represent the metrics associated with a data flow:
+    % \begin{itemize}
+        % \item Run time: this metric is a property of an analysis block
+        % \item Fidelity: this metric is a property of an individual local output
+        % \item Expected Convergence
+    % \end{itemize}
 
-    The key assumption is that identical variables are recognized as such. This serves as the basis for creating a data flow by connecting compatible input and output nodes with a directed edge. 
-    To represent the fact that execution of an analysis code does not depend on the number of outputs being used, we have created the following figure (not made yet).
+    % The key assumption is that identical variables are recognized as such. This serves as the basis for creating a data flow by connecting compatible input and output nodes with a directed edge. 
+    % To represent the fact that execution of an analysis code does not depend on the number of outputs being used, we have created the following figure (not made yet).
     
-    This information immediately leads to the maximal connectivity graph, which is formed by placing a directed edge from each local output or global parameter to each matching local input or global output. 
-    Whenever multiple edges are connected to a single input, a conflict occurs because only one may be used. Resolving these conflicts is one key challenge in creating a data flow.
+    % This information immediately leads to the maximal connectivity graph, which is formed by placing a directed edge from each local output or global parameter to each matching local input or global output. 
+    % Whenever multiple edges are connected to a single input, a conflict occurs because only one may be used. Resolving these conflicts is one key challenge in creating a data flow.
 %    \begin{itemize}
 %        \item Specify analyses
 %        \item Connections between analyses 
