@@ -1,7 +1,7 @@
 \section{Graph-based Problem Formulation Syntax}
 We begin by discussing the general syntax of graph theory and then expand upon this syntax to represent the data flow of an MDAO problem.
 A graph is a pair $G = (V,E)$ of sets such that $E \subseteq V \times V$, which means that the elements of $E$ are 2--element subsets of $V$ \cite{Diestel2010}. 
-For a directed graph we introduce two maps $S:E \to V$ and $F:E \to V$ to denote the starting and final nodes of each edge, respectively. 
+For a directed graph we construct $E$ as a set of ordered pairs instead of a set of sets. Each ordered pair represents an edge starting at the node indicated by the first entry and directed to the node indicated by the second entry. Therefore, $E$ is a mapping from $V$ to $V$.
 \begin{figure}[htb!]
 	\begin{center}
 	\includegraphics[width=1.5in]{images/example_directed_graph}
@@ -13,9 +13,7 @@ For a directed graph we introduce two maps $S:E \to V$ and $F:E \to V$ to denote
 As an example, for the directed graph shown in Fig.~\ref{f:example directed graph} we have
 \begin{IEEEeqnarray*}{rCl}
 V & = & \{1,2,3,4,5\}, \\
-E & = & \big\{\{1,2\},\{2,3\},\{1,3\},\{3,4\}\big\}, \\
-S & = & \Big\{ \big(\{1,2\},2\big),\big(\{2,3\},3\big),\big(\{1,3\},1\big),\big(\{3,4\},3\big) \Big\}, \\
-F & = & \Big\{ \big(\{1,2\},1\big),\big(\{2,3\},2\big),\big(\{1,3\},3\big),\big(\{3,4\},4\big) \Big\}.
+E & = & \big\{(1,2),(3,2),(1,3),(3,4)\big\}.
 \end{IEEEeqnarray*}
 
 We now assign additional properties to the nodes and edges so that they may represent the data flow of an MDAO problem. 
@@ -34,6 +32,7 @@ and the possible edge types are
 \item in
 \item analysis
 \item out
+\item ((consider eliminating `in' and `out' and using connection))
 \end{itemize}
 Then, considering sets $T_\txt{node}$ and $T_\txt{edge}$ to be sets containing the possible node types and edge types, respectively, we use mappings $t_\txt{node}:V \to T_\txt{node}$ and $t_\txt{edge}:E \to T_\txt{edge}$ to assign a type to each node and edge. Nodes and edges are named according to their type (e.g. connection edge). Additional properties will be discussed is subsequent sections.
 
@@ -59,29 +58,33 @@ E_M & = & C \cup \left( \bigcup_{i=1}^m E_{A_i} \right),
 \end{IEEEeqnarray*}
 where $C$ is a set containing connection edges defined for $v_1,v_2 \in V_M$ as:
 \begin{IEEEeqnarray*}{rl}
-c = & \{v_1,v_2\} \in C \txt{ if:} \\
+c = & (v_1,v_2) \in C \txt{ if:} \\
 & t_\txt{node}(v_1) = \txt{`local output' or `global input'}, \\
 & t_\txt{node}(v_2) = \txt{`local input' or `global output'},\txt{ and} \\
-& n(v_1) = n(v_2),
+& n(v_1) = n(v_2).
 \end{IEEEeqnarray*}
-in which case $S(c) = v_1$ and $F(c) = v_2$. The maximal connectivity graph contains all possible connections that may exist between the given analysis blocks, and these connections are made by connecting variables with the same name, which requires a consistent naming convention between analysis blocks.
+The maximal connectivity graph contains all possible connections that may exist between the given analysis blocks, and these connections are made by connecting variables with the same name, which requires a consistent naming convention between analysis blocks.
 
 \subsection{Fundamental Problem Formulation Graph}
-We may now define the graph representing the fundamental problem formulation $P=(V_P,E_P)$ as a subgraph of $M$ such that there are no \emph{holes} or \emph{collisions}. 
-Before defining these terms, let us first define $\txt{deg}^-(v)$ as the \emph{indegree} $\txt{deg}^+(v)$ as the \emph{outdegree} of vertex $v$, where indegree and outdegree refer to the number of edges directed into vertex $v$ and the number of edges directed out of vertex $v$, respectively.
-Let $H$ be the set of all nodes which are holes in $M$ and define $H$ as
-\begin{equation}
-v \in H \txt{ if } t_\txt{node}(v) = \txt{`local input' or `global output'} \txt{ and } \txt{deg}^-(v) = 0.
-\end{equation}
-Next, let $L$ be the set of all nodes which are collisions in $M$ and define $L$ as
-\begin{equation}
-v \in L \txt{ if } t_\txt{node}(v) = \txt{`local input' or `global output'} \txt{ and } \txt{deg}^-(v) > 1.
-\end{equation}
-This means that exactly one edge must be directed into each local input node and each global output node. We also require $P$ to contain all of the global output nodes, meaning $P\subset M$ is a fundamental problem formulation if
-\begin{equation}
-\mathcal O \subset V_P \ \txt{ and } \ v \notin H, v \notin L \ \forall v \in V_P.
-\end{equation}
+Before defining the the fundamental problem formulation graph, let us first define $\txt{deg}^-(v)$ as the \emph{indegree} $\txt{deg}^+(v)$ as the \emph{outdegree} of vertex $v$, where indegree and outdegree refer to the number of edges directed into vertex $v$ and the number of edges directed out of vertex $v$, respectively. Then, define a mapping $d:V|_\txt{local input} \to \mathbb{N}$ to specifiy the maximum number of connections that are allowed into a local input node.
+If $d(v)=1$ for each local input node, then exactly one edge must be directed into each local input node and each global output node. 
+If $d(v)>1$ for a local input node, this means that multiple inputs are accepted, such as the case for a multifidelity formulation.
 
+Next, let $H$ be the set of all nodes which are \emph{holes} in $M$ and define $H$ as
+\begin{equation}
+H=\big\{v \in M \big| t_\txt{node}(v) = \txt{`local input' or `global output'} \txt{ and } \txt{deg}^-(v) = 0\big\}.
+\end{equation}
+Also, let $L$ be the set of all nodes which are \emph{collisions} in $M$ and define $L$ as
+\begin{equation}
+L = \big\{v \in M \big| t_\txt{node}(v) = \txt{`local input' or `global output'} \txt{ and } \txt{deg}^-(v) > d(v) \big\}.
+\end{equation}
+We may now define the graph representing the fundamental problem formulation $F=(V_F,E_F)$ as a subgraph of $M$ such that there are no holes or collisions. 
+
+We also require $F$ to contain all of the global output nodes, meaning $F\subset M$ is a fundamental problem formulation if
+\begin{equation}
+\mathcal O \subset V_F \ \txt{ and } \ v \notin H, v \notin L \ \forall v \in V_F.
+\end{equation}
+((this is missing any edges!!!))
 \subsection{Obtaining the Fundamental Problem Formulation Graph}
 In general, the fundamental problem formulation graph $P$ may not exist, or there may be multiple different solutions. Then the first problem is to determine if there exists a graph $P$.
 In practice, it is likely that this definition will not produce a unique solution. 
