@@ -1,13 +1,14 @@
 %%
-%% IEEEtrantools.sty 2007/01/11 version V1.2
+%% IEEEtrantools.sty 2012/12/27 version V1.3
 %% 
 %% 
 %% This package provides several popular and unique commands from the
-%% IEEEtran.cls class (version 1.7) file.
+%% IEEEtran.cls class (version 1.8) file.
 %% 
 %% The provided commands include \IEEEPARstart, \IEEEitemize, \IEEEenumerate,
 %% \IEEEdescription as well as the \IEEEeqnarray, \IEEEeqnarraybox family
-%% of commands including support commands such as \IEEEstrut.
+%% of commands including support commands such as \IEEEstrut, the IEEEproof
+%% environment and its support commands and the \IEEEauthorrefmark command.
 %% Also provides the \bstctlcite command for the control entry types of
 %% IEEEtran.bst V1.00 and later.
 %% 
@@ -18,7 +19,7 @@
 %% http://www.ctan.org/tex-archive/macros/latex/contrib/IEEEtran/
 %%
 %% 
-%% Copyright (c) 2002-2007 by Michael Shell
+%% Copyright (c) 2002-2012 by Michael Shell
 %%                            See: http://www.michaelshell.org/
 %%                            for current contact information.
 %%
@@ -50,75 +51,36 @@
 %%
 %%
 %%
-%% Available package options (e.g., \usepackage[retainorgcmds]{IEEEtrantools}
+%% Available package options (e.g., \usepackage[redeflists]{IEEEtrantools}
 %%
-%% retainorgcmds
-%%    Prevents IEEEtrantools from overriding existing LaTeX commands.
-%%    Currently, the only effect is to preserve the original definitions
-%%    of itemize, enumerate and description. The IEEEtran versions are
-%%    always available as IEEEitemize, IEEEenumerate and IEEEdescription.
+%% redeflists
+%%    Causes IEEEtrantools to redefine the standard itemize, enumerate and
+%%    description (IED) list environments to their IEEE versions.
+%%    IEEEitemize, IEEEenumerate and IEEEdescription remain available in any
+%%    case. This option may not be compatible with packages that alter the
+%%    standard IED list environments.
+%%    
 %%
-%%*******
-% 1/2007 V1.2 (V1.7 of IEEEtran.cls) changes:
-%
-% 1) Several commands and environments have depreciated in favor of
-%    replacements with IEEE prefixes to better avoid potential future name
-%    clashes with other packages. Legacy code retained to allow
-%    use of the obsolete forms, but with an warning message to the
-%    console during compilation:
-%    \IEEEPARstart
-%    For IED lists:
-%    \IEEEiedlabeljustifyc, \IEEEiedlabeljustifyl, \IEEEiedlabeljustifyr,
-%    \IEEEnocalcleftmargin, \IEEElabelindent, \IEEEsetlabelwidth,
-%    \IEEEusemathlabelsep
-% 
-% 2) These commands/lengths now require the IEEE prefix and do not have
-%    legacy support: \IEEEnormaljot.
-%    For IED lists: \ifIEEEnocalcleftmargin, \ifIEEEnolabelindentfactor,
-%    \IEEEiedlistdecl, \IEEElabelindentfactor
-%
-% 3) \normalsizebaselineskip no longer provided.
-%
-% 4) New \IEEEPARstart controls:
-%    \IEEEPARstartHEIGHTTEXT, \IEEEPARstartFONTSTYLE, \IEEEPARstartCAPSTYLE,
-%    \IEEEPARstartWORDFONTSTYLE, \IEEEPARstartWORDCAPSTYLE,
-%    \IEEEPARstartHOFFSET, \IEEEPARstartITLCORRECT
-%    and the (output) length \IEEEPARstartletwidth.
-%
-% 5) Provide for an optional argument to \bstctlcite to provide a way to
-%    specify a different aux file.
-%
-%
-% 11/2002 V1.1 (V1.6b of IEEEtran.cls) changes:
-% 
-% 1) In addition to the IEEE IED lists, the original LaTeX IED style list
-%    environments are now preserved as LaTeXitemize, LaTeXenumerate, and
-%    LaTeXdescription. Also, users can now redefine \makelabel within
-%    IEEE IED list controls. There may be some use for these in specialized
-%    applications. Thanks to Eli Barzilay for suggesting this feature.
-% 
 %%**********************************************************************
 
 
-\ProvidesPackage{IEEEtrantools}[2007/01/11 V1.2 by Michael Shell]
+\ProvidesPackage{IEEEtrantools}[2012/12/27 V1.3 by Michael Shell]
 \typeout{-- See the "IEEEtrantools_doc.txt" manual for usage information.}
 \typeout{-- http://www.michaelshell.org/tex/ieeetran/tools/}
 \NeedsTeXFormat{LaTeX2e}
 
 
-% If IEEEtran.cls is detected, error.
-{\@ifundefined{IEEEtransversionmajor}{\relax}{%
-\PackageError{IEEEtrantools}{IEEEtrantools is not for use with the\MessageBreak
-                             IEEEtran class}%
+% If \@IEEEeqnarray is detected, error.
+{\@ifundefined{@IEEEeqnarray}{\relax}{%
+\PackageError{IEEEtrantools}{The IEEEtrantools package is not for use\MessageBreak
+                             with classes that already provide it}%
     {Do not load IEEEtrantools - you don't need it.}%
 }}
 
 
-% define new needed flags to indicate document options
-% and set a few "failsafe" defaults
-\newif\if@IEEETOOLSretainorgcmds       
-\global\@IEEETOOLSretainorgcmdsfalse
-
+% define needed flags to indicate document options
+\newif\if@IEEETOOLSredeflists
+\global\@IEEETOOLSredeflistsfalse
 
 
 % IEEEtran class scratch pad registers
@@ -133,7 +95,9 @@
 
 
 % declare the options
-\DeclareOption{retainorgcmds}{\@IEEETOOLSretainorgcmdstrue}
+\DeclareOption{redeflists}{\@IEEETOOLSredefliststrue}
+% provide legacy support for retainorgcmds which does nothing now.
+\DeclareOption{retainorgcmds}{\@IEEETOOLSredeflistsfalse}
 
 % get and process any supplied options
 \ProcessOptions
@@ -351,8 +315,8 @@
 \let\endLaTeXdescription\enddescription
 
 
-% override LaTeX's default IED lists, unless the user requested they be retained
-\if@IEEETOOLSretainorgcmds\relax\else
+% override LaTeX's default IED lists, if the user requested it
+\if@IEEETOOLSredeflists
 \def\itemize{\@IEEEitemize}
 \def\enditemize{\@endIEEEitemize}
 \def\enumerate{\@IEEEenumerate}
@@ -390,7 +354,7 @@
                 \ifnum\@listdepth>5\relax\@toodeep\else%
                 \advance\@itemdepth\@ne%
                 \edef\@itemitem{labelitem\romannumeral\the\@itemdepth}%
-                % get the labelindentfactor for this level
+                % get the IEEElabelindentfactor for this level
                 \advance\@listdepth\@ne% we need to know what the level WILL be
                 \edef\IEEElabelindentfactor{\csname IEEElabelindentfactor\romannumeral\the\@listdepth\endcsname}%
                 \advance\@listdepth-\@ne% undo our increment
@@ -419,9 +383,9 @@
                 \IEEEiedlistdecl% let user alter parameters
                 #1\relax%
                 % If the user has requested not to use the
-                % labelindent factor, don't revise \labelindent
+                % IEEElabelindent factor, don't revise \IEEElabelindent
                 \ifIEEEnolabelindentfactor\relax%
-                \else\IEEElabelindent=\IEEElabelindentfactor\labelindent%
+                \else\IEEElabelindent=\IEEElabelindentfactor\IEEElabelindent%
                 \fi%
                 % Unless the user has requested otherwise,
                 % calculate our left margin based
@@ -441,7 +405,7 @@
                 \ifnum\@listdepth>5\relax\@toodeep\else%
                 \advance\@enumdepth\@ne%
                 \edef\@enumctr{enum\romannumeral\the\@enumdepth}%
-                % get the labelindentfactor for this level
+                % get the IEEElabelindentfactor for this level
                 \advance\@listdepth\@ne% we need to know what the level WILL be
                 \edef\IEEElabelindentfactor{\csname IEEElabelindentfactor\romannumeral\the\@listdepth\endcsname}%
                 \advance\@listdepth-\@ne% undo our increment
@@ -490,7 +454,7 @@
 % Note controlled spacing here, shield end of lines with %
 \def\@@IEEEdescription[#1]{%
                 \ifnum\@listdepth>5\relax\@toodeep\else%
-                % get the labelindentfactor for this level
+                % get the IEEElabelindentfactor for this level
                 \advance\@listdepth\@ne% we need to know what the level WILL be
                 \edef\IEEElabelindentfactor{\csname IEEElabelindentfactor\romannumeral\the\@listdepth\endcsname}%
                 \advance\@listdepth-\@ne% undo our increment
@@ -565,7 +529,7 @@
 
 
 %%
-%% START OF IEEEeqnarry DEFINITIONS
+%% START OF IEEEeqnarray DEFINITIONS
 %%
 %% Inspired by the concepts, examples, and previous works of LaTeX 
 %% coders and developers such as Donald Arseneau, Fred Bartlett, 
@@ -575,10 +539,10 @@
 
 
 % hook to allow easy changeover to IEEEtran.cls/tools.sty error reporting
-\def\@IEEEclspkgerror{\PackageError{IEEEtran}}
+\def\@IEEEclspkgerror{\ClassError{IEEEtran}}
 
-\newif\if@IEEEeqnarraystarform% flag to indicate if the environment was called as the star form
-\@IEEEeqnarraystarformfalse
+\newif\if@IEEEeqnarrayboxnojot% flag to indicate if the environment was called as the star form
+\@IEEEeqnarrayboxnojotfalse
 
 \newif\if@advanceIEEEeqncolcnt% tracks if the environment should advance the col counter
 % allows a way to make an \IEEEeqnarraybox that can be used within an \IEEEeqnarray
@@ -599,43 +563,116 @@
 \def\IEEEeqnarraydecl{\relax}
 \def\IEEEeqnarrayboxdecl{\relax}
 
+
+
+% V1.8 flags to indicate that equation numbering is to persist
+\newif\if@IEEEeqnumpersist%
+\@IEEEeqnumpersistfalse
+\newif\if@IEEEsubeqnumpersist%
+\@IEEEsubeqnumpersistfalse
+%
+% V1.8 flags to indicate if (sub)equation number of last line was preadvanced
+\newif\if@IEEEeqnumpreadv%
+\@IEEEeqnumpreadvfalse
+\newif\if@IEEEsubeqnumpreadv%
+\@IEEEsubeqnumpreadvfalse
+
+\newcount\@IEEEsubeqnnumrollback% saves previous value of IEEEsubequation number in case we need to restore it
+
 % \yesnumber is the opposite of \nonumber
 % a novel concept with the same def as the equationarray package
 % However, we give IEEE versions too since some LaTeX packages such as 
 % the MDWtools mathenv.sty redefine \nonumber to something else.
+% This command is intended for use in non-IEEEeqnarray math environments
 \providecommand{\yesnumber}{\global\@eqnswtrue}
-\def\IEEEyesnumber{\global\@eqnswtrue}
-\def\IEEEnonumber{\global\@eqnswfalse}
 
 
-\def\IEEEyessubnumber{\global\@IEEEissubequationtrue\global\@eqnswtrue%
-\if@IEEEeqnarrayISinner% only do something inside an IEEEeqnarray
-\if@IEEElastlinewassubequation\addtocounter{equation}{-1}\else\setcounter{IEEEsubequation}{1}\fi%
-\def\@currentlabel{\p@IEEEsubequation\theIEEEsubequation}\fi}
+% IEEEyes/nonumber 
+% V1.8 add persistant * forms
+% These commands can alter the type of equation an IEEEeqnarray line is.
+\def\IEEEyesnumber{\@ifstar{\global\@IEEEeqnumpersisttrue\global\@IEEEsubeqnumpersistfalse\@IEEEyesnumber}{\@IEEEyesnumber}}
 
-% flag to indicate that an equation is a sub equation
-\newif\if@IEEEissubequation%
-\@IEEEissubequationfalse
+\def\@IEEEyesnumber{\global\@eqnswtrue
+\if@IEEEeqnarrayISinner% alter counters and label only inside an IEEEeqnarray
+\ifnum\c@IEEEsubequation>0\relax
+   \stepcounter{equation}\setcounter{IEEEsubequation}{0}\gdef\@currentlabel{\p@equation\theequation}\relax
+   \gdef\@currentHref{\@IEEEtheHrefequation}% setup hyperref label
+\fi
+% even if we reached this eqn num via a preadv, it is legit now
+\global\@IEEEeqnumpreadvfalse\global\@IEEEsubeqnumpreadvfalse
+\fi}
+
+\def\IEEEnonumber{\@ifstar{\global\@IEEEeqnumpersistfalse\global\@IEEEsubeqnumpersistfalse\global\@eqnswfalse}{\global\@eqnswfalse}}
+
+
+\def\IEEEyessubnumber{\@ifstar{\global\@IEEEsubeqnumpersisttrue\@IEEEyessubnumber}{\@IEEEyessubnumber}}
+%
+\def\@IEEEyessubnumber{\if@IEEEeqnarrayISinner% alter counters and label only inside an IEEEeqnarray
+  \ifnum\c@IEEEsubequation>0\relax% if it already is a subequation, we are good to go as-is
+  \else% if we are a regular equation we have to watch out for two cases
+    \if@IEEEeqnumpreadv% if this equation is the result of a preadvance, backout and bump the sub eqnnum
+       \global\advance\c@equation\m@ne\global\c@IEEEsubequation=\@IEEEsubeqnnumrollback\addtocounter{IEEEsubequation}{1}\relax
+    \else% non-preadvanced equations just need initialization of their sub eqnnum
+       \setcounter{IEEEsubequation}{1}\relax
+    \fi
+  \fi% fi already is subequation
+  \gdef\@currentlabel{\p@IEEEsubequation\theIEEEsubequation}\relax
+  \gdef\@currentHref{\@IEEEtheHrefsubequation}% setup hyperref label
+  \global\@IEEEeqnumpreadvfalse\global\@IEEEsubeqnumpreadvfalse% no longer a preadv anymore
+  \global\@eqnswtrue
+\fi}
+
+
+\def\IEEEnosubnumber{\@ifstar{\global\@IEEEsubeqnumpersistfalse\@IEEEnosubnumber}{\@IEEEnosubnumber}}
+%
+\def\@IEEEnosubnumber{\if@IEEEeqnarrayISinner% alter counters and label only inside an IEEEeqnarray
+  \if@eqnsw % we do nothing unless we know we will display because we play with the counters here
+    % if it currently is a subequation, bump up to the next equation number and turn off the subequation
+    \ifnum\c@IEEEsubequation>0\relax\addtocounter{equation}{1}\setcounter{IEEEsubequation}{0}\relax
+    \fi
+    \global\@IEEEeqnumpreadvfalse\global\@IEEEsubeqnumpreadvfalse% no longer a preadv anymore
+    \gdef\@currentlabel{\p@equation\theequation}\relax
+    \gdef\@currentHref{\@IEEEtheHrefequation}% setup hyperref label
+  \fi
+\fi}
+
+
 
 % allows users to "push away" equations that get too close to the equation numbers
-\def\IEEEeqnarraynumspace{\hphantom{\if@IEEEissubequation\theIEEEsubequationdis\else\theequationdis\fi}}
+\def\IEEEeqnarraynumspace{\hphantom{\ifnum\c@IEEEsubequation>0\relax\theIEEEsubequationdis\else\theequationdis\fi}}
 
 % provides a way to span multiple columns within IEEEeqnarray environments
 % will consider \if@advanceIEEEeqncolcnt before globally advancing the
 % column counter - so as to work within \IEEEeqnarraybox
 % usage: \IEEEeqnarraymulticol{number cols. to span}{col type}{cell text}
-\long\def\IEEEeqnarraymulticol#1#2#3{\multispan{#1}%
-% check if column is defined
-\relax\expandafter\ifx\csname @IEEEeqnarraycolDEF#2\endcsname\@IEEEeqnarraycolisdefined%
-\csname @IEEEeqnarraycolPRE#2\endcsname#3\relax\relax\relax\relax\relax%
-\relax\relax\relax\relax\relax\csname @IEEEeqnarraycolPOST#2\endcsname%
+\long\def\IEEEeqnarraymulticol#1#2#3{\multispan{#1}\relax
+% check if column is defined for the precolumn definition
+% We have to be careful here because TeX scans for & even within an \iffalse
+% where it does not expand macros. So, if we used only one \ifx and a #3
+% appeared in the false branch and the user inserted another alignment
+% structure that uses & in the \IEEEeqnarraymulticol{}, TeX will not see that
+% there is an inner alignment in the false branch yet still will see any &
+% there and will think that they apply to the outer alignment resulting in an
+% incomplete \ifx error.
+% So, here we use separate checks for the pre and post parts in order to keep
+% the #3 outside of all conditionals.
+\relax\expandafter\ifx\csname @IEEEeqnarraycolDEF#2\endcsname\@IEEEeqnarraycolisdefined\relax
+\csname @IEEEeqnarraycolPRE#2\endcsname
 \else% if not, error and use default type
 \@IEEEclspkgerror{Invalid column type "#2" in \string\IEEEeqnarraymulticol.\MessageBreak
 Using a default centering column instead}%
 {You must define IEEEeqnarray column types before use.}%
-\csname @IEEEeqnarraycolPRE@IEEEdefault\endcsname#3\relax\relax\relax\relax\relax%
-\relax\relax\relax\relax\relax\csname @IEEEeqnarraycolPOST@IEEEdefault\endcsname%
-\fi%
+\csname @IEEEeqnarraycolPRE@IEEEdefault\endcsname
+\fi
+% The ten \relax are to help prevent misleading error messages in case a user
+% accidently inserted a macro that tries to acquire additional arguments.
+#3\relax\relax\relax\relax\relax\relax\relax\relax\relax\relax
+% check if column is defined for the postcolumn definition
+\expandafter\ifx\csname @IEEEeqnarraycolDEF#2\endcsname\@IEEEeqnarraycolisdefined\relax
+\csname @IEEEeqnarraycolPOST#2\endcsname
+\else% if not, use the default type
+\csname @IEEEeqnarraycolPOST@IEEEdefault\endcsname
+\fi
 % advance column counter only if the IEEEeqnarray environment wants it
 \if@advanceIEEEeqncolcnt\global\advance\@IEEEeqncolcnt by #1\relax\fi}
 
@@ -926,6 +963,9 @@ Using a default centering column instead}%
 \xdef\@IEEEeqnarrayTHEstrutdepth{\@IEEEeqnarrayTHEstrutdepth}%
 \global\@IEEEeqnarrayusemasterstrutfalse%
 \fi}
+
+
+
 % usage: \IEEEeqnarraystrutsize{height}{depth}[font size commands]
 % If called outside the lines of an IEEEeqnarray, sets the height
 % and depth of both the master and local struts. If called inside
@@ -1092,11 +1132,15 @@ Using a default centering column instead}%
 \baselineskip=0pt\lineskip=0pt\lineskiplimit=0pt\jot=0pt}
 
 
+% equation and subequation forms to use to setup hyperref's \@currentHref
+\def\@IEEEtheHrefequation{equation.\theHequation}
+\def\@IEEEtheHrefsubequation{equation.\theHequation\alph{IEEEsubequation}}
 
-\def\IEEEeqnarray{\@IEEEeqnarraystarformfalse\@IEEEeqnarray}
+
+\def\IEEEeqnarray{\@IEEEeqnumpersisttrue\@IEEEsubeqnumpersistfalse\@IEEEeqnarray}
 \def\endIEEEeqnarray{\end@IEEEeqnarray}
 
-\@namedef{IEEEeqnarray*}{\@IEEEeqnarraystarformtrue\@IEEEeqnarray}
+\@namedef{IEEEeqnarray*}{\@IEEEeqnumpersistfalse\@IEEEsubeqnumpersistfalse\@IEEEeqnarray}
 \@namedef{endIEEEeqnarray*}{\end@IEEEeqnarray}
 
 
@@ -1107,12 +1151,19 @@ Using a default centering column instead}%
 \def\@@IEEEeqnarray[#1]#2{%
    % default to showing the equation number or not based on whether or not
    % the star form was involked
-   \if@IEEEeqnarraystarform\global\@eqnswfalse
+   \if@IEEEeqnumpersist\global\@eqnswtrue
    \else% not the star form
-   \global\@eqnswtrue
+   \global\@eqnswfalse
    \fi% if star form
-   \@IEEEissubequationfalse% default to no subequations
-   \@IEEElastlinewassubequationfalse% assume last line is not a sub equation
+   % provide a basic hyperref \theHequation if this has not already been setup (hyperref not loaded, or no section counter)
+   \@ifundefined{theHequation}{\def\theHequation{\arabic{equation}}}{}\relax
+   % provide dummy hyperref commands in case hyperref is not loaded
+   \providecommand{\Hy@raisedlink}[1]{}\relax
+   \providecommand{\hyper@anchorstart}[1]{}\relax
+   \providecommand{\hyper@anchorend}{}\relax
+   \providecommand{\@currentHref}{}\relax
+   \@IEEEeqnumpreadvfalse% reset eqnpreadv flag
+   \@IEEEsubeqnumpreadvfalse% reset subeqnpreadv flag
    \@IEEEeqnarrayISinnerfalse% not yet within the lines of the halign
    \@IEEEeqnarraystrutsize{0pt}{0pt}[\relax]% turn off struts by default
    \@IEEEeqnarrayusemasterstruttrue% use master strut till user asks otherwise
@@ -1125,9 +1176,15 @@ Using a default centering column instead}%
    \mathsurround\z@\relax% no extra spacing around math
    \@advanceIEEEeqncolcnttrue% advance the col counter for each col the user uses, 
                              % used in \IEEEeqnarraymulticol and in the preamble build
-   \stepcounter{equation}% advance equation counter before first line
-   \setcounter{IEEEsubequation}{0}% no subequation yet 
+   %V1.8 Here we preadvance to the next equation number.
+   % If the user later wants a continued subequation, we can roll back.
+   \global\@IEEEsubeqnnumrollback=\c@IEEEsubequation%
+   \stepcounter{equation}\@IEEEeqnumpreadvtrue% advance equation counter before first line
+   \setcounter{IEEEsubequation}{0}% no subequation yet
+   \let\@IEEEcurrentlabelsave\@currentlabel% save current label as we later change it globally
+   \let\@IEEEcurrentHrefsave\@currentHref% save current href label as we later change it globally
    \def\@currentlabel{\p@equation\theequation}% redefine the ref label
+   \def\@currentHref{\@IEEEtheHrefequation}% setup hyperref label
    \IEEEeqnarraydecl\relax% allow a way for the user to make global overrides
    #1\relax% allow user to override defaults
    \let\\\@IEEEeqnarraycr% replace newline with one that can put in eqn. numbers
@@ -1155,19 +1212,19 @@ Using a default centering column instead}%
 
 % enter isolation/strut column (or the next column if the user did not use
 % every column), record the strut status, complete the columns, do the strut if needed,
-% restore counters to correct values and exit
-\def\end@IEEEeqnarray{\@IEEEeqnarrayglobalizestrutstatus&\@@IEEEeqnarraycr\egroup%
-\if@IEEElastlinewassubequation\global\advance\c@IEEEsubequation\m@ne\fi%
-\global\advance\c@equation\m@ne%
+% restore counters (to backout any equation setup for a next line that was never used)
+% to their correct values and exit
+\def\end@IEEEeqnarray{\@IEEEeqnarrayglobalizestrutstatus&\@@IEEEeqnarraycr\egroup
+\if@IEEEsubeqnumpreadv\global\advance\c@IEEEsubequation\m@ne\fi
+\if@IEEEeqnumpreadv\global\advance\c@equation\m@ne\global\c@IEEEsubequation=\@IEEEsubeqnnumrollback\fi
+\global\let\@currentlabel\@IEEEcurrentlabelsave% restore current label
+\global\let\@currentHref\@IEEEcurrentHrefsave% restore current href label
 $$\@ignoretrue}
 
-% need a way to remember if last line is a subequation
-\newif\if@IEEElastlinewassubequation%
-\@IEEElastlinewassubequationfalse
 
 % IEEEeqnarray uses a modifed \\ instead of the plain \cr to
 % end rows. This allows for things like \\*[vskip amount]
-% This "cr" macros are modified versions those for LaTeX2e's eqnarray
+% These "cr" macros are modified versions of those for LaTeX2e's eqnarray
 % the {\ifnum0=`} braces must be kept away from the last column to avoid
 % altering spacing of its math, so we use & to advance to the next column
 % as there is an isolation/strut column after the user's columns
@@ -1192,7 +1249,7 @@ $$\@ignoretrue}
     \ifnum\@IEEEeqncolcnt>\@IEEEeqnnumcols\relax
     \@IEEEclspkgerror{Too many columns within the IEEEeqnarray\MessageBreak
                           environment}%
-    {Use fewer \string &'s or put more columns in the IEEEeqnarry column\MessageBreak 
+    {Use fewer \string &'s or put more columns in the IEEEeqnarray column\MessageBreak 
      specifications.}\relax%
     \else
     \loop% add cols if the user did not use them all
@@ -1208,18 +1265,54 @@ $$\@ignoretrue}
     \@IEEEeqnarrayinsertstrut% do the strut if needed
     \@IEEEeqnarraystrutreset% reset the strut system for next line or IEEEeqnarray
     &% and enter the equation number column
-    % is this line needs an equation number, display it and advance the
-    % (sub)equation counters, record what type this line was
-    \if@eqnsw%
-     \if@IEEEissubequation\theIEEEsubequationdis\addtocounter{equation}{1}\stepcounter{IEEEsubequation}%
-     \global\@IEEElastlinewassubequationtrue%
-     \else% display a standard equation number, initialize the IEEEsubequation counter
-     \theequationdis\stepcounter{equation}\setcounter{IEEEsubequation}{0}%
-     \global\@IEEElastlinewassubequationfalse\fi%
-    \fi%
-    % reset the eqnsw flag to indicate default preference of the display of equation numbers
-    \if@IEEEeqnarraystarform\global\@eqnswfalse\else\global\@eqnswtrue\fi
-    \global\@IEEEissubequationfalse% reset the subequation flag
+    \if@eqnsw% only if we display something
+      \Hy@raisedlink{\hyper@anchorstart{\@currentHref}}% start a hyperref anchor
+      \global\@IEEEeqnumpreadvfalse\relax% displaying an equation number means
+      \global\@IEEEsubeqnumpreadvfalse\relax% the equation counters point to valid equations
+      % V1.8 Here we setup the counters, currentlabel and status for what would be the *next*
+      % equation line as would be the case under the current settings. However, there are two problems.
+      % One problem is that there might not ever be a next line. The second problem is that the user
+      % may later alter the meaning of a line with commands such as \IEEEyessubnumber. So, to handle
+      % these cases we have to record the current values of the (sub)equation counters and revert back
+      % to them if the next line is changed or never comes. The \if@IEEEeqnumpreadv, \if@IEEEsubeqnumpreadv
+      % and \@IEEEsubeqnnumrollback stuff tracks this.
+      % The logic to handle all this is surprisingly complex, but a nice feature of the approach here is
+      % that the equation counters and labels remain valid for what the line would be unless a
+      % \IEEEyessubnumber et al. later changes it. So, any hyperref links are always correct.
+      \ifnum\c@IEEEsubequation>0\relax% handle subequation
+         \theIEEEsubequationdis\relax
+         \if@IEEEsubeqnumpersist% setup for default type of next line
+            \stepcounter{IEEEsubequation}\global\@IEEEsubeqnumpreadvtrue\relax
+            \gdef\@currentlabel{\p@IEEEsubequation\theIEEEsubequation}\relax
+            \gdef\@currentHref{\@IEEEtheHrefsubequation}% setup hyperref label
+         \else
+             % if no subeqnum persist, go ahead and setup for a new equation number
+             \global\@IEEEsubeqnnumrollback=\c@IEEEsubequation
+             \stepcounter{equation}\global\@IEEEeqnumpreadvtrue\relax
+             \setcounter{IEEEsubequation}{0}\gdef\@currentlabel{\p@equation\theequation}\relax
+             \gdef\@currentHref{\@IEEEtheHrefequation}% setup hyperref label
+         \fi
+      \else% display a standard equation number
+        \theequationdis\relax
+        \setcounter{IEEEsubequation}{0}\relax% not really needed
+        \if@IEEEsubeqnumpersist% setup for default type of next line
+           % subequations that follow plain equations carry the same equation number e.g, 5, 5a rather than 5, 6a
+           \stepcounter{IEEEsubequation}\global\@IEEEsubeqnumpreadvtrue\relax
+           \gdef\@currentlabel{\p@IEEEsubequation\theIEEEsubequation}\relax
+           \gdef\@currentHref{\@IEEEtheHrefsubequation}% setup hyperref label
+         \else
+             % if no subeqnum persist, go ahead and setup for a new equation number
+             \global\@IEEEsubeqnnumrollback=\c@IEEEsubequation
+             \stepcounter{equation}\global\@IEEEeqnumpreadvtrue\relax
+             \setcounter{IEEEsubequation}{0}\gdef\@currentlabel{\p@equation\theequation}\relax
+             \gdef\@currentHref{\@IEEEtheHrefequation}% setup hyperref label
+         \fi
+      \fi%
+      \Hy@raisedlink{\hyper@anchorend}% end hyperref anchor
+    \fi% fi only if we display something
+    % reset the flags to indicate the default preferences of the display of equation numbers
+    \if@IEEEeqnumpersist\global\@eqnswtrue\else\global\@eqnswfalse\fi
+    \if@IEEEsubeqnumpersist\global\@eqnswtrue\fi% ditto for the subequation flag
     % reset the number of columns the user actually used
     \global\@IEEEeqncolcnt\z@\relax
     % the real end of the line
@@ -1243,21 +1336,21 @@ $$\@ignoretrue}
 % natural width is the default.
 % The * forms do not add \jot line spacing
 % usage: \IEEEeqnarraybox[decl][pos][width]{cols}
-\def\IEEEeqnarrayboxm{\@IEEEeqnarraystarformfalse\@IEEEeqnarrayboxHBOXSWfalse\@IEEEeqnarraybox}
+\def\IEEEeqnarrayboxm{\@IEEEeqnarrayboxnojotfalse\@IEEEeqnarrayboxHBOXSWfalse\@IEEEeqnarraybox}
 \def\endIEEEeqnarrayboxm{\end@IEEEeqnarraybox}
-\@namedef{IEEEeqnarrayboxm*}{\@IEEEeqnarraystarformtrue\@IEEEeqnarrayboxHBOXSWfalse\@IEEEeqnarraybox}
+\@namedef{IEEEeqnarrayboxm*}{\@IEEEeqnarrayboxnojottrue\@IEEEeqnarrayboxHBOXSWfalse\@IEEEeqnarraybox}
 \@namedef{endIEEEeqnarrayboxm*}{\end@IEEEeqnarraybox}
 
-\def\IEEEeqnarrayboxt{\@IEEEeqnarraystarformfalse\@IEEEeqnarrayboxHBOXSWtrue\@IEEEeqnarraybox}
+\def\IEEEeqnarrayboxt{\@IEEEeqnarrayboxnojotfalse\@IEEEeqnarrayboxHBOXSWtrue\@IEEEeqnarraybox}
 \def\endIEEEeqnarrayboxt{\end@IEEEeqnarraybox}
-\@namedef{IEEEeqnarrayboxt*}{\@IEEEeqnarraystarformtrue\@IEEEeqnarrayboxHBOXSWtrue\@IEEEeqnarraybox}
+\@namedef{IEEEeqnarrayboxt*}{\@IEEEeqnarrayboxnojottrue\@IEEEeqnarrayboxHBOXSWtrue\@IEEEeqnarraybox}
 \@namedef{endIEEEeqnarrayboxt*}{\end@IEEEeqnarraybox}
 
-\def\IEEEeqnarraybox{\@IEEEeqnarraystarformfalse\ifmmode\@IEEEeqnarrayboxHBOXSWfalse\else\@IEEEeqnarrayboxHBOXSWtrue\fi%
+\def\IEEEeqnarraybox{\@IEEEeqnarrayboxnojotfalse\ifmmode\@IEEEeqnarrayboxHBOXSWfalse\else\@IEEEeqnarrayboxHBOXSWtrue\fi%
 \@IEEEeqnarraybox}
 \def\endIEEEeqnarraybox{\end@IEEEeqnarraybox}
 
-\@namedef{IEEEeqnarraybox*}{\@IEEEeqnarraystarformtrue\ifmmode\@IEEEeqnarrayboxHBOXSWfalse\else\@IEEEeqnarrayboxHBOXSWtrue\fi%
+\@namedef{IEEEeqnarraybox*}{\@IEEEeqnarrayboxnojottrue\ifmmode\@IEEEeqnarrayboxHBOXSWfalse\else\@IEEEeqnarrayboxHBOXSWtrue\fi%
 \@IEEEeqnarraybox}
 \@namedef{endIEEEeqnarraybox*}{\end@IEEEeqnarraybox}
 
@@ -1355,7 +1448,7 @@ $$\@ignoretrue}
 
 % IEEEeqnarraybox does not automatically increase line spacing by \jot
 \def\@IEEEeqnarrayboxXCR[#1]{\ifnum0=`{\fi}%
-\cr\noalign{\if@IEEEeqnarraystarform\else\vskip\jot\fi\vskip#1\relax}}
+\cr\noalign{\if@IEEEeqnarrayboxnojot\else\vskip\jot\fi\vskip#1\relax}}
 
 
 
@@ -1630,7 +1723,7 @@ between column types.}%
 
 
 %%
-%% END OF IEEEeqnarry DEFINITIONS
+%% END OF IEEEeqnarray DEFINITIONS
 %%
 
 
@@ -1811,8 +1904,34 @@ between column types.}%
 \fi\endgroup}
 
 
+% \IEEEauthorrefmark
+\DeclareRobustCommand*{\IEEEauthorrefmark}[1]{\raisebox{0pt}[0pt][0pt]{\textsuperscript{\footnotesize\ensuremath{\ifcase#1\or *\or \dagger\or \ddagger\or%
+    \mathsection\or \mathparagraph\or \|\or **\or \dagger\dagger%
+    \or \ddagger\ddagger \else\textsuperscript{\expandafter\romannumeral#1}\fi}}}}
 
 
+% V1.3 IEEEQED and IEEEproof
+\def\IEEEproofname{Proof}
+
+\def\IEEEQEDclosed{\mbox{\rule[0pt]{1.3ex}{1.3ex}}} % for a filled box
+\def\IEEEQEDopen{{\setlength{\fboxsep}{0pt}\setlength{\fboxrule}{0.2pt}\fbox{\rule[0pt]{0pt}{1.3ex}\rule[0pt]{1.3ex}{0pt}}}}
+\def\IEEEQED{\IEEEQEDclosed} % default to closed
+
+%V1.8 flag to indicate if QED symbol is to be shown
+\newif\if@IEEEQEDshow  \@IEEEQEDshowtrue
+\def\IEEEproofindentspace{2\parindent}% V1.8 allow user to change indentation amount if desired
+% v1.7 name change to avoid namespace collision with amsthm. Also add support
+% for an optional argument.
+\def\IEEEproof{\@ifnextchar[{\@IEEEproof}{\@IEEEproof[\IEEEproofname]}}
+\def\@IEEEproof[#1]{\@IEEEQEDshowtrue\par\noindent\hspace{\IEEEproofindentspace}{\itshape #1: }}
+\def\endIEEEproof{\if@IEEEQEDshow\hspace*{\fill}\nobreakspace\IEEEQED\fi\par}
+% qedhere for equation environments, similar to AMS \qedhere
+\def\IEEEQEDhereeqn{\global\@IEEEQEDshowfalse\eqno\let\eqno\relax\let\leqno\relax
+                    \let\veqno\relax\hbox{\IEEEQED}}
+% IEEE style qedhere for IEEEeqnarray and other environments
+\def\IEEEQEDhere{\global\@IEEEQEDshowfalse\IEEEQED}
+% command to disable QED at end of IEEEproof
+\def\IEEEQEDoff{\global\@IEEEQEDshowfalse}
 
 
 % Provide support for the control entries of IEEEtran.bst V1.00 and later.
@@ -1836,23 +1955,22 @@ between column types.}%
 
 
 % hook to allow easy disabling of all legacy warnings
-\def\@IEEElegacywarn#1#2{\typeout{** ATTENTION: \@IEEEbackslash #1 is depreciated (line \the\inputlineno).
+\def\@IEEElegacywarn#1#2{\typeout{** ATTENTION: \@IEEEbackslash #1 is deprecated (line \the\inputlineno).
 Use \@IEEEbackslash #2 instead.}}
 
 % provide for legacy commands
 \def\PARstart{\@IEEElegacywarn{PARstart}{IEEEPARstart}\IEEEPARstart}
 
-% provide for legacy IED commands/lengths when possible
-\let\labelindent\IEEElabelindent
-\def\calcleftmargin{\@IEEElegacywarn{calcleftmargin}{IEEEcalcleftmargin}\IEEEcalcleftmargin}
-\def\setlabelwidth{\@IEEElegacywarn{setlabelwidth}{IEEEsetlabelwidth}\IEEEsetlabelwidth}
-\def\usemathlabelsep{\@IEEElegacywarn{usemathlabelsep}{IEEEusemathlabelsep}\IEEEusemathlabelsep}
-\def\iedlabeljustifyc{\@IEEElegacywarn{iedlabeljustifyc}{IEEEiedlabeljustifyc}\IEEEiedlabeljustifyc}
-\def\iedlabeljustifyl{\@IEEElegacywarn{iedlabeljustifyl}{IEEEiedlabeljustifyl}\IEEEiedlabeljustifyl}
-\def\iedlabeljustifyr{\@IEEElegacywarn{iedlabeljustifyr}{IEEEiedlabeljustifyr}\IEEEiedlabeljustifyr}
+% V1.3 no longer support legacy IED list commands
+% \let\labelindent\IEEElabelindent
+% \def\calcleftmargin{\@IEEElegacywarn{calcleftmargin}{IEEEcalcleftmargin}\IEEEcalcleftmargin}
+% \def\setlabelwidth{\@IEEElegacywarn{setlabelwidth}{IEEEsetlabelwidth}\IEEEsetlabelwidth}
+% \def\usemathlabelsep{\@IEEElegacywarn{usemathlabelsep}{IEEEusemathlabelsep}\IEEEusemathlabelsep}
+% \def\iedlabeljustifyc{\@IEEElegacywarn{iedlabeljustifyc}{IEEEiedlabeljustifyc}\IEEEiedlabeljustifyc}
+% \def\iedlabeljustifyl{\@IEEElegacywarn{iedlabeljustifyl}{IEEEiedlabeljustifyl}\IEEEiedlabeljustifyl}
+% \def\iedlabeljustifyr{\@IEEElegacywarn{iedlabeljustifyr}{IEEEiedlabeljustifyr}\IEEEiedlabeljustifyr}
 
 
 \endinput
 %%%%%%%%%%%%%%%%%%%%%%%%%% End of IEEEtrantools.sty  %%%%%%%%%%%%%%%%%%%%%%
 % That's all folks!
-
