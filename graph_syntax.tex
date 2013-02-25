@@ -34,7 +34,7 @@ and the possible edge types are
 \item out
 \item ((consider eliminating `in' and `out' and using connection))
 \end{itemize}
-Then, considering sets $T_\txt{node}$ and $T_\txt{edge}$ to be sets containing the possible node types and edge types, respectively, we use mappings $t_\txt{node}:V \to T_\txt{node}$ and $t_\txt{edge}:E \to T_\txt{edge}$ to assign a type to each node and edge. Nodes and edges are named according to their type (e.g. connection edge). Additional properties will be discussed is subsequent sections.
+Then, considering sets $T_\txt{node}$ and $T_\txt{edge}$ to be sets containing the possible node types and edge types, respectively, we use mappings $t_\txt{node}:V \to T_\txt{node}$ and $t_\txt{edge}:E \to T_\txt{edge}$ to assign a type to each node and edge. Nodes and edges are named according to their type (e.g. connection edge). Additional properties will be discussed in subsequent sections.
 
 Next, we introduce the graph $A$ which represents a single analysis block broken down into its individual inputs and outputs. An example graph is shown in Fig.~\ref{f:analysis block} to demonstrate the basic structure. This structure is derived from the need to represent each input and output individually while representing the actual analysis with a single node or edge. The `local input' nodes each represent a single input of the analysis block. Each of these nodes is connected to a single `analysis start' node via an `in' edge. Next the analysis start node is directed to the `analysis finish' node via the `analysis edge', which represents the actual analysis. Finally, the analysis finish node is directed to `local output' nodes via individual `out' edges.
 \begin{figure}[htb!]
@@ -54,11 +54,11 @@ Next, Consider an MDAO problem defined by a set of codes, global inputs, and glo
 Then we may construct the \emph{maximal connectivity graph} $M=(V_M,E_M)$ as
 \begin{IEEEeqnarray*}{rCl}
 V_M & = & \mathcal I \cup \mathcal O \cup \left( \bigcup_{i = 1}^m V_{A_i} \right), \\
-E_M & = & C \cup \left( \bigcup_{i=1}^m E_{A_i} \right),
+E_M & = & C_M \cup \left( \bigcup_{i=1}^m E_{A_i} \right),
 \end{IEEEeqnarray*}
 where $C$ is a set containing connection edges defined for $v_1,v_2 \in V_M$ as:
 \begin{IEEEeqnarray*}{rl}
-c = & (v_1,v_2) \in C \txt{ if:} \\
+c = & (v_1,v_2) \in C_M \txt{ if:} \\
 & t_\txt{node}(v_1) = \txt{`local output' or `global input'}, \\
 & t_\txt{node}(v_2) = \txt{`local input' or `global output'},\txt{ and} \\
 & n(v_1) = n(v_2).
@@ -66,29 +66,31 @@ c = & (v_1,v_2) \in C \txt{ if:} \\
 The maximal connectivity graph contains all possible connections that may exist between the given analysis blocks, and these connections are made by connecting variables with the same name, which requires a consistent naming convention between analysis blocks.
 
 \subsection{Fundamental Problem Formulation Graph}
-Before defining the the fundamental problem formulation graph, let us first define $\txt{deg}^-(v)$ as the \emph{indegree} $\txt{deg}^+(v)$ as the \emph{outdegree} of vertex $v$, where indegree and outdegree refer to the number of edges directed into vertex $v$ and the number of edges directed out of vertex $v$, respectively. Then, define a mapping $d:V|_\txt{local input} \to \mathbb{N}$ to specifiy the maximum number of connections that are allowed into a local input node.
-If $d(v)=1$ for each local input node, then exactly one edge must be directed into each local input node and each global output node. 
+Before defining the the fundamental problem formulation graph, let us first define $\txt{deg}^-(v)$ as the \emph{indegree} $\txt{deg}^+(v)$ as the \emph{outdegree} of vertex $v$, where indegree and outdegree refer to the number of edges directed into vertex $v$ and the number of edges directed out of vertex $v$, respectively. Then, define a mapping $d:V \to \mathbb{N}$ to specifiy the maximum number of connections that are allowed into a local input node.
 If $d(v)>1$ for a local input node, this means that multiple inputs are accepted, such as the case for a multifidelity formulation.
 
-Next, let $H$ be the set of all nodes which are \emph{holes} in $M$ and define $H$ as
-\begin{equation}
-H=\big\{v \in M \big| t_\txt{node}(v) = \txt{`local input' or `global output'} \txt{ and } \txt{deg}^-(v) = 0\big\}.
-\end{equation}
-Also, let $L$ be the set of all nodes which are \emph{collisions} in $M$ and define $L$ as
-\begin{equation}
-L = \big\{v \in M \big| t_\txt{node}(v) = \txt{`local input' or `global output'} \txt{ and } \txt{deg}^-(v) > d(v) \big\}.
-\end{equation}
-We may now define the graph representing the fundamental problem formulation $F=(V_F,E_F)$ as a subgraph of $M$ such that there are no holes or collisions. 
+% Next, let $H$ be the set of all nodes which are \emph{holes} in $M$ and define $H$ as
+% \begin{equation}
+% H=\big\{v \in M \big| t_\txt{node}(v) = \txt{`local input' or `global output'} \txt{ and } \txt{deg}^-(v) = 0\big\}.
+% \end{equation}
+% Also, let $L$ be the set of all nodes which are \emph{collisions} in $M$ and define $L$ as
+% \begin{equation}
+% L = \big\{v \in M \big| t_\txt{node}(v) = \txt{`local input' or `global output'} \txt{ and } \txt{deg}^-(v) > d(v) \big\}.
+% \end{equation}
+We may now define the \emph{fundamental problem formulation graph}, $F=(V_F,E_F)$, as a directed graph meeting the following conditions
+\begin{enumerate}
+\item[(1)] $\displaystyle{V_F = \mathcal I_F \cup \mathcal O \cup \left( \bigcup_{i \in \mathcal A} V_{A_i} \right),\ \mathcal I_F \subset \mathcal I}$
+\item[(2)] $\displaystyle{E_F = C_F \cup \left( \bigcup_{i \in \mathcal A} E_{A_i} \right)}$
+\item[(3)] $\displaystyle{\forall v \in V_F \txt{ with } t_\txt{node}(v) = \txt{`local input' or `global output,'}\quad 0 < \txt{deg}^-(v) \leq d(v)}$
+\end{enumerate}
+The set $\mathcal A$ is an index set containing the indices of the analysis blocks in $F$. The first requirement for $F$ is that $V_F$ be composed of all of the global outputs (which are given as required), the nodes from each analysis block in $F$, and any global input nodes that are needed, $\mathcal I_F$. The second requirement suggests that the edges in $F$ comprise the edges for each analysis block and the connections between them, the global inputs, and the global outputs. The final requirement is specific to the number of connection edges directed into a local input node or a global outputs node. If there are no connections directed inward, the node is called a \emph{hole}, and if more connections are directed in than are allowed, the node is called a \emph{collision}.
 
-We also require $F$ to contain all of the global output nodes, meaning $F\subset M$ is a fundamental problem formulation if
-\begin{equation}
-\mathcal O \subset V_F \ \txt{ and } \ v \notin H, v \notin L \ \forall v \in V_F.
-\end{equation}
-((this is missing any edges!!!))
 \subsection{Obtaining the Fundamental Problem Formulation Graph}
-In general, the fundamental problem formulation graph $P$ may not exist, or there may be multiple different solutions. Then the first problem is to determine if there exists a graph $P$.
-In practice, it is likely that this definition will not produce a unique solution. 
+In general, there may be multiple different graphs that satisfy the FPF conditions, though there may be none at all. Here, we describe a process for obtaining an FPF by starting with the MCG and removing nodes and edges until the FPF conditions are met. Then the problem is reduced to deciding which nodes and edges to remove, and this is centered on the local input nodes, which are treated as decision switches.
+The first step is to detect holes and remove the corresponding analysis blocks, which could not be used in a 
+
 A collision represents a choice.
+Delete edges and analysis blocks so that there are no nodes or collisions.
 
 
 
