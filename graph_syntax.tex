@@ -1,7 +1,7 @@
 \section{Graph-based Problem Formulation Syntax}
 We begin by discussing the general syntax of graph theory and then expand upon this syntax to represent the data flow of an MDAO problem.
 A graph is a pair $G = (V,E)$ of sets such that $E \subseteq V \times V$, which means that the elements of $E$ are 2--element subsets of $V$ \cite{Diestel2010}. 
-For a directed graph we construct $E$ as a set of ordered pairs instead of a set of sets. Each ordered pair represents an edge starting at the node indicated by the first entry and directed to the node indicated by the second entry. Therefore, $E$ is a mapping from $V$ to $V$.
+For a directed graph we construct $E$ as a set of ordered pairs instead of a set of sets. Each ordered pair represents an edge starting at the node indicated by the first entry and directed to the node indicated by the second entry. While $E$ is effectively a mapping from $V$ to $V$, we reference this mapping as $e$.
 \begin{figure}[htb!]
 	\begin{center}
 	\includegraphics[width=1.5in]{images/example_directed_graph}
@@ -79,17 +79,42 @@ Then, mathematically, the FPF starts with $\mathcal A_1 = \{1,\ldots,m\}$, $I_{F
 
 
 \begin{enumerate}
-\item The first step is to detect holes and remove the corresponding analysis blocks, which could not be used because the required inputs are not supplied.
+\item The first step is to detect holes and remove the corresponding analysis blocks, which could not be used because the required inputs are not supplied. Any analysis blocks with holes may be stored in an index set $\mathcal H$ as
 \begin{equation}
-\forall i \in \mathcal A_1,\txt{ and }\forall v \in V_{A_i},\txt{ if deg}^-(v)=0 \txt{ then } i \in \mathcal B
+\forall i \in \mathcal A_1,\txt{ and }\forall v \in V_{A_i},\txt{ if deg}^-(v)=0 \txt{ then } i \in \mathcal H.
+\end{equation}
+Then an updated index set $\mathcal A_2$ is created using set difference notation as
+\begin{equation}
+\mathcal A_2 = \mathcal A_1 \setminus \mathcal H
+\end{equation}The connection edges directed from the removed analysis blocks are removed as
+\begin{equation}
+H = \{c \in C_{F,1} |c = (e^{-1}(v),v), \txt{ where } v \in V_{A_i} \txt{ for some } i \in \mathcal H\},
 \end{equation}
 \begin{equation}
-\mathcal A_2 = \mathcal A_1 \setminus \mathcal B
+C_{F,2} = C_{F,1} \setminus H
 \end{equation}
+Finally, the FPF is updated as
+\begin{equation}
+V_{F,2} = I_{F,2} \cup O \cup \left( \bigcup_{i \in \mathcal A_2} V_{A_i} \right),
+\end{equation}
+\begin{equation}
+E_{F,2} = C_{F,2} \cup \left( \bigcup_{i \in \mathcal A_2} E_{A_i} \right)
+\end{equation}
+This process may require multiple iterations because removing an analysis block may create holes upstream. It is assumed that the process as been repeated sufficiently such that $\mathcal A_2$ does not have any holes.
+
+\item The next step is to resolve conflicts. The set $C$ of input nodes containing conflicts is
+\begin{equation}
+C = \{v \in V_{F,2} | t_\txt{node}(v) = \txt{`input'} \txt{ and } \txt{deg}^-(v) > d(v)\}
+\end{equation}
+%\begin{equation}
+%for v \in c let 
+%\end{equation}
 \end{enumerate}
 
-A collision represents a choice.
-Delete edges and analysis blocks so that there are no nodes or collisions.
+\subsection{Classification of the FPF}
+
+%A collision represents a choice.
+%Delete edges and analysis blocks so that there are no nodes or collisions.
 
 
 
