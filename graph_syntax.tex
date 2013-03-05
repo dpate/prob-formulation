@@ -1,7 +1,7 @@
 \section{Graph-based Problem Formulation Syntax}
-We begin by discussing the general syntax of graph theory and then expand upon this syntax to represent the data flow of an MDAO problem.
-A graph is a pair $G = (V,E)$ of sets such that $E \subseteq V \times V$, which means that the elements of $E$ are 2--element subsets of $V$ \cite{Diestel2010}. 
-For a directed graph we construct $E$ as a set of ordered pairs instead of a set of sets. Each ordered pair represents an edge starting at the node indicated by the first entry and directed to the node indicated by the second entry. While $E$ is effectively a mapping from $V$ to $V$, we reference this mapping as $e$.
+We begin by discussing the general syntax of graph theory and then expand upon this syntax to represent the data flow of an MDAO problem. The present notation is adapted from Diestel \cite{Diestel2010}.
+A \emph{graph} is a pair $G = (V,E)$ of sets such that $E \subseteq V \times V$, which means that the elements of $E$ are 2--element subsets of $V$. The set $V$ contains the \emph{vertices} or \emph{nodes} and the set $E$ contains the \emph{edges}.
+For a \emph{directed graph*} we construct $E$ as a set of ordered pairs instead of a set of sets. Each ordered pair represents an edge starting at the node indicated by the first entry and directed to the node indicated by the second entry.
 \begin{figure}[htb!]
 	\begin{center}
 	\includegraphics[width=1.5in]{images/example_directed_graph}
@@ -15,23 +15,63 @@ As an example, for the directed graph shown in Fig.~\ref{f:example directed grap
 V & = & \{1,2,3,4,5\}, \\
 E & = & \big\{(1,2),(3,2),(1,3),(3,4)\big\}.
 \end{IEEEeqnarray*}
+The edges directed out of $v \in V$ are given by $E(v)$ and the edges directed into $v$ are given by $E^{-1}(v)$. The \emph{indegree} is the number of edges directed in and is denoted as $\txt{deg}^-(v)$, and the \emph{outdegree} is the number of edges directed out and it is denoted as $\txt{deg}^+(v)$. Edge $e$ = $(x,y)$ may be referred to simply as $xy$. A \emph{path} is a nonempty graph $P = (V,E)$ with $V = \{x_0,x_1,\ldots,x_k\}$ and $E = \{x_0x_1,x_1x_2,\ldots,x_{k-1}x_k\}$, where $x_i$ are all distinct. A graph $G$ is \emph{connected} if any two of its vertices are linked by a path in $G$. A \emph{tree} is a connected and acyclic graph.
 
-We now assign additional properties to the nodes and edges so that they may represent the data flow of an MDAO problem. 
+The MDAO problem formulation concepts we wish to represent are:
+\begin{description}
+\item[global input] A global input is a variable that is taken as given and is used by multiple analyses.
+\item[design variable]
+\item[function call] A function call requires a set of inputs to be fulfilled and has certain properties, such as run time, which are independent of the number of outputs actually being used.
+\item[passing of distinct variables] Instead of connecting analyses, the individual variables as are connected
+\item[objective \& constraint] These are variables that mush be produced by the problem formulation for it to be valid
+\item[collision] A collision occurs when an input has multiple sources
+\item[hole] A hole occurs when an input has no sources
+\end{description}
+
+In order to represent the listed problem formulation concepts with a graph, we assign properties and rules for these nodes and edges.
 The first property assigned to nodes and edges is the \emph{type}. The possible node types are:
 \begin{description}
-\item[input] The `input' node has specific rules for the number of edges that may be directed into it.
-\item[simple] The `simple' node has no additional properties and is used as a building block.
+\item[variable node] The variable node represents passing of data.
+\item[model node] The model node represents the handling of data.
 \end{description}
 
 The possible edge types are:
 \begin{description}
-\item[connection] The `connection' edge represents the passing of data between analysis blocks.
-\item[data] The `data' edge represents the passing of data within an analysis block.
-\item[analysis] The `analysis' edge contains additional properties to represent the execution of an analysis block.
+\item[fixed edge] A fixed edge may not be removed.
+\item[free edge] A free edge may be removed.
 \end{description}
-Then, considering sets $T_\txt{node}$ and $T_\txt{edge}$ to be sets containing the possible node types and edge types, respectively, we use mappings $t_\txt{node}:V \to T_\txt{node}$ and $t_\txt{edge}:E \to T_\txt{edge}$ to assign a type to each node and edge. Nodes and edges are herein referred to by their type (e.g. `connection' edge). Additional properties will be discussed in subsequent sections.
 
-Next, we introduce the graph $A$ which represents a single analysis block broken down into its individual inputs and outputs. An example graph is shown in Fig.~\ref{f:analysis block} to demonstrate the basic structure. This structure is derived from the need to represent each input and output individually while representing the actual analysis with a single node or edge. The `input' nodes each represent a single input of the analysis block. Each of these nodes is connected to a single `simple' node via a `data' edge, which represents the gathering of the inputs to begin the analysis. Next the `simple' node is directed to another `simple' node via the `analysis edge', which represents the actual analysis. Finally, this `simple' node is directed to several `simple' nodes via individual `data' edges, and this represents individual local outputs which may then be connected to other analysis blocks.
+For these types of nodes and edges we impose the following rules:
+\begin{itemize}
+\item A model node can only have one edge directed to or from another model node.
+\item A model node can only have fixed edges directed in or out.
+\item A model node must have at least one edge directed in and at least one edge directed out.
+\item An objective or constraint is indicated by a variable node with no outgoing edges and with the incoming edges being directed from only other variable nodes.
+\item A global input is a variable node with no edges directed in and with at least two edges directed out to different variable nodes.
+\end{itemize}
+Additionally, the problem formulation concepts represented by the edges are described in Table \ref{t:edge representation}
+\begin{table}[h!]
+ \begin{center}
+  \caption{Problem formulation concept represented by an edge}
+  \label{t:edge representation}
+  \begin{tabular}{ccc} \hline 
+from node & to node & edge representation \\ \hline
+variable & variable & connection/passing of a variable\\
+variable & model & local input \\
+model & variable & local output \\
+model & model & function call \\ \hline
+  \end{tabular}
+ \end{center}
+ \vspace{-15pt}
+\end{table}
+
+Any tree containing only fixed edges and at least one model node is an analysis block.
+
+Then, considering sets $T_\txt{node}$ and $T_\txt{edge}$ to be sets containing the possible node types and edge types, respectively, we use mappings $t_\txt{node}:V \to T_\txt{node}$ and $t_\txt{edge}:E \to T_\txt{edge}$ to assign a type to each node and edge. Nodes and edges are herein referred to by their type (e.g. `connection' edge). 
+
+Additional properties will be discussed in subsequent sections.
+
+Next, we introduce the graph $A$ which represents a single analysis block broken down into its individual inputs and outputs. An example graph is shown in Fig.~\ref{f:analysis block} to demonstrate the basic structure. This structure is derived from the need to represent each input and output individually while representing the actual analysis with a single node or edge. The variable nodes each represent a single input of the analysis block. Each of these nodes is connected to a single model node via a `data' edge, which represents the gathering of the inputs to begin the analysis. Next the model node is directed to another model node via the `analysis edge', which represents the actual analysis. Finally, this model node is directed to several model nodes via individual `data' edges, and this represents individual local outputs which may then be connected to other analysis blocks.
 \begin{figure}[htb!]
 	\begin{center}
 	\includegraphics[width=4in]{images/analysis_block}
@@ -43,7 +83,7 @@ Next, we introduce the graph $A$ which represents a single analysis block broken
 `Connection' edges connect the local outputs from one analysis block to input nodes. In this way, the analysis block graph is the fundamental building block of the MDAO problem data flow.
 
 \subsection{Maximal Connectivity Graph}
-Next, Consider an MDAO problem defined by a set of codes, global inputs, global outputs. The codes are represented by analysis blocks $A_i=(V_{A_i},E_{A_i}), \ i=1,\ldots,m$, the global inputs are represented a set of `simple' nodes $I$, and the global outputs are represented by a set of `input' nodes $O$. We assume that $O$, $I$, and $A_i$ are given, and that any potential connection edge is given in the form of the set $C_M$. 
+Next, Consider an MDAO problem defined by a set of codes, global inputs, global outputs. The codes are represented by analysis blocks $A_i=(V_{A_i},E_{A_i}), \ i=1,\ldots,m$, the global inputs are represented a set of `simple' nodes $I$, and the global outputs are represented by a set of variable nodes $O$. We assume that $O$, $I$, and $A_i$ are given, and that any potential connection edge is given in the form of the set $C_M$. 
 Then we may construct the \emph{maximal connectivity graph} $M=(V_M,E_M)$ as
 \begin{IEEEeqnarray*}{rCl}
 V_M & = & I \cup O \cup \left( \bigcup_{i = 1}^m V_{A_i} \right), \\
