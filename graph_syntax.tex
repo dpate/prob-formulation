@@ -1,7 +1,8 @@
 \section{Graph-based Problem Formulation Syntax}
-We begin by discussing the general syntax of graph theory and then expand upon this syntax to represent the data flow of an MDAO problem.
-A graph is a pair $G = (V,E)$ of sets such that $E \subseteq V \times V$, which means that the elements of $E$ are 2--element subsets of $V$ \cite{Diestel2010}. 
-For a directed graph we construct $E$ as a set of ordered pairs instead of a set of sets. Each ordered pair represents an edge starting at the node indicated by the first entry and directed to the node indicated by the second entry. While $E$ is effectively a mapping from $V$ to $V$, we reference this mapping as $e$.
+\subsection{Graph Theory Basics}
+We begin by discussing the general syntax of graph theory and then expand upon this syntax to represent the data flow of an MDAO problem. The present notation is adapted from Diestel \cite{Diestel2010}.
+A \emph{graph} is a pair $G = (V,E)$ of sets such that $E \subseteq V \times V$, which means that the elements of $E$ are 2--element subsets of $V$. The set $V$ contains the \emph{vertices} or \emph{nodes} and the set $E$ contains the \emph{edges}.
+For a \emph{directed graph*} we construct $E$ as a set of ordered pairs instead of a set of sets. Each ordered pair represents an edge starting at the node indicated by the first entry and directed to the node indicated by the second entry.
 \begin{figure}[htb!]
 	\begin{center}
 	\includegraphics[width=1.5in]{images/example_directed_graph}
@@ -15,23 +16,63 @@ As an example, for the directed graph shown in Fig.~\ref{f:example directed grap
 V & = & \{1,2,3,4,5\}, \\
 E & = & \big\{(1,2),(3,2),(1,3),(3,4)\big\}.
 \end{IEEEeqnarray*}
+The edges directed out of $v \in V$ are given by $E(v)$ and the edges directed into $v$ are given by $E^{-1}(v)$. The \emph{indegree} is the number of edges directed in and is denoted as $\txt{deg}^-(v)$, and the \emph{outdegree} is the number of edges directed out and it is denoted as $\txt{deg}^+(v)$. Edge $e$ = $(x,y)$ may be referred to simply as $xy$ and we say $y = E(x)$. Also, $E(E(v))$ is denoted as $E^2(v)$, and likewise for additonal levels.
 
-We now assign additional properties to the nodes and edges so that they may represent the data flow of an MDAO problem. 
+ A \emph{path} is a nonempty graph $P = (V,E)$ with $V = \{x_0,x_1,\ldots,x_k\}$ and $E = \{x_0x_1,x_1x_2,\ldots,x_{k-1}x_k\}$, where $x_i$ are all distinct. A graph $G$ is \emph{connected} if any two of its vertices are linked by a path in $G$. A \emph{tree} is a connected and acyclic graph.
+
+\subsection{Problem Formulation Concepts to Represent}
+The MDAO problem formulation concepts we wish to represent are:
+\begin{description}
+\item[global input] A global input is a variable that is taken as given and is used by multiple analyses.
+\item[design variable]
+\item[function call] A function call requires a set of inputs to be fulfilled and has certain properties, such as run time, which are independent of the number of outputs actually being used.
+\item[passing of distinct variables] Instead of connecting analyses, the individual variables as are connected
+\item[objective \& constraint] These are variables that must be produced by the problem formulation for it to be valid
+\item[collision] A collision occurs when an input has multiple sources
+\item[hole] A hole occurs when an input has no sources
+\item[coupling] Couple is the mutual dependence between a set of analysis
+\item[multi--fidelity] It may be desirable for the same variable to be calculated by separate analyses and to use both results.
+\end{description}
+
+\subsection{Graph Theory Representation of a Problem Formulation}
+In order to represent the listed problem formulation concepts with a graph, we assign properties and rules to nodes and edges.
 The first property assigned to nodes and edges is the \emph{type}. The possible node types are:
 \begin{description}
-\item[input] The `input' node has specific rules for the number of edges that may be directed into it.
-\item[simple] The `simple' node has no additional properties and is used as a building block.
+\item[variable node] The variable node represents passing of data.
+\item[model node] The model node represents the handling of data.
 \end{description}
 
 The possible edge types are:
 \begin{description}
-\item[connection] The `connection' edge represents the passing of data between analysis blocks.
-\item[data] The `data' edge represents the passing of data within an analysis block.
-\item[analysis] The `analysis' edge contains additional properties to represent the execution of an analysis block.
+\item[fixed edge] A fixed edge may not be removed.
+\item[free edge] A free edge may be removed.
 \end{description}
-Then, considering sets $T_\txt{node}$ and $T_\txt{edge}$ to be sets containing the possible node types and edge types, respectively, we use mappings $t_\txt{node}:V \to T_\txt{node}$ and $t_\txt{edge}:E \to T_\txt{edge}$ to assign a type to each node and edge. Nodes and edges are herein referred to by their type (e.g. `connection' edge). Additional properties will be discussed in subsequent sections.
+To keep track of which nodes and edges are which type, let $T_\txt{node}$ and $T_\txt{edge}$ be sets containing the possible node types and edge types, respectively, and then define mappings $t_\txt{node}:V \to T_\txt{node}$ and $t_\txt{edge}:E \to T_\txt{edge}$ to assign a type to each node and edge.
+For these types of nodes and edges we impose the following rules:
+\begin{itemize}
+\item A model node can only have one edge directed to or from another model node.
+\item A model node can only have fixed edges directed in or out.
+\item A model node must have at least one edge directed in and at least one edge directed out.
+\item An objective or constraint is indicated by a variable node with no outgoing edges and with the incoming edges being directed from only other variable nodes.
+\item A global input is a variable node with no edges directed in and with at least two edges directed out to different variable nodes.
+\end{itemize}
+Additional problem formulation concepts represented by the edges are described in Table \ref{t:edge representation}
+\begin{table}[h!]
+ \begin{center}
+  \caption{Problem formulation concept represented by an edge}
+  \label{t:edge representation}
+  \begin{tabular}{ccc} \hline 
+from node & to node & edge representation \\ \hline
+variable & variable & connection/passing of a variable\\
+variable & model & local input \\
+model & variable & local output \\
+model & model & function call \\ \hline
+  \end{tabular}
+ \end{center}
+ \vspace{-15pt}
+\end{table}
 
-Next, we introduce the graph $A$ which represents a single analysis block broken down into its individual inputs and outputs. An example graph is shown in Fig.~\ref{f:analysis block} to demonstrate the basic structure. This structure is derived from the need to represent each input and output individually while representing the actual analysis with a single node or edge. The `input' nodes each represent a single input of the analysis block. Each of these nodes is connected to a single `simple' node via a `data' edge, which represents the gathering of the inputs to begin the analysis. Next the `simple' node is directed to another `simple' node via the `analysis edge', which represents the actual analysis. Finally, this `simple' node is directed to several `simple' nodes via individual `data' edges, and this represents individual local outputs which may then be connected to other analysis blocks.
+Finally, any tree containing only fixed edges and at least one model node is an \emph{analysis block}, which is used to represent a contributing analysis. An example analysis block is shown in Fig.~\ref{f:analysis block} to demonstrate the basic structure. This structure is derived from the need to represent each input and output individually while representing the actual analysis with a single node or edge. The variable nodes each represent a single input or output of the analysis block. Each of these nodes is connected to a single model node via a fixed edge, which represents the gathering of the inputs to begin the analysis or the disseminating of outputs after the analysis. Finally, free edges are used to connect the variable nodes of the analysis block to other variables nodes outside of the analysis block. In this way, the analysis block graph is the fundamental building block of the MDAO problem data flow.
 \begin{figure}[htb!]
 	\begin{center}
 	\includegraphics[width=4in]{images/analysis_block}
@@ -40,10 +81,10 @@ Next, we introduce the graph $A$ which represents a single analysis block broken
 \caption{Example directed graph. The each node type and edge type is labeled, with nodes being label in italics.}
 \label{f:analysis block}
 \end{figure}
-`Connection' edges connect the local outputs from one analysis block to input nodes. In this way, the analysis block graph is the fundamental building block of the MDAO problem data flow.
+%`Connection' edges connect the local outputs from one analysis block to input nodes.
 
 \subsection{Maximal Connectivity Graph}
-Next, Consider an MDAO problem defined by a set of codes, global inputs, global outputs. The codes are represented by analysis blocks $A_i=(V_{A_i},E_{A_i}), \ i=1,\ldots,m$, the global inputs are represented a set of `simple' nodes $I$, and the global outputs are represented by a set of `input' nodes $O$. We assume that $O$, $I$, and $A_i$ are given, and that any potential connection edge is given in the form of the set $C_M$. 
+Next, Consider an MDAO problem defined by a set of codes, global inputs, global outputs. The codes are represented by analysis blocks $A_i=(V_{A_i},E_{A_i}), \ i=1,\ldots,m$, the global inputs are represented a set of variable nodes $I$, and the global outputs are represented by a set of variable nodes $O$. We assume that $O$, $I$, and $A_i$ are given, and that any potential connection between variables is given in the form of the free edges in the set $C_M$. 
 Then we may construct the \emph{maximal connectivity graph} $M=(V_M,E_M)$ as
 \begin{IEEEeqnarray*}{rCl}
 V_M & = & I \cup O \cup \left( \bigcup_{i = 1}^m V_{A_i} \right), \\
@@ -52,64 +93,85 @@ E_M & = & C_M \cup \left( \bigcup_{i=1}^m E_{A_i} \right).
 The maximal connectivity graph contains all possible connections that may exist between the given analysis blocks.
 
 \subsection{Fundamental Problem Formulation Graph}
-Before defining the the fundamental problem formulation graph, let us first define $\txt{deg}^-(v)$ as the \emph{indegree} $\txt{deg}^+(v)$ as the \emph{outdegree} of vertex $v$, where indegree and outdegree refer to the number of edges directed into vertex $v$ and the number of edges directed out of vertex $v$, respectively. Then, define a mapping $d:V \to \mathbb{N}$ to specifiy the maximum number of connections that are allowed into an input node.
-If $d(v)>1$ for an input node, this means that multiple inputs are accepted, such as the case for a multifidelity formulation.
+Before defining the the fundamental problem formulation graph, let us first define the \emph{upper degree limit} 
+\begin{equation}
+\txt{deg}_u^-(v):V \to \mathbb{N}
+\end{equation} 
+and the \emph{lower degree limit}
+\begin{equation}
+\txt{deg}_l^-(v):V \to \mathbb{N}.
+\end{equation}
+These user-specified limits set the number of edges that may be directed into a node for a problem formulation to be valid. For example, a variable node $v$ will have $\txt{deg}_u^-(v) = \txt{deg}_l^-(v) = 1$, unless it is a multi--fidelity variable, in which case the user may specify some upper limit higher than one.
 
-% Next, let $H$ be the set of all nodes which are \emph{holes} in $M$ and define $H$ as
-% \begin{equation}
-% H=\big\{v \in M \big| t_\txt{node}(v) = \txt{`local input' or `global output'} \txt{ and } \txt{deg}^-(v) = 0\big\}.
-% \end{equation}
-% Also, let $L$ be the set of all nodes which are \emph{collisions} in $M$ and define $L$ as
-% \begin{equation}
-% L = \big\{v \in M \big| t_\txt{node}(v) = \txt{`local input' or `global output'} \txt{ and } \txt{deg}^-(v) > d(v) \big\}.
-% \end{equation}
 We may now define the \emph{fundamental problem formulation graph}, $F=(V_F,E_F)$, as a directed graph meeting the following conditions
 \begin{enumerate}
 \item[(1)] $\displaystyle{V_F = I_F \cup O \cup \left( \bigcup_{i \in \mathcal A} V_{A_i} \right),\ I_F \subset I}$
 \item[(2)] $\displaystyle{E_F = C_F \cup \left( \bigcup_{i \in \mathcal A} E_{A_i} \right)}$
-\item[(3)] $\displaystyle{\forall v \in V_F \txt{ with } t_\txt{node}(v) = \txt{`input,'}\quad 0 < \txt{deg}^-(v) \leq d(v)}$
+\item[(3)] $\displaystyle{\forall v \in V_F \txt{ with } t_\txt{node}(v) = \txt{`variable,'}\quad \txt{deg}_l^-(v) < \txt{deg}^-(v) \leq \txt{deg}_u^-(v)}$
 \end{enumerate}
-The set $\mathcal A$ is an index set containing the indices of the analysis blocks in $F$. The first requirement for $F$ is that $V_F$ be composed of all of the global outputs (which are given as required), the nodes from each analysis block in $F$, and any global input nodes that are needed, $I_F$. The second requirement suggests that the edges in $F$ comprise the edges for each analysis block and the connections between them, the global inputs, and the global outputs. The final requirement is specific to the number of connection edges directed into a local input node or a global outputs node. If there are no connections directed inward, the node is called a \emph{hole}, and if more connections are directed in than are allowed, the node is called a \emph{collision}. The final requirement is therefore a requirement on $C_F$.
+The set $\mathcal A$ is an index set containing the indices of the analysis blocks in $F$. The first requirement for $F$ is that $V_F$ be composed of all of the global outputs (which are given as required), the nodes from each analysis block in $F$, and any global input nodes that are needed, $I_F$. The second requirement suggests that the edges in $F$ comprise the edges for each analysis block and the edges between them, the global inputs, and the global outputs. The final requirement is specific to the number of edges directed into a variable. If there are no edges directed inward, the node is called a \emph{hole}, and if more connections are directed in than are allowed, the node is called a \emph{collision}; a hole is allowed if $\txt{deg}_l^-(v)=0$. The final requirement is therefore a requirement on $C_F$.
 
 \subsection{Obtaining the Fundamental Problem Formulation Graph}
-In general, there may be multiple different graphs that satisfy the FPF conditions, though there may be none at all. Here, we describe a process for obtaining an FPF by starting with the MCG and removing nodes and edges until the FPF conditions are met. Then the problem is reduced to deciding which nodes and edges to remove, and this is centered on the input nodes, which are treated as decision switches.
+In general, there may be multiple different graphs that satisfy the FPF conditions, though there may be none at all. Here, we describe a process for obtaining an FPF by starting with the MCG and disconnecting free edges until the FPF conditions are met. Then the problem is reduced to deciding which free edges to remove.
 
-Then, mathematically, the FPF starts with $\mathcal A_1 = \{1,\ldots,m\}$, $I_{F,1} = I$, and $C_{F,1} = C_M$.
-
-
+%Then, mathematically, the FPF starts with $\mathcal A_1 = \{1,\ldots,m\}$, $I_{F,1} = I$, and $C_{F,1} = C_M$.
+Then, mathematically, the FPF starts with $C_{F,0} = C_M$.
+First address the nodes where $\txt{deg}^-(v) < \txt{deg}_l^-(v)$ then the ones where $\txt{deg}^-(v) > \txt{deg}_u^-(v)$
 
 \begin{enumerate}
-\item The first step is to detect holes and remove the corresponding analysis blocks, which could not be used because the required inputs are not supplied. Any analysis blocks with holes may be stored in an index set $\mathcal H$ as
+\item The first step is to detect holes and disconnect the free edges following them. These free edges are removed because they represent variables which cannot be determined because the analysis function does not have adequate inputs. The set of variable nodes which are holes is created as
 \begin{equation}
-\forall i \in \mathcal A_1,\txt{ and }\forall v \in V_{A_i},\txt{ if deg}^-(v)=0 \txt{ then } i \in \mathcal H.
+H = \{v \in V | \txt{deg}^-(v) < \txt{deg}_l^-(v) \}
 \end{equation}
-Then an updated index set $\mathcal A_2$ is created using set difference notation as
+Then the updated set of edges is
 \begin{equation}
-\mathcal A_2 = \mathcal A_1 \setminus \mathcal H
-\end{equation}The connection edges directed from the removed analysis blocks are removed as
-\begin{equation}
-H = \{c \in C_{F,1} |c = (e^{-1}(v),v), \txt{ where } v \in V_{A_i} \txt{ for some } i \in \mathcal H\},
+C_{F,1} = C_{F,0} \setminus \{\ e \in E, \ e=xy | x=E^3(v) \txt{ for } v \in H\}
 \end{equation}
-\begin{equation}
-C_{F,2} = C_{F,1} \setminus H
-\end{equation}
-Finally, the FPF is updated as
-\begin{equation}
-V_{F,2} = I_{F,2} \cup O \cup \left( \bigcup_{i \in \mathcal A_2} V_{A_i} \right),
-\end{equation}
-\begin{equation}
-E_{F,2} = C_{F,2} \cup \left( \bigcup_{i \in \mathcal A_2} E_{A_i} \right)
-\end{equation}
-This process may require multiple iterations because removing an analysis block may create holes upstream. It is assumed that the process as been repeated sufficiently such that $\mathcal A_2$ does not have any holes.
-
-\item The next step is to resolve conflicts. The set $C$ of input nodes containing conflicts is
-\begin{equation}
-C = \{v \in V_{F,2} | t_\txt{node}(v) = \txt{`input'} \txt{ and } \txt{deg}^-(v) > d(v)\}
-\end{equation}
-%\begin{equation}
-%for v \in c let 
-%\end{equation}
+%deg-v is now recaculated for the new C. 
+This step is demonstrated by Fig.~\ref{f:holes}.
 \end{enumerate}
+\begin{figure}[htb!]
+	\begin{center}
+	\includegraphics[width=3in]{images/analysis_block_hole}
+	\end{center}
+	\vspace{-20pt}
+\caption{Example variable node indicating a hole.}
+\label{f:holes}
+\end{figure}
+
+
+%\begin{enumerate}
+%\item The first step is to detect holes and remove the corresponding analysis blocks, which could not be used because the required inputs are not supplied. Any analysis blocks with holes may be stored in an index set $\mathcal H$ as
+%\begin{equation}
+%\forall i \in \mathcal A_1,\txt{ and }\forall v \in V_{A_i},\txt{ if deg}^-(v)=0 \txt{ then } i \in \mathcal H.
+%\end{equation}
+%Then an updated index set $\mathcal A_2$ is created using set difference notation as
+%\begin{equation}
+%\mathcal A_2 = \mathcal A_1 \setminus \mathcal H
+%\end{equation}The connection edges directed from the removed analysis blocks are removed as
+%\begin{equation}
+%H = \{c \in C_{F,1} |c = (e^{-1}(v),v), \txt{ where } v \in V_{A_i} \txt{ for some } i \in \mathcal H\},
+%\end{equation}
+%\begin{equation}
+%C_{F,2} = C_{F,1} \setminus H
+%\end{equation}
+%Finally, the FPF is updated as
+%\begin{equation}
+%V_{F,2} = I_{F,2} \cup O \cup \left( \bigcup_{i \in \mathcal A_2} V_{A_i} \right),
+%\end{equation}
+%\begin{equation}
+%E_{F,2} = C_{F,2} \cup \left( \bigcup_{i \in \mathcal A_2} E_{A_i} \right)
+%\end{equation}
+%This process may require multiple iterations because removing an analysis block may create holes upstream. It is assumed that the process as been repeated sufficiently such that $\mathcal A_2$ does not have any holes.
+%
+%\item The next step is to resolve conflicts. The set $C$ of input nodes containing conflicts is
+%\begin{equation}
+%C = \{v \in V_{F,2} | t_\txt{node}(v) = \txt{`input'} \txt{ and } \txt{deg}^-(v) > d(v)\}
+%\end{equation}
+%%\begin{equation}
+%%for v \in c let 
+%%\end{equation}
+%\end{enumerate}
 
 \subsection{Classification of the FPF}
 
