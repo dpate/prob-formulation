@@ -8,6 +8,7 @@ the graph needs to accomodate a number of constructs from MDAO problem:
 \begin{itemize}
     \item Analysis tools 
     \item Local and global variables 
+    \item Information passing between analyses
     \item Coupling between analyses
     \item Design variables
     \item Objective or objectives 
@@ -15,21 +16,53 @@ the graph needs to accomodate a number of constructs from MDAO problem:
     \item Iterative loops from solvers and optimizers
 \end{itemize}
 
-The following section provides an overview of graph theory basics, then describes 
-in detail the different node and edge types, as well as rules governing allowable 
-egdegs between nodes, used as the foundation of the new graph syntax. These basic graph 
-primatives are them mapped to the MDAO constructs stated above, and used to 
-build three distinct graph forms: 
+Beyond those basic constructs, there are also multiple three phases for a design process that 
+all need to be representable with the new syntax. Firstly there is the initial problem definition
+phase where the specific analysis tools and design goals are identified. At the end of this phase, 
+a single formal problem formulation is selected specifying design variables, constraints, objectives, 
+analysis tools, etc. Lastly some specifc procedure for solving the problem is selected, for example 
+picking an MDAO optimization architecture. Using the proposed graph syntax, each of these phases 
+can be represented with a related graph. 
 
 \begin{itemize}
     \item Maximal Connectivity
     \item Fundamental Problem Formulation 
-    \item Specific Solution
+    \item Specific Solution Formulation
 \end{itemize}
 
-Each of these forms serves a different purpose in the design process, and we 
-present some transformations that can be applied to transition 
-between any two of the three graph forms. 
+We present some transformations that can be applied to transition any graph
+between any two adjacent design phases. The \emph{maximal connectivity graph} 
+represents the full potential of all the analysis codes being considered, i.e. 
+a large set of analysis codes being considered for a given problem are included in
+a graph, with all possible connections between them also present. The second graph 
+is \emph{fundamental problem formulation graph}, which is the smallest possible graph 
+that still fully defines a given problem formulation. Finally, a \emph{specific problem formulation} 
+may be represented by including additional edges and node types to represent the 
+solution strategy being employed to solve the problem. 
+
+The relationship between these three graphs is depicted in Figs.~\ref{f:tree} and \ref{f:hourglass}. 
+The tree diagram demonstrates the fact that it is generally possible to obtain 
+multiple FPFs from a single maximal connectivity graph. This  may correspond to 
+different down--selections of analysis codes, different connections between them, 
+or both. Each down--selection shrinks the number of possible FPFs that could be reached 
+untill only one is remaining. Then, a single FPF, different SPFs may be obtained by implementing 
+different solution strategies. The hourglass shape in Fig. \ref{f:hourglass} illustrates how 
+the MCG gets reduced to a single FPF, then multiple possible SPFs exist to solve the problem.
+In other words the FPF is obtained from the MCG by removing nodes and edges, 
+and the SPF is obtained from the FPF by adding nodes and edges.
+
+\begin{figure}[htb!]
+    \centering
+    \subfigure[number of possible graphs]{
+    \includegraphics[width=2.0in]{images/tree}
+    \label{f:tree}
+    }
+    \subfigure[graph size]{
+    \includegraphics[width=2.0in]{images/hourglass}
+    \label{f:hourglass}
+    }
+\caption{The relationship between the MCG, FPF, and SPF.}
+\end{figure}
 
 \subsection{Graph Theory Basics}
 The notation used in this work is adapted from Diestel \cite{Diestel2010}. 
@@ -94,9 +127,10 @@ type of edges that can be connected to it:
 \item A model node can only have one edge directed to or from another model node.
 \item A model node can only have fixed edges directed in or out.
 \item A model node must have at least one edge directed in and at least one edge directed out.
+\item If a variable node with an outgoing edge to a model node may not have any other outgoing edges.
 \end{enumerate}
 
-Analysis tools take in a number input variables, then perform some work calculate 
+Analysis tools take in a number input variables, then perform some work to calculate 
 the values for their respective outputs. In an MDAO graph, this process is 
 represented by an group of nodes and edges called an \emph{analysis block}, 
 shown in Fig. \ref{f:analysis block}. Within an analysis block each variable 
@@ -104,7 +138,8 @@ node represents a single input or output and is connected
 to a single model node via a fixed edge. Note that in Fig. \ref{f:analysis block}, 
 the analysis block contains two model nodes, with a single edge connecting them. 
 This part of the graph represents the necessary calculations to map given inputs 
-to proper output values. 
+to proper output values. Although analysis blocks are comprised of multiple nodes and edges, since all 
+the edges within them are fixed, they become fixed structures within a graph.
 
 \begin{figure}[htb!]
     \begin{center}
@@ -115,10 +150,16 @@ to proper output values.
 \label{f:analysis block}
 \end{figure}
 
-Finally, free edges are used to connect the variable nodes of the analysis block 
-to other variables nodes outside of the analysis block. In this way, the 
-analysis block graph is a fundamental building block of the MDAO problem data flow.
-
+Via the analysis block structure, we can also distinguish between input and ouptut
+variable nodes. Inputs are any variable nodes that have an outgoing edge into a model 
+node. Conversely, outputs are any variable nodes that have an incoming edge from a model node. 
+Note that by this definition, inputs and outputs can only exist when variable nodes poses an 
+edge joining them to a model node. In Fig. \ref{f:analysis block} these are labeled out as 
+local inputs and local outputs. The necessity to be connected to a specific model node forces
+the variable nodes to be local in nature. When information from the output of one analysis 
+block is passed, or connected, to the input of another analysis block, a new free edge is added 
+connecting the two variable nodes involved in the exchange. The edge is free because, unlike the edges 
+within an analysis block, it could be added or removed depending on the demands of the specific problem. 
 
 The MDO problem formulation concepts represented by nodes are given in 
 Table \ref{t:node representation}, and the concepts represented by edges are 
@@ -158,21 +199,7 @@ model & model & function call \\ \hline
 %`Connection' edges connect the local outputs from one analysis block to input nodes.
 
 \section{Graph--based Representation of the Fundamental Problem Formulation}
-Next we provide the meaningful graphs that can be created from the suggested syntax. The first graph is the \emph{maximal connectivity graph} which represents the full potential of all the analysis codes being considered, i.e. each analysis code is represented by an analysis block, and each potential connections between variables is represented by a free edge. The second graph that may be represented is \emph{fundamental problem formulation graph}, which is the graph with the fewest number of edges and nodes needed to provide a valid problem formulation, as disscussed subsequently. Finally, a \emph{solution problem formulation} may be represented by including additional edges and node times to represent the optimization architecture, though this is beyond the scope of this paper. 
 
-The relationship between these three graphs is depicted in Figs.~\ref{f:tree} and \ref{f:hourglass}. The tree diagram demonstrates the fact that it is generally possible to obtain multiple FPFs from a single maximal connectivity graph. This  may correspond to different down--selections of analysis codes, different connections between them, or both. Then, for each FPF, different SPFs may be obtained by implementing different optimization architectures. The hourglass shape indicates that the FPF graph is the smallest graph that may represent a specific problem formulation. The FPF is obtained from the MCG by removing nodes and edges, and the SPF is obtained from the FPF by adding nodes and edges.
-\begin{figure}[htb!]
-	\centering
-	\subfigure[number of possible graphs]{
-	\includegraphics[width=2.0in]{images/tree}
-	\label{f:tree}
-	}
-	\subfigure[graph size]{
-	\includegraphics[width=2.0in]{images/hourglass}
-	\label{f:hourglass}
-	}
-\caption{The relationship between the MCG, FPF, and SPF.}
-\end{figure}
 
 In this section we introduce the remaining necessary notion and give graph--theory based definitions of the MCG and FPF, and then process to demonstrate how the FPF is obtained from the MCG.
 
@@ -291,10 +318,6 @@ F_3 = (V_{F,3},C_{F,3})
 %Fixed edges are fixed only with respect to the analysis block in which they reside, it is okay to remove them along with the entire analysis block.
 
 \end{enumerate}
-
-
-
-
 
 
 
