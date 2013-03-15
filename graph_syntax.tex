@@ -78,8 +78,8 @@ There are three node types:
 \end{description}
 There are two edge types: 
 \begin{description}
-\item[fixed edge] A fixed edge may not be removed.
-\item[free edge] A free edge may be removed.
+\item[fixed edge] A fixed edge may never be removed from the graph.
+\item[free edge] A free edge may be removed removed from the graph.
 \end{description}
 
 A number of restrictions are places on the model node with respect to the number and 
@@ -89,6 +89,30 @@ type of edges that can be connected to it:
 \item A model node can only have fixed edges directed in or out.
 \item A model node must have at least one edge directed in and at least one edge directed out.
 \end{enumerate}
+
+Analysis tools take in a number input variables, then perform some work calculate 
+the values for their respective outputs. In an MDAO graph, this process is 
+represented by an group of nodes and edges called an \emph{analysis block}, 
+shown in Fig. \ref{f:analysis block}. Within an analysis block each variable 
+node represents a single input or output and is connected 
+to a single model node via a fixed edge. Note that in Fig. \ref{f:analysis block}, 
+the analysis block contains two model nodes, with a single edge connecting them. 
+This part of the graph represents the necessary calculations to map given inputs 
+to proper output values. 
+
+\begin{figure}[htb!]
+    \begin{center}
+    \includegraphics[width=4in]{images/analysis_block}
+    \end{center}
+    \vspace{-10pt}
+\caption{Example analysis block. The each node type and edge type is labeled in italics and annotated parenthetically.}
+\label{f:analysis block}
+\end{figure}
+
+Finally, free edges are used to connect the variable nodes of the analysis block 
+to other variables nodes outside of the analysis block. In this way, the 
+analysis block graph is a fundamental building block of the MDAO problem data flow.
+
 
 The MDO problem formulation concepts represented by nodes are given in 
 Table \ref{t:node representation}, and the concepts represented by edges are 
@@ -125,16 +149,6 @@ model & model & function call \\ \hline
  \end{center}
  \vspace{-15pt}
 \end{table}
-
-Finally, an analysis code is represented by an \emph{analysis block}, which is a collection of model nodes, variable nodes, and fixed edges with a specific structure. This structure is derived from the need to represent each input and output individually while representing the actual analysis with a single node or edge. The variable nodes each represent a single input or output of the analysis block. Each of these nodes is connected to a single model node via a fixed edge, which represents the gathering of the inputs to begin the analysis or the disseminating of outputs after the analysis. Finally, free edges are used to connect the variable nodes of the analysis block to other variables nodes outside of the analysis block. In this way, the analysis block graph is a fundamental building block of the MDAO problem data flow.
-\begin{figure}[htb!]
-	\begin{center}
-	\includegraphics[width=4in]{images/analysis_block}
-	\end{center}
-	\vspace{-10pt}
-\caption{Example analysis block. The each node type and edge type is labeled in italics and annotated parenthetically.}
-\label{f:analysis block}
-\end{figure}
 %`Connection' edges connect the local outputs from one analysis block to input nodes.
 
 \section{Graph--based Representation of the Fundamental Problem Formulation}
