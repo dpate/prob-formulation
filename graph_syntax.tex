@@ -55,6 +55,12 @@ V & = & \{1,2,3,4,5\}, \\
 E & = & \big\{(1,2),(3,2),(1,3),(3,4)\big\}.
 \end{IEEEeqnarray*}
 
+Let $I$ be a nonempty set such that for each $i \in I$ there is a corresponding set $A_i$. The family $\{A_i | i \in I\}$ is an indexed family of sets with index $i$ and indexing set $I$, and we can say $\mathcal A = \{A_i | i \in I\}$\cite{smith2006}. Then the union over this family of sets is
+\begin{equation}
+\bigcup_{i \in I} A_i = \bigcup_{A \in \mathcal A} A = \{x | x \in A \txt{ for } A \in \mathcal A\}.
+\end{equation}
+Lastly, the cardinality of a set $B$ is the number of elements in $B$ and is denoted as $|B|$.
+
 % \subsection{Problem Formulation Concepts to Represent}
 % The MDAO problem formulation concepts we wish to represent are:
 % \begin{description}
@@ -82,7 +88,7 @@ There are two edge types:
 \item[free edge] A free edge may be removed removed from the graph.
 \end{description}
 
-A number of restrictions are places on the model node with respect to the number and 
+A number of restrictions are placed on the model node with respect to the number and 
 type of edges that can be connected to it: 
 \begin{enumerate}
 \item A model node can only have one edge directed to or from another model node.
@@ -192,22 +198,29 @@ Then, for example, for a variable node $v$ we have $t_\txt{node}(v) = \txt{`vari
 
 
 \subsection{Maximal Connectivity Graph}
-To construct the maximal connectivity graph, we assume that a set of codes, global inputs, and objectives and constraints (collectively called global outputs). The codes are represented by analysis blocks $A_i=(V_{A_i},E_{A_i}), \ i=1,\ldots,m$, the global inputs are represented a set of variable nodes $I$, and the global outputs are represented by a set of variable nodes $O$. We assume that $O$, $I$, and $A_i$ are given, and that any potential connection between variables is given in the form of the free edges in the set $C_M$. 
+To construct the maximal connectivity graph, we assume that a set of codes, global inputs, and objectives and constraints (collectively called global outputs). The codes are represented by analysis blocks $A_i=(V_{A_i},E_{A_i}), \ i\in \{1,2,\ldots,m\}=I$, the global inputs are represented a set of variable nodes $V_\txt{in}$, and the global outputs are represented by a set of variable nodes $V_\txt{out}$. We assume that $V_\txt{in}$, $V_\txt{out}$, and $A_i$ are given, and that any potential connection between variables is given in the form of the free edges in the set $C_M$. 
 Then we may construct the maximal connectivity graph $M=(V_M,E_M)$ as
 \begin{IEEEeqnarray*}{rCl}
-V_M & = & I \cup O \cup \left( \bigcup_{i = 1}^m V_{A_i} \right), \\
-E_M & = & C_M \cup \left( \bigcup_{i=1}^m E_{A_i} \right),
+V_M & = & V_\txt{in} \cup V_\txt{out} \cup \left( \bigcup_{i \in I} V_{A_i} \right), \\
+E_M & = & C_M \cup \left( \bigcup_{i \in I} E_{A_i} \right),
 \end{IEEEeqnarray*}
 The MCG $M$ is uniquely determined by the given set of analysis blocks, the required outputs, and the given global inputs. In the cases where the set of global inputs $I$ is not known a priori, the process of obtaining the FPF will reveal the required inputs, as discussed subsequently.
 
 \subsection{Fundamental Problem Formulation Graph}
 We now define the fundamental problem formulation graph, $F=(V_F,E_F)$, as a directed graph meeting the following conditions
 \begin{enumerate}
-\item[(1)] $\displaystyle{V_F = I_F \cup O \cup \left( \bigcup_{i \in \mathcal A} V_{A_i} \right),\ I_F \subset I}$
-\item[(2)] $\displaystyle{E_F = C_F \cup \left( \bigcup_{i \in \mathcal A} E_{A_i} \right)}$
-\item[(3)] $\displaystyle{\forall v \in V_F \txt{ with } t_\txt{node}(v) = \txt{`variable,'}\quad \txt{deg}_l^-(v) < \txt{deg}^-(v) \leq \txt{deg}_u^-(v)}$
+\item[(1)] $\displaystyle{I_F \subset I}$ such that the following conditions hold
+\item[(2)] $\displaystyle{ \forall i \in I, \ \exists v \in V_{A_i} \txt{ with } t_\txt{node}(E^{-1}(v))=\txt{`model'} \txt{ and } \txt{deg}^+(v)>0 }$
+%\item[(3)] $\displaystyle{ \forall i \in I, \forall v \in V_{A_i} \txt{ with } t_\txt{node}(v) = \txt{`variable,'} \  \txt{deg}_l^-(v) < \txt{deg}^-(v) \leq \txt{deg}_u^-(v)}$
+%\item[(3)] $\displaystyle{ \forall i \in I, \forall v \in V_\txt{out} \txt{ with } t_\txt{node}(v) = \txt{`variable,'} \  \txt{deg}_l^-(v) < \txt{deg}^-(v) \leq \txt{deg}_u^-(v)}$
+\item[(3)] $\displaystyle{V_{\txt{in},F} = \{v \in V_\txt{in} | \txt{deg}^+(v) > 0\} }$
+\item[(4)] $\displaystyle{V_F = V_{\txt{in},F} \cup V_\txt{out} \cup \left( \bigcup_{i \in I_F} V_{A_i} \right)}$
+\item[(5)] $\displaystyle{E_F = C_F \cup \left( \bigcup_{i \in I_F} E_{A_i} \right), \ C_F \subset C_M}$
+\item[(6)] $\displaystyle{\forall v \in V_F \txt{ with } t_\txt{node}(v) = \txt{`variable,'} \  \txt{deg}_l^-(v) \leq \txt{deg}^-(v) \leq \txt{deg}_u^-(v)}$
 \end{enumerate}
-The set $\mathcal A$ is an index set containing the indices of the analysis blocks in $F$; for the case where all of the analysis blocks are used, we would have $\mathcal A = \{1,2,\ldots,m\}$. The first requirement for $F$ is that $V_F$ be composed of all of the global outputs (the required objectives and constraints), the nodes from each analysis block in $F$, and any global input nodes that are needed, $I_F$. The second requirement suggests that the edges in $F$ comprise the edges for each analysis block and the edges between them, the global inputs, and the global outputs. The final requirement is specific to the number of edges directed into a variable. If there are no edges directed inward, the node is called a \emph{hole}, and if more connections are directed in than are allowed, the node is called a \emph{collision}; a hole is allowed if $\txt{deg}_l^-(v)=0$. The final requirement is therefore a requirement on $C_F$.
+The set $I_F$ is an index set containing the indices of the analysis blocks in $F$ and it may only include the analysis blocks $A_i$ that meet requirements (2) and (6). Requirement (2) stipulates that the analysis blocks in $F$ must each have at least one local output that is beging used. Requirement (3) stipulates that only the global inputs that are being used should be included. Lastly, requirement (6) stipulates that the number of edges directed into the variable nodes must be within the lower and upper indegree limits; if $\txt{deg}^-(v) < \txt{deg}_l^-(v)$ the node is called a \emph{hole}, and if $\txt{deg}^-(v) > \txt{deg}_u^-(v)$ the node is called a \emph{collision}. 
+
+The set $C_F$ is a set containing free edges representing connections. Since $C_M$ is the set of all potential connections, we must have $C_F \subset C_M$. While no other conditions are explicitly stated for $C_F$, requirement (6) is actually a requirement on both $I$ and $C_F$.
 
 \subsection{Obtaining the Fundamental Problem Formulation Graph}
 In general, there may be multiple different graphs that satisfy the FPF conditions, though there may be none at all. Here, we describe a process for obtaining an FPF by starting with the MCG and disconnecting free edges until the FPF conditions are met. Then the problem is reduced to deciding which free edges to remove.
@@ -219,16 +232,15 @@ First address the nodes where $\txt{deg}^-(v) < \txt{deg}_l^-(v)$ then the ones 
 \begin{enumerate}
 \item The first step is to detect holes and disconnect the free edges following them. These free edges are removed because they represent variables which cannot be determined because the analysis function does not have adequate inputs. The set of variable nodes which are holes is created as
 \begin{equation}
-H = \{v \in V | \txt{deg}^-(v) < \txt{deg}_l^-(v) \}
+H = \{v \in V | t_\txt{node}(v) = \txt{`variable'} \txt{ and } \txt{deg}^-(v) < \txt{deg}_l^-(v) \},
 \end{equation}
-Then the updated set of edges is
+which is the set of variable nodes with few incoming edges than are allowed by the lower indegree limit.
+Then the updated set of edges is created by removing the first set of free edges following the hole:
 \begin{equation}
-C_{F,1} = C_{F,0} \setminus \{\ e \in E, \ e=xy | x=E^3(v) \txt{ for } v \in H\}
+C_{F,1} = C_{F,0} \setminus \{(x,y) \in E | x=E^3(v) \txt{ for } v \in H\},
 \end{equation}
 %deg-v is now recaculated for the new C. 
-This step is demonstrated by Fig.~\ref{f:holes}.
-\item (())
-\end{enumerate}
+and this step is demonstrated by Fig.~\ref{f:holes}. Because removing these edges can create new holes, this step must be repeated until no more holes are found.
 \begin{figure}[htb!]
 	\begin{center}
 	\includegraphics[width=3in]{images/analysis_block_hole}
@@ -237,124 +249,54 @@ This step is demonstrated by Fig.~\ref{f:holes}.
 \caption{Example variable node indicating a hole.}
 \label{f:holes}
 \end{figure}
+\item The second step is to detect collisions and to then disconnect enough free edges so that the collisions are resolved. The set of variable nodes which contain collisions is created as
+\begin{equation}
+S_\txt{nodes} = \{v \in V | t_\txt{node}(v) = \txt{`variable'} \txt{ and } \txt{deg}^-(v) > \txt{deg}_u^-(v) \}.
+\end{equation}
+For each collision node we can construct a set contained the edges directed in. The set containing all of these sets is constructed as
+\begin{equation}
+S_\txt{edges} = \big \{ \{(x,y) \in E\} \big | y \in S_\txt{nodes} \big \}
+\end{equation}
+Let $J=\{1,2,\ldots,|S_\txt{edges}|\}$ be an indexing set for $S_\txt{edges}$ such that each $S_{\txt{edges},j}$ corresponds to a set in $S_\txt{edges}$ for $j \in J$. We can assume that $J$ also indexes $S_\txt{nodes}$ because there is a one--to--one correspondence between the elements in $S_\txt{nodes}$ and the elements in $S_\txt{edges}$. Then we may construct sets of edges as
+\begin{equation}
+B_j = \big \{e_k \in S_{\txt{edges},j} \ | \ k \in \{1,2,\ldots,K\} \txt{ with } K \leq \txt{deg}_u^-(v_j) \big \}, \ j \in J,
+\end{equation}
+which means that each set $B_j$ is constructed from the set $S_{\txt{edges},j}$ by taking only as many edges as are allowed by the upper indegree limit of $v_j$. The construction of each $B_j$ corresponds to making a decision on which edges to include and which edges not to include. Then let
+\begin{equation}
+C_{F,2} = \{ e \in C_{F,1} \ | \ e \in B_j \txt{ for some } j \in J\}.
+\end{equation}
+\item The third and final step is to remove any unused nodes and edges. The set of unused variable nodes representing local outputs is
+\begin{equation}
+V_\txt{empty} = \{v \in V_M \ | \ t_\txt{node}(E^{-1}(v))=\txt{`model'} \txt{ and } \txt{deg}^+(v) = 0\},
+\end{equation}
+and so then the indexing set for only the analysis blocks with at least one used local output may be constructed as
+\begin{equation}
+I_3 =  \{i \in I \ | \ \nexists v \in V_{A_i} \txt{ such that }  v \in V_\txt{empty} \}.
+\end{equation}
+Finally, the set of nodes and edges describing a fundamental problem formulation is given by
+\begin{equation}
+V_{F,3} = V_M \setminus V_\txt{empty}
+\end{equation}
+\begin{equation}
+C_{F,3} = \{ (x,y) \in C_{F,2} \ | \ x \in V_{A_i} \txt{ or } y \in V_{A_i} \txt{ for some } i \in I_3 \}
+\end{equation}
+\begin{equation}
+F_3 = (V_{F,3},C_{F,3})
+\end{equation}
 
 
-%\begin{enumerate}
-%\item The first step is to detect holes and remove the corresponding analysis blocks, which could not be used because the required inputs are not supplied. Any analysis blocks with holes may be stored in an index set $\mathcal H$ as
-%\begin{equation}
-%\forall i \in \mathcal A_1,\txt{ and }\forall v \in V_{A_i},\txt{ if deg}^-(v)=0 \txt{ then } i \in \mathcal H.
-%\end{equation}
-%Then an updated index set $\mathcal A_2$ is created using set difference notation as
-%\begin{equation}
-%\mathcal A_2 = \mathcal A_1 \setminus \mathcal H
-%\end{equation}The connection edges directed from the removed analysis blocks are removed as
-%\begin{equation}
-%H = \{c \in C_{F,1} |c = (e^{-1}(v),v), \txt{ where } v \in V_{A_i} \txt{ for some } i \in \mathcal H\},
-%\end{equation}
-%\begin{equation}
-%C_{F,2} = C_{F,1} \setminus H
-%\end{equation}
-%Finally, the FPF is updated as
-%\begin{equation}
-%V_{F,2} = I_{F,2} \cup O \cup \left( \bigcup_{i \in \mathcal A_2} V_{A_i} \right),
-%\end{equation}
-%\begin{equation}
-%E_{F,2} = C_{F,2} \cup \left( \bigcup_{i \in \mathcal A_2} E_{A_i} \right)
-%\end{equation}
-%This process may require multiple iterations because removing an analysis block may create holes upstream. It is assumed that the process as been repeated sufficiently such that $\mathcal A_2$ does not have any holes.
-%
-%\item The next step is to resolve conflicts. The set $C$ of input nodes containing conflicts is
-%\begin{equation}
-%C = \{v \in V_{F,2} | t_\txt{node}(v) = \txt{`input'} \txt{ and } \txt{deg}^-(v) > d(v)\}
-%\end{equation}
-%%\begin{equation}
-%%for v \in c let 
-%%\end{equation}
-%\end{enumerate}
+%Let $F_2 = (V_M,C_{F,2})$ be an undirected graph, which is to say to disregard the directions associated with $C_{F,2}$. 
 
-%\subsection{Classification of the FPF}
 
-%A collision represents a choice.
-%Delete edges and analysis blocks so that there are no nodes or collisions.
+%Fixed edges are fixed only with respect to the analysis block in which they reside, it is okay to remove them along with the entire analysis block.
+
+\end{enumerate}
 
 
 
 
 
-% \begin{figure}[htb!]
-	% \begin{center}
-	% \includegraphics[width=2in]{images/hour_glass}
-	% \end{center}
-	% \vspace{-20pt}
-% \caption{(()).}
-% \label{f:our glass}
-% \end{figure}
-% \subsection{old}
-	% For a large scale problem with many analyses, obtaining the FPF is likely to be a challenge. In general, a set of analysis codes will be given and the desired outputs will be specified as
-	    % \begin{align}
-            % given & \ \ A: \lbrace x_i \lvert i \in A_\textrm{input} \rbrace \rightarrow \lbrace x_i \lvert i \in A_\textrm{output} \rbrace \notag
-            % \\    & \ \ B: \lbrace x_i \lvert i \in B_\textrm{input} \rbrace \rightarrow \lbrace x_i \lvert i \in B_\textrm{output} \rbrace \notag
-			% \\    & \ \ \quad \quad \quad \quad \quad \quad  \quad \quad \vdots
-            % \\min. &\ \ f(x_i), i \in \mathcal{O} \notag
-            % \\w.r.t. & \ \ x_i, i \in \mathcal{I}, \notag
-            % \label{eqn:preFPF}
-        % \end{align}
-	% where $\mathcal{O}$ is the index set of the global outputs and $\mathcal{I}$ is the index set of the global inputs. For this to be an FPF, there must be no \emph{conflicts} or \emph{holes}. A conflict arises when different analyses produce the same output; two analysis codes $A$ and $B$ are in conflict if
-		% \begin{equation}
-			% A_\textrm{output} \cap B_\textrm{output} \neq \emptyset.
-		% \end{equation}
-	% A hole arises when a local input to an analysis block is neither a global input nor a local output of any analysis block. If we let $\mathcal{H}$ denote the index set of local inputs which are holes
-		% \begin{equation}
-			% i \in \bigcup \{A_\textrm{input},B_\textrm{input},\ldots\} \textrm{ and } i \notin \bigcup \{\mathcal{I},A_\textrm{output},B_\textrm{output},\ldots\}  \implies  i \in \mathcal{H}.
-		% \end{equation}
-	% If the given set of analyses contains any holes, an FPF cannot be obtained. On the contrary, if there are conflicts multiple FPFs may be obtained. This is because every conflict represents a choice of which analysis to use and each choice could (potentially) yeild a different but valid FPF. The following section develops an application of graphy theory to obtain multiple FPFs from a set of analyses and desired outputs.
-		
-    % \subsection{Formulation Graph Syntax}
-    % Rather than start with an adjacency, we chose to work directly with a directed cyclic graph to develop a syntax for the FPF. 
-    % The following information must be provided to start:
-    % \begin{itemize}
-        % \item Analysis blocks: an analysis block represents any calculation, and each comes with
-            % \begin{itemize}
-                % \item local inputs
-                % \item local outputs 
-                % \item execution properties: these are the properties associated with running the code, such as run time
-            % \end{itemize}
-        % \item Global parameters: these may serve as fixed inputs to the local inputs of analysis blocks
-        % \item Global outputs: these may represent
-            % \begin{itemize}
-                % \item objectives
-                % \item constraints
-                % \item residuals: (not sure)
-            % \end{itemize}
-    % \end{itemize}
 
-    % The graph representation of a data flow is cast to utilize the extensive library of algorithms in graph theory to analyze a directed weighted graph. 
-    % Edge weights are used to represent the metrics associated with a data flow:
-    % \begin{itemize}
-        % \item Run time: this metric is a property of an analysis block
-        % \item Fidelity: this metric is a property of an individual local output
-        % \item Expected Convergence
-    % \end{itemize}
-
-    % The key assumption is that identical variables are recognized as such. This serves as the basis for creating a data flow by connecting compatible input and output nodes with a directed edge. 
-    % To represent the fact that execution of an analysis code does not depend on the number of outputs being used, we have created the following figure (not made yet).
-    
-    % This information immediately leads to the maximal connectivity graph, which is formed by placing a directed edge from each local output or global parameter to each matching local input or global output. 
-    % Whenever multiple edges are connected to a single input, a conflict occurs because only one may be used. Resolving these conflicts is one key challenge in creating a data flow.
-%    \begin{itemize}
-%        \item Specify analyses
-%        \item Connections between analyses 
-%            \begin{itemize}
-%                \item local variables
-%                \item global variables? Use "fake" node that broadcasts out to the rest of the graph? 
-%            \end{itemize}
-%        \item Cycles indicate coupling
-%        \item Cycles for design variables->objectives/constraints
-%        \item Objectives/constraints are just outputs? Special nodes? 
-%        \item Residuals are just outputs? Special nodes? 
-%        \item Parameters are just input nodes that are not design variables (use identifies these)
-%        \item FPF no solvers/optimizers anywhere in it
-%    \end{itemize}
 
     \subsection{Solution Graph Syntax}
     What is the difference between a problem formulation and a problem solution method? Convert from a cyclic graph, to an acyclic graph
