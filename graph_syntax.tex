@@ -1,12 +1,46 @@
-\section{Graph--based Problem Formulation Syntax}
-A problem formulation will be represented by nodes and edges which will be assigned certain properties and rules. There are many MDAO problem formulation concepts that we wish to represent. An analysis code should be represented by a distinct structure to distinguish between the input, output, and function evaluation, processes. The variables passed between analysis codes should be represented separately to provide insight and control over the dataflow. For example, it is important to distinguish between the case where two analysis codes are supplying the same variable to a third code, or the case where the two analysis codes are providing different variables to the third code. 
-Local inputs, local outputs, and design variables(??) should be distinguished from global inputs, which are input that are used by multiple analysis codes.
-Objectives and constaints should be represented as separate from local variables because they must be provided in order for the problem formulation to be valid. The coupling between sets of analysis codes is important to capture, and multi--fidelity analysis should also be allowed.
+\section{New Graph--based Syntax}
+The ultimate goal of the new graph--based syntax presented here is to be able to 
+fully describe the fundamental problem formulation for a complex design task, 
+while still being able to accomodate the more specific case when a solution 
+strategy is applied to the problem formulation. In order to achieve that goal 
+the graph needs to accomodate a number of constructs from MDAO problem: 
+
+\begin{itemize}
+    \item Analysis tools 
+    \item Local and global variables 
+    \item Coupling between analyses
+    \item Design variables
+    \item Objective or objectives 
+    \item Local and global Constraints
+    \item Iterative loops from solvers and optimizers
+\end{itemize}
+
+The following section provides an overview of graph theory basics, then describes 
+in detail the different node and edge types, as well as rules governing allowable 
+egdegs between nodes, used as the foundation of the new graph syntax. These basic graph 
+primatives are them mapped to the MDAO constructs stated above, and used to 
+build three distinct graph forms: 
+
+\begin{itemize}
+    \item Maximal Connectivity
+    \item Fundamental Problem Formulation 
+    \item Specific Solution
+\end{itemize}
+
+Each of these forms serves a different purpose in the design process, and we 
+present some transformations that can be applied to transition 
+between any two of the three graph forms. 
 
 \subsection{Graph Theory Basics}
-We begin by discussing the general syntax of graph theory and then expand upon this syntax to represent the data flow of an MDAO problem. The present notation is adapted from Diestel \cite{Diestel2010}.
-A \emph{graph} is a pair $G = (V,E)$ of sets such that $E \subseteq V \times V$, which means that the elements of $E$ are 2--element subsets of $V$. The set $V$ contains the \emph{vertices} or \emph{nodes} and the set $E$ contains the \emph{edges}.
-For a \emph{directed graph*} we construct $E$ as a set of ordered pairs instead of a set of sets. Each ordered pair represents an edge starting at the node indicated by the first entry and directed to the node indicated by the second entry. Edge $e$ = $(x,y)$ may be referred to simply as $xy$ and we say $y = E(x)$. 
+The notation used in this work is adapted from Diestel \cite{Diestel2010}. 
+A \emph{graph} is a pair $G = (V,E)$ of sets such that $E \subseteq V \times V$, 
+which means that the elements of $E$ are 2--element subsets of $V$. The set $V$ 
+contains the \emph{vertices} or \emph{nodes} and the set $E$ contains the \emph{edges}.
+For a \emph{directed graph*} we construct $E$ as a set of ordered pairs instead 
+of a set of sets. Each ordered pair represents an edge starting at the node 
+indicated by the first entry and directed to the node indicated by the second 
+entry. Edge $e$ = $(x,y)$ may be referred to simply as $xy$ and we say $y = E(x)$. 
+
 \begin{figure}[htb!]
 	\begin{center}
 	\includegraphics[width=1.5in]{images/example_directed_graph}
@@ -35,26 +69,30 @@ E & = & \big\{(1,2),(3,2),(1,3),(3,4)\big\}.
 % \item[multi--fidelity] It may be desirable for the same variable to be calculated by separate analyses and to use both results.
 % \end{description}
 
-\subsection{Graph Theory Representation of a Problem Formulation}
-In order to represent the listed problem formulation concepts with a graph, we assign properties and rules to nodes and edges.
-The first property assigned to nodes and edges is the \emph{type}. \\
-The possible node types are:
+\subsection{MDAO Graph Primatives}
+There are three node types:  
 \begin{description}
-\item[variable node] The variable node represents passing of data.
-\item[model node] The model node represents the handling of data.
+\item[variable node] represents passing of data.
+\item[model node] represents the handling of data.
+\item[driver node] represents constrol structures capable of managing iteration
 \end{description}
-The possible edge types are:
+There are two edge types: 
 \begin{description}
 \item[fixed edge] A fixed edge may not be removed.
 \item[free edge] A free edge may be removed.
 \end{description}
-Model nodes must be used with the following rules:
-\begin{itemize}
+
+A number of restrictions are places on the model node with respect to the number and 
+type of edges that can be connected to it: 
+\begin{enumerate}
 \item A model node can only have one edge directed to or from another model node.
 \item A model node can only have fixed edges directed in or out.
 \item A model node must have at least one edge directed in and at least one edge directed out.
-\end{itemize}
-The MDO problem formulation concepts represented by nodes are given in Table \ref{t:node representation}, and the concepts represented by nodes are given in Table \ref{t:edge representation}.
+\end{enumerate}
+
+The MDO problem formulation concepts represented by nodes are given in 
+Table \ref{t:node representation}, and the concepts represented by edges are 
+given in Table \ref{t:edge representation}.
 % \begin{itemize}
 % \item An objective or constraint is indicated by a variable node with no outgoing edges and with the incoming edges being directed from only other variable nodes.
 % \item A global input is a variable node with no edges directed in and with at least two edges directed out to different variable nodes.
