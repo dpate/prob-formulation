@@ -1,4 +1,4 @@
-\section{New Graph--based Syntax}
+\section{Requirements for New Graph Syntax}
 The ultimate goal of the new graph--based syntax presented here is to be able to 
 fully describe the fundamental problem formulation for a complex design task, 
 while still being able to accomodate the more specific case when a solution 
@@ -7,10 +7,10 @@ the graph needs to accomodate a number of constructs from MDAO problems:
 
 \begin{itemize}
     \item Analysis tools and connections between them
-    \item Coupling between analyses
-    \item Design Variable
-    \item Objectives and constraints
+    \item Design variables, objectives, and constraints
     \item Local and global properties
+    \item Coupling between analyses
+    \item Multi-fidelity analyses
 \end{itemize}
 
 Beyond those basic constructs, there are also three phases of a design process that 
@@ -107,7 +107,7 @@ Lastly, the cardinality of a set $B$ is the number of elements in $B$ and is den
 % \item[multi--fidelity] It may be desirable for the same variable to be calculated by separate analyses and to use both results.
 % \end{description}
 
-\subsection{MDAO Graph Primatives}
+\section{MDAO Graph Primatives}
 There are three node types:  
 \begin{description}
 \item[variable node] represents passing of data.
@@ -133,7 +133,7 @@ type of edges that can be connected to it:
 \item If a variable node with an outgoing edge to a model node may not have any other outgoing edges.
 \end{enumerate}
 
-\subsubsection{Analysis Blocks and Connections}
+\subsection{Analysis Blocks and Connections}
 
 Analysis tools take in a number input variables, then perform some work to calculate 
 the values for their respective outputs. In an MDAO graph, this process is 
@@ -166,12 +166,7 @@ block is passed, or connected, to the input of another analysis block, a new fre
 connecting the two variable nodes involved in the exchange. The edge is free because, unlike the edges 
 within an analysis block, it could be added or removed depending on the demands of the specific problem. 
 
-
-\subsubsection{Design Variables, Objectives, and Constraints}
-
-\subsubsection{Local vs Global}
-
-\subsubsection{}
+\subsection{Design Variables, Objectives, and Constraints}
 
 The MDO problem formulation concepts represented by nodes are given in 
 Table \ref{t:node representation}, and the concepts represented by edges are 
@@ -210,12 +205,12 @@ model & model & function call \\ \hline
 \end{table}
 %`Connection' edges connect the local outputs from one analysis block to input nodes.
 
-\section{Graph--based Representation of the Fundamental Problem Formulation}
+\subsection{Local vs Global Properties}
 
+\subsection{Coupling Between Analyses}
 
-In this section we introduce the remaining necessary notion and give graph--theory based definitions of the MCG and FPF, and then process to demonstrate how the FPF is obtained from the MCG.
+\subsection{Multi-fidelity Analyses}
 
-\subsection{Additional Notation}
 For node $v \in V$ the edges directed out are given by $E(v)$ and the edges directed into $v$ are given by $E^{-1}(v)$; $E(E(v))$ is denoted as $E^2(v)$, and likewise for additional levels. 
 The \emph{indegree} of a node is the number of edges directed in and is denoted as $\txt{deg}^-(v)$, and the \emph{outdegree} is the number of edges directed out and it is denoted as $\txt{deg}^+(v)$.
 We also define the \emph{upper indegree limit} 
@@ -231,9 +226,10 @@ These user-specified limits set the number of edges that may be directed into a 
 To keep track of which nodes and edges are which type, let $T_\txt{node}$ and $T_\txt{edge}$ be sets containing the possible node types and edge types, respectively, and then define mappings $t_\txt{node}:V \to T_\txt{node}$ and $t_\txt{edge}:E \to T_\txt{edge}$ to assign a type to each node and edge.
 Then, for example, for a variable node $v$ we have $t_\txt{node}(v) = \txt{`variable'}$.
 
-
  % A \emph{path} is a nonempty graph $P = (V,E)$ with $V = \{x_0,x_1,\ldots,x_k\}$ and $E = \{x_0x_1,x_1x_2,\ldots,x_{k-1}x_k\}$, where $x_i$ are all distinct. A graph $G$ is \emph{connected} if any two of its vertices are linked by a path in $G$. A \emph{tree} is a connected and acyclic graph.
 %%% this needs to be changed to fit the definition using a directed graph
+
+\section{Building MCG, FPF, and SPF Graphs}
 
 
 \subsection{Maximal Connectivity Graph}
