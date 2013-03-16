@@ -3,20 +3,17 @@ The ultimate goal of the new graph--based syntax presented here is to be able to
 fully describe the fundamental problem formulation for a complex design task, 
 while still being able to accomodate the more specific case when a solution 
 strategy is applied to the problem formulation. In order to achieve that goal 
-the graph needs to accomodate a number of constructs from MDAO problem: 
+the graph needs to accomodate a number of constructs from MDAO problems: 
 
 \begin{itemize}
-    \item Analysis tools 
-    \item Local and global variables 
-    \item Information passing between analyses
+    \item Analysis tools and connections between them
     \item Coupling between analyses
-    \item Design variables
-    \item Objective or objectives 
-    \item Local and global Constraints
-    \item Iterative loops from solvers and optimizers
+    \item Design Variable
+    \item Objectives and constraints
+    \item Local and global properties
 \end{itemize}
 
-Beyond those basic constructs, there are also multiple three phases for a design process that 
+Beyond those basic constructs, there are also three phases of a design process that 
 all need to be representable with the new syntax. Firstly there is the initial problem definition
 phase where the specific analysis tools and design goals are identified. At the end of this phase, 
 a single formal problem formulation is selected specifying design variables, constraints, objectives, 
@@ -30,11 +27,8 @@ can be represented with a related graph.
     \item Specific Solution Formulation
 \end{itemize}
 
-We present some transformations that can be applied to transition any graph
-between any two adjacent design phases. The \emph{maximal connectivity graph} 
-represents the full potential of all the analysis codes being considered, i.e. 
-a large set of analysis codes being considered for a given problem are included in
-a graph, with all possible connections between them also present. The second graph 
+The \emph{maximal connectivity graph} represents the first phase with all the 
+analysis codes being considered with all possible connections between them also present. The second graph 
 is \emph{fundamental problem formulation graph}, which is the smallest possible graph 
 that still fully defines a given problem formulation. Finally, a \emph{specific problem formulation} 
 may be represented by including additional edges and node types to represent the 
@@ -63,6 +57,11 @@ and the SPF is obtained from the FPF by adding nodes and edges.
     }
 \caption{The relationship between the MCG, FPF, and SPF.}
 \end{figure}
+
+In the following sections we present some graph theory basics, then demonstrate how to build 
+the relevant MDAO constructs from the given grah primatives. Next we show how to construct 
+the MCG, FPF, and SPF graphs from those constructs and demonstrate methods to transition between 
+them. 
 
 \subsection{Graph Theory Basics}
 The notation used in this work is adapted from Diestel \cite{Diestel2010}. 
@@ -115,7 +114,11 @@ There are three node types:
 \item[model node] represents the handling of data.
 \item[driver node] represents constrol structures capable of managing iteration
 \end{description}
-There are two edge types: 
+
+Only the variable node and the model node are allowed to be used in an MCG or FPF. 
+All three nodes are required for any SPF. IN addition to the three node types, there 
+are two edge types: 
+
 \begin{description}
 \item[fixed edge] A fixed edge may never be removed from the graph.
 \item[free edge] A free edge may be removed removed from the graph.
@@ -129,6 +132,8 @@ type of edges that can be connected to it:
 \item A model node must have at least one edge directed in and at least one edge directed out.
 \item If a variable node with an outgoing edge to a model node may not have any other outgoing edges.
 \end{enumerate}
+
+\subsubsection{Analysis Blocks and Connections}
 
 Analysis tools take in a number input variables, then perform some work to calculate 
 the values for their respective outputs. In an MDAO graph, this process is 
@@ -160,6 +165,13 @@ the variable nodes to be local in nature. When information from the output of on
 block is passed, or connected, to the input of another analysis block, a new free edge is added 
 connecting the two variable nodes involved in the exchange. The edge is free because, unlike the edges 
 within an analysis block, it could be added or removed depending on the demands of the specific problem. 
+
+
+\subsubsection{Design Variables, Objectives, and Constraints}
+
+\subsubsection{Local vs Global}
+
+\subsubsection{}
 
 The MDO problem formulation concepts represented by nodes are given in 
 Table \ref{t:node representation}, and the concepts represented by edges are 
