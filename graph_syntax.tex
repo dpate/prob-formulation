@@ -108,16 +108,17 @@ Lastly, the cardinality of a set $B$ is the number of elements in $B$ and is den
 % \end{description}
 
 \section{MDAO Graph Primatives}
-There are three node types:  
+There are four node types:  
 \begin{description}
-\item[variable node] represents passing of data.
-\item[model node] represents the handling of data.
-\item[driver node] represents constrol structures capable of managing iteration
+\item[variable] represents scalar or array data
+\item[model] responsible for mapping inputs to outputs
+\item[expression] simple algebreic combinations of variables (such as for constraint of objective functions)
+\item[driver] constrol structures capable of managing iteration
 \end{description}
 
-Only the variable node and the model node are allowed to be used in an MCG or FPF. 
-All three nodes are required for any SPF. IN addition to the three node types, there 
-are two edge types: 
+Only the variable, model nodes are allowed to be used in an MCG. In a FPF expression 
+nodes are also required. All four nodes are required for any SPF. In addition to 
+the three node types, there are two edge types: 
 
 \begin{description}
 \item[fixed edge] A fixed edge may never be removed from the graph.
@@ -160,14 +161,45 @@ variable nodes. Inputs are any variable nodes that have an outgoing edge into a 
 node. Conversely, outputs are any variable nodes that have an incoming edge from a model node. 
 Note that by this definition, inputs and outputs can only exist when variable nodes poses an 
 edge joining them to a model node. In Fig. \ref{f:analysis block} these are labeled out as 
-local inputs and local outputs. The necessity to be connected to a specific model node forces
-the variable nodes to be local in nature. When information from the output of one analysis 
+local inputs and local outputs. The variables are local because they are explicitely tied
+to the analysis block and have no relevance without it. 
+
+MDAO problems require that information be passed between sets of analyses. When information from the output of one analysis 
 block is passed, or connected, to the input of another analysis block, a new free edge is added 
 connecting the two variable nodes involved in the exchange. The edge is free because, unlike the edges 
 within an analysis block, it could be added or removed depending on the demands of the specific problem. 
 
 \subsection{Design Variables, Objectives, and Constraints}
 
+Design variables, objectives, and constraints all share the property, that they are 
+require external decisions to be made about a given system to identify them. Consider 
+a notional problem given by the graph in Fig. [insert ref]a. There are three input variable 
+nodes which, could potentially become design variables: w, x, and y. Assume that the 
+output y is connected to the input y, yeilding Fig. [insert ref]b. Now only w and x could 
+be design variables. We define a design variable to be any input variable node that does 
+not have an incoming connection. 
+
+[[INSERT GRAPH HERE]]
+
+Objective and constraints are also constructs that need to be identified by engineers 
+as part of the design process. In the case of objective functions single output values 
+could be selected, but commonly multiple values are assembeled together via simple 
+athrimetic opperations to form the final objective function. For example, the problem from 
+Fig. [insert ref] might have an objective function of $z^2$ or $2y + z$. Constraints are 
+always given in the form of either an inequality of an equality, e.g. 
+$\frac{2y}{10}-1<0$ or $3x+2y - 5=0$. In both cases, an engineer explictly identifies variables 
+or groups of variables and assigns an simple, explicit relationship between them. 
+
+For the proposed syntax objectives and constraints are represented through the use of 
+expression nodes. These nodes contain the actual mathematical expression used to define the 
+objective or constraint value. You can distinguish between an objective or constraint node 
+via the presence of a simple expression (objective) vs an inequality/equality (constraint). 
+Fig. [insert new ref] shows the notional problem graph augmented with objective and 
+constraint values. 
+
+[[INSERT ANOTHER GRAPH HERE]]
+
+\begin{comment}
 The MDO problem formulation concepts represented by nodes are given in 
 Table \ref{t:node representation}, and the concepts represented by edges are 
 given in Table \ref{t:edge representation}.
@@ -204,8 +236,15 @@ model & model & function call \\ \hline
  \vspace{-15pt}
 \end{table}
 %`Connection' edges connect the local outputs from one analysis block to input nodes.
-
+\end{comment}
 \subsection{Local vs Global Properties}
+
+\begin{itemize}
+  \item what can be local or global? Variables, objectives, constraints, 
+  \item What does it really mean to be local vs global? 
+  \item What does the graph structure of local vs global look like? 
+  \item local is a frame of reference... a variable could be global when looking at two analyses, but local to the two when looking at the three
+\end{itemize}
 
 \subsection{Coupling Between Analyses}
 
