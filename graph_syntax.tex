@@ -175,9 +175,11 @@ local inputs and local outputs. The variables are local because they are explici
 to the analysis block and have no relevance without it. 
 
 MDAO problems require that information be passed between sets of analyses. When information from the output of one analysis 
-block is passed, or connected, to the input of another analysis block, a new free edge is added 
-connecting the two variable nodes involved in the exchange. The edge is free because, unlike the edges 
-within an analysis block, it could be added or removed depending on the demands of the specific problem. 
+block is passed, or connected, to the input of another analysis block, a new explicit edge is added 
+connecting the two variable nodes involved in the exchange. Explicit edges are free because, unlike the edges 
+within an analysis block, they could be added or removed depending on the demands of the specific problem. 
+In other words, explicit edges are created by engineers linking the output of one tool to the input 
+of another one. 
 
 \subsection{Design Variables, Objectives, and Constraints}
 
@@ -209,7 +211,7 @@ always given in the form of either an inequality of an equality, e.g.
 $\frac{2y}{10}-1<0$ or $3x+2y - 5=0$. In both cases, an engineer explictly identifies variables 
 or groups of variables and assigns a simple, explicit relationship between them. 
 
-For the proposed syntax objectives and constraints are represented through the use of 
+For the proposed syntax, objectives and constraints are represented through the use of 
 expression nodes. These nodes contain the actual mathematical expression used to define the 
 objective or constraint value. Objective or constraint nodes are distinguished
 via the presence of a simple expression (objective) vs an inequality/equality (constraint). 
@@ -233,8 +235,8 @@ given in Table \ref{t:edge representation}.
   \label{t:node representation}
   \begin{tabular}{ccc} \hline 
 edges directed in & edges directed out & node representation \\ \hline
-only free edges & none & objective or constraint\\
-none & at least two free edges & global input \\
+only explicit edges & none & objective or constraint\\
+none & at least two explicit edges & global input \\
 none & one fixed edge & design variable \\ \hline
   \end{tabular}
  \end{center}
@@ -291,7 +293,7 @@ Then, for example, for a variable node $v$ we have $t_\txt{node}(v) = \txt{`vari
 
 
 \subsection{Maximal Connectivity Graph}
-To construct the maximal connectivity graph, we assume that a set of codes, global inputs, and objectives and constraints (collectively called global outputs). The codes are represented by analysis blocks $A_i=(V_{A_i},E_{A_i}), \ i\in \{1,2,\ldots,m\}=I$, the global inputs are represented a set of variable nodes $V_\txt{in}$, and the global outputs are represented by a set of variable nodes $V_\txt{out}$. We assume that $V_\txt{in}$, $V_\txt{out}$, and $A_i$ are given, and that any potential connection between variables is given in the form of the free edges in the set $C_M$. 
+To construct the maximal connectivity graph, we assume that a set of codes, global inputs, and objectives and constraints (collectively called global outputs). The codes are represented by analysis blocks $A_i=(V_{A_i},E_{A_i}), \ i\in \{1,2,\ldots,m\}=I$, the global inputs are represented a set of variable nodes $V_\txt{in}$, and the global outputs are represented by a set of variable nodes $V_\txt{out}$. We assume that $V_\txt{in}$, $V_\txt{out}$, and $A_i$ are given, and that any potential connection between variables is given in the form of the explicit edges in the set $C_M$. 
 Then we may construct the maximal connectivity graph $M=(V_M,E_M)$ as
 \begin{IEEEeqnarray*}{rCl}
 V_M & = & V_\txt{in} \cup V_\txt{out} \cup \left( \bigcup_{i \in I} V_{A_i} \right), \\
@@ -313,22 +315,22 @@ We now define the fundamental problem formulation graph, $F=(V_F,E_F)$, as a dir
 \end{enumerate}
 The set $I_F$ is an index set containing the indices of the analysis blocks in $F$ and it may only include the analysis blocks $A_i$ that meet requirements (2) and (6). Requirement (2) stipulates that the analysis blocks in $F$ must each have at least one local output that is beging used. Requirement (3) stipulates that only the global inputs that are being used should be included. Lastly, requirement (6) stipulates that the number of edges directed into the variable nodes must be within the lower and upper indegree limits; if $\txt{deg}^-(v) < \txt{deg}_l^-(v)$ the node is called a \emph{hole}, and if $\txt{deg}^-(v) > \txt{deg}_u^-(v)$ the node is called a \emph{collision}. 
 
-The set $C_F$ is a set containing free edges representing connections. Since $C_M$ is the set of all potential connections, we must have $C_F \subset C_M$. While no other conditions are explicitly stated for $C_F$, requirement (6) is actually a requirement on both $I$ and $C_F$.
+The set $C_F$ is a set containing explicit edges representing connections. Since $C_M$ is the set of all potential connections, we must have $C_F \subset C_M$. While no other conditions are explicitly stated for $C_F$, requirement (6) is actually a requirement on both $I$ and $C_F$.
 
 \subsection{Obtaining the Fundamental Problem Formulation Graph}
-In general, there may be multiple different graphs that satisfy the FPF conditions, though there may be none at all. Here, we describe a process for obtaining an FPF by starting with the MCG and disconnecting free edges until the FPF conditions are met. Then the problem is reduced to deciding which free edges to remove.
+In general, there may be multiple different graphs that satisfy the FPF conditions, though there may be none at all. Here, we describe a process for obtaining an FPF by starting with the MCG and disconnecting explicit edges until the FPF conditions are met. Then the problem is reduced to deciding which explicit edges to remove.
 
 %Then, mathematically, the FPF starts with $\mathcal A_1 = \{1,\ldots,m\}$, $I_{F,1} = I$, and $C_{F,1} = C_M$.
 Then, mathematically, the FPF starts with $C_{F,0} = C_M$.
 First address the nodes where $\txt{deg}^-(v) < \txt{deg}_l^-(v)$ then the ones where $\txt{deg}^-(v) > \txt{deg}_u^-(v)$
 
 \begin{enumerate}
-\item The first step is to detect holes and disconnect the free edges following them. These free edges are removed because they represent variables which cannot be determined because the analysis function does not have adequate inputs. The set of variable nodes which are holes is created as
+\item The first step is to detect holes and disconnect the explicit edges following them. These explicit edges are removed because they represent variables which cannot be determined because the analysis function does not have adequate inputs. The set of variable nodes which are holes is created as
 \begin{equation}
 H = \{v \in V \st t_\txt{node}(v) = \txt{`variable'} \txt{ and } \txt{deg}^-(v) < \txt{deg}_l^-(v) \},
 \end{equation}
 which is the set of variable nodes with few incoming edges than are allowed by the lower indegree limit.
-Then the updated set of edges is created by removing the first set of free edges following the hole:
+Then the updated set of edges is created by removing the first set of explicit edges following the hole:
 \begin{equation}
 C_{F,1} = C_{F,0} \setminus \{(x,y) \in E \st x=E^3(v) \txt{ for } v \in H\},
 \end{equation}
@@ -344,7 +346,7 @@ and this step is demonstrated by Fig.~\ref{f:hole}. Because removing these edges
 \end{figure}
 
 
-\item The second step is to detect collisions and to then disconnect enough free edges so that the collisions are resolved. The set of variable nodes which contain collisions is created as
+\item The second step is to detect collisions and to then disconnect enough explicit edges so that the collisions are resolved. The set of variable nodes which contain collisions is created as
 \begin{equation}
 S_\txt{nodes} = \{v \in V \st t_\txt{node}(v) = \txt{`variable'} \txt{ and } \txt{deg}^-(v) > \txt{deg}_u^-(v) \}.
 \end{equation}
