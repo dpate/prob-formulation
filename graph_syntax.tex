@@ -112,27 +112,36 @@ Lastly, the cardinality of a set $B$ is the number of elements in $B$ and is den
 \section{MDAO Graph Primatives}
 There are four node types:  
 \begin{description}
-\item[variable] represents scalar or array data
-\item[model] responsible for mapping inputs to outputs
-\item[expression] simple algebreic combinations of variables (such as for constraint of objective functions)
-\item[driver] constrol structures capable of managing iteration
+\item[variable: ] represents scalar or array data
+\item[model:] responsible for mapping inputs to outputs
+\item[expression:] simple algebreic combinations of variables (such as for constraint of objective functions)
+\item[driver:] constrol structures capable of managing iteration
 \end{description}
 
-Only the variable, model, and expression nodes are allowed to be used in an MCG or FPF. 
-All four nodes are required for any SPF. In addition to the three node types, there are two edge types: 
+In addition to the four node types, there are three edge types: 
 
 \begin{description}
-\item[fixed edge] A fixed edge may never be removed from the graph.
-\item[free edge] A free edge may be removed removed from the graph.
+\item[fixed edge:] Fundamental, non-changeable property of a problem, such as 
+  connections between related variable nodes. These 
+edges can never be removed from a graph. 
+\item[explicit edge:] Explicit exchange of information between two nodes. No node 
+  can have more than a single incomming explicit edge. These edges are free and
+  can be added or removed from the graph. 
+\item [implicit edge:] Implicit passing of information from a driver node to a 
+  variable node. A single variable node can have many incomming implicit edges. These edges are 
+  free and can be added or removed from the graph. 
 \end{description}
 
-A number of restrictions are placed on the model node with respect to the number and 
-type of edges that can be connected to it: 
+The driver node and the implicit edge are only allowed to be pressent in SPF graphs. All 
+other node and edge types can be present in in any of the three graphs, subject to a 
+few restrictions: 
 \begin{enumerate}
 \item A model node can only have one edge directed to or from another model node.
 \item A model node can only have fixed edges directed in or out.
-\item A model node must have at least one edge directed in and at least one edge directed out.
-\item If a variable node with an outgoing edge to a model node may not have any other outgoing edges.
+\item A model node must have at least one edge directed in and at least one edge 
+  directed out.
+\item If a variable node has an outgoing edge to a model node then it may not have 
+  any other outgoing edges.
 \end{enumerate}
 
 \subsection{Analysis Blocks and Connections}
@@ -172,15 +181,22 @@ within an analysis block, it could be added or removed depending on the demands 
 
 \subsection{Design Variables, Objectives, and Constraints}
 
-Design variables, objectives, and constraints all share the property, that they are 
-require external decisions to be made about a given system to identify them. Consider 
-a notional problem given by the graph in Fig. [insert ref]a. There are three input variable 
-nodes which, could potentially become design variables: w, x, and y. Assume that the 
-output y is connected to the input y, yeilding Fig. [insert ref]b. Now only w and x could 
-be design variables. We define a design variable to be any input variable node that does 
-not have an incoming connection. 
+Design variables, objectives, and constraints all require external decisions 
+to be made about a given system to identify them. Consider 
+a notional problem given by the graph in Fig. \ref{f:design vars} There are three input variables 
+which, could potentially become design variables: $w$, $x$, and $y$. Because the output, $x$, of $A$
+is connected to the input, $x$, of $B$ x can't actually be a design variable. The inputs $w$ and $y$
+have no incomming edges and could each be selected as design variables. 
 
-[[INSERT GRAPH HERE]]
+\begin{figure}[htb!]
+  \begin{center}
+    \includegraphics[width=.6\textwidth]{images/design_vars_graph}
+  \end{center}
+  \caption{Simple notional problem with two potential design variables \label{f:design vars}}
+\end{figure}
+
+More formally, all inputs that have no incomming fixed or explicit edges are defined
+as design variables. 
 
 Objective and constraints are also constructs that need to be identified by engineers 
 as part of the design process. In the case of objective functions single output values 
