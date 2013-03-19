@@ -196,22 +196,24 @@ have no incomming edges and could each be selected as design variables.
 \end{figure}
 
 More formally, all inputs that have no incomming fixed or explicit edges are defined
-as design variables. 
+as design variables. When working with a MCG or FPF, only fixed and explicit edges are allowed, 
+in which case a design variable is simply a variable node with no incomming edges. For a SPF 
+any design variable node would have at least one incomming implicit edge from a driver node. 
 
 Objective and constraints are also constructs that need to be identified by engineers 
 as part of the design process. In the case of objective functions single output values 
 could be selected, but commonly multiple values are assembeled together via simple 
 athrimetic opperations to form the final objective function. For example, the problem from 
-Fig. [insert ref] might have an objective function of $z^2$ or $2y + z$. Constraints are 
+Fig. \ref{f:design vars} might have an objective function of $z^2$ or $2y + z$. Constraints are 
 always given in the form of either an inequality of an equality, e.g. 
 $\frac{2y}{10}-1<0$ or $3x+2y - 5=0$. In both cases, an engineer explictly identifies variables 
 or groups of variables and assigns an simple, explicit relationship between them. 
 
 For the proposed syntax objectives and constraints are represented through the use of 
 expression nodes. These nodes contain the actual mathematical expression used to define the 
-objective or constraint value. You can distinguish between an objective or constraint node 
+objective or constraint value. Objective or constraint nodes are distinguished
 via the presence of a simple expression (objective) vs an inequality/equality (constraint). 
-Fig. [insert new ref] shows the notional problem graph augmented with objective and 
+Fig. [insert ref] shows the notional problem graph augmented with objective and 
 constraint values. 
 
 [[INSERT ANOTHER GRAPH HERE]]
