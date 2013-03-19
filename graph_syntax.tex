@@ -24,13 +24,13 @@ picking an MDAO optimization architecture. Using the proposed graph syntax, each
 can be represented with a related graph. 
 
 \begin{itemize}
-    \item Maximal Connectivity
-    \item Fundamental Problem Formulation 
-    \item Specific Solution Formulation
+    \item Maximal Connectivity Graph (MCG)
+    \item Fundamental Problem  (FPG)
+    \item Problem Solution Graph (SPG)
 \end{itemize}
 
-The \emph{maximal connectivity graph} represents the first phase with all the 
-analysis codes being considered with all possible connections between them also present. The second graph 
+The \emph{maximal connectivity graph} represents the first phase with all 
+analysis codes being considered and all possible connections between them also present. The second graph 
 is \emph{fundamental problem formulation graph}, which is the smallest possible graph 
 that still fully defines a given problem formulation. Finally, a \emph{specific problem formulation} 
 may be represented by including additional edges and node types to represent the 
@@ -38,14 +38,14 @@ solution strategy being employed to solve the problem.
 
 The relationship between these three graphs is depicted in Figs.~\ref{f:tree} and \ref{f:hourglass}. 
 The tree diagram demonstrates the fact that it is generally possible to obtain 
-multiple FPFs from a single maximal connectivity graph. This  may correspond to 
+multiple FPGs from a single maximal connectivity graph. This  may correspond to 
 different down--selections of analysis codes, different connections between them, 
-or both. Each down--selection shrinks the number of possible FPFs that could be reached 
-untill only one is remaining. Then, a single FPF, different SPFs may be obtained by implementing 
+or both. Each down--selection shrinks the number of possible FPGs that could be reached 
+untill only one is remaining. Then, from a single FPG, different PSGs may be obtained by implementing 
 different solution strategies. The hourglass shape in Fig. \ref{f:hourglass} illustrates how 
-the MCG gets reduced to a single FPF, then multiple possible SPFs exist to solve the problem.
-In other words the FPF is obtained from the MCG by removing nodes and edges, 
-and the SPF is obtained from the FPF by adding nodes and edges.
+the MCG gets reduced to a single FPG, then multiple possible PSGs exist to solve the problem.
+In other words the FPG is obtained from the MCG by removing nodes and edges, 
+and the PSG is obtained from the FPG by adding nodes and edges.
 
 \begin{figure}[htb!]
     \centering
@@ -57,15 +57,18 @@ and the SPF is obtained from the FPF by adding nodes and edges.
     \includegraphics[width=2.0in]{images/hourglass}
     \label{f:hourglass}
     }
-\caption{The relationship between the MCG, FPF, and SPF.}
+\caption{The relationship between the MCG, FPG, and PSG.}
 \end{figure}
 
-In the following sections we present some graph theory basics, then demonstrate how to build 
-the relevant MDAO constructs from the given grah primatives. Next we show how to construct 
-the MCG, FPF, and SPF graphs from those constructs and demonstrate methods to transition between 
-them. 
 
-\subsection{Graph Theory Basics}
+
+%the relevant MDAO constructs from the given grah primatives. Next we show how to construct 
+%the MCG, FPG, and SPF graphs from those constructs and demonstrate methods to transition between 
+%them.
+
+\section{Syntax Definition}
+In the rest of this section we present the necessary graph theory fundamentals to 
+construct any of the different graphs discussed above. 
 The notation used in this work is adapted from Diestel \cite{Diestel2010}. 
 A \emph{graph} is a pair $G = (V,E)$ of sets such that $E \subseteq V \times V$, 
 which means that the elements of $E$ are 2--element subsets of $V$. The set $V$ 
@@ -89,32 +92,22 @@ V & = & \{1,2,3,4,5\}, \\
 E & = & \big\{(1,2),(3,2),(1,3),(3,4)\big\}.
 \end{IEEEeqnarray*}
 
-Let $I$ be a nonempty set such that for each $i \in I$ there is a corresponding set $A_i$. The family $\{A_i \st i \in I\}$ is an indexed family of sets with index $i$ and indexing set $I$, and we can say $\mathcal A = \{A_i \st i \in I\}$\cite{smith2006}. Then the union over this family of sets is
+Let $I$ be a nonempty set such that for each $i \in I$ there is a corresponding set $A_i$. 
+The family $\{A_i \st i \in I\}$ is an indexed family of sets with index $i$ and 
+indexing set $I$, and we can say $\mathcal A = \{A_i \st i \in I\}$\cite{smith2006}. 
+Then the union over this family of sets is
+
 \begin{equation}
 \bigcup_{i \in I} A_i = \bigcup_{A \in \mathcal A} A = \{x \st x \in A \txt{ for } A \in \mathcal A\}.
 \end{equation}
 Lastly, the cardinality of a set $B$ is the number of elements in $B$ and is denoted as $|B|$.
 
-% \subsection{Problem Formulation Concepts to Represent}
-% The MDAO problem formulation concepts we wish to represent are:
-% \begin{description}
-% \item[global input] A global input is a variable that is taken as given and is used by multiple analyses.
-% \item[design variable]
-% \item[function call] A function call requires a set of inputs to be fulfilled and has certain properties, such as run time, which are independent of the number of outputs actually being used.
-% \item[passing of distinct variables] Instead of connecting analyses, the individual variables as are connected
-% \item[objective \& constraint] These are variables that must be produced by the problem formulation for it to be valid
-% \item[collision] A collision occurs when an input has multiple sources
-% \item[hole] A hole occurs when an input has no sources
-% \item[coupling] Couple is the mutual dependence between a set of analysis
-% \item[multi--fidelity] It may be desirable for the same variable to be calculated by separate analyses and to use both results.
-% \end{description}
-
-\section{MDAO Graph Primatives}
 There are four node types:  
 \begin{description}
 \item[variable: ] represents scalar or array data
 \item[model:] responsible for mapping inputs to outputs
-\item[expression:] simple algebreic combinations of variables (such as for constraint of objective functions)
+\item[expression:] simple algebreic combinations of variables (such as for 
+  constraint of objective functions)
 \item[driver:] constrol structures capable of managing iteration
 \end{description}
 
@@ -132,8 +125,10 @@ edges can never be removed from a graph.
   free and can be added or removed from the graph. 
 \end{description}
 
-The driver node and the implicit edge are only allowed to be pressent in SPF graphs. All 
-other node and edge types can be present in in any of the three graphs, subject to a 
+[[Insert legend for node and edge types]]
+
+The driver node and the implicit edge are only allowed to be pressent in PSGs. All 
+other node and edge types can be present in any of the three graphs, subject to a 
 few restrictions: 
 \begin{enumerate}
 \item A model node can only have one edge directed to or from another model node.
@@ -142,7 +137,38 @@ few restrictions:
   directed out.
 \item If a variable node has an outgoing edge to a model node then it may not have 
   any other outgoing edges.
+\item If a variable node has any incomming explicit edges, it may not have any 
+  incomming implicit edges. 
 \end{enumerate}
+
+For node $v \in V$ the edges directed out are given by $E(v)$ and the edges 
+directed into $v$ are given by $E^{-1}(v)$; $E(E(v))$ is denoted as $E^2(v)$, 
+and likewise for additional levels. The \emph{indegree} of a node is the number 
+of explicit edges directed in and is denoted as $\txt{deg}^-(v)$, and the \emph{outdegree} 
+is the number of explicit edges directed out and it is denoted as $\txt{deg}^+(v)$.
+We also define the \emph{upper indegree limit} 
+
+\begin{equation}
+\txt{deg}_u^-(v):V \to \mathbb{N}
+\end{equation} 
+and the \emph{lower indegree limit}
+\begin{equation}
+\txt{deg}_l^-(v):V \to \mathbb{N}.
+\end{equation}
+
+These user-specified limits govern the number of explicit edges that may be directed into a 
+node for a valid graph. Consider a variable node $v$ with
+$\txt{deg}_u^-(v) = \txt{deg}_l^-(v) = 1$. In this case, that node must have one, and only one
+incomming explicit edge or the graph is not valid. Two possiblities exists for voilating 
+the limit conditions: 
+\begin{description}
+  \item[hole: ] $\txt{deg}_u^-(v) < \txt{deg}_l^-(v)$. The number of incomming edges 
+  is less than $\txt{deg}_l^-(v)$. 
+  \item[collision: ]$\txt{deg}_u^-(v) > \txt{deg}_u^-(v)$. The number of incomming edges 
+  is greater than $ \txt{deg}_u^-(v)$.
+\end{description} 
+
+\section{Graph Representation of MDAO Features}
 
 \subsection{Analysis Blocks and Connections}
 
@@ -198,8 +224,8 @@ have no incomming edges and could each be selected as design variables.
 \end{figure}
 
 More formally, all inputs that have no incomming fixed or explicit edges are defined
-as design variables. When working with a MCG or FPF, only fixed and explicit edges are allowed, 
-in which case a design variable is simply a variable node with no incomming edges. For a SPF 
+as design variables. When working with a MCG or FPG, only fixed and explicit edges are allowed, 
+in which case a design variable is simply a variable node with no incomming edges. For a valid PSG 
 any design variable node would have at least one incomming implicit edge from a driver node. 
 
 Objective and constraints are also constructs that need to be identified by engineers 
@@ -271,25 +297,7 @@ model & model & function call \\ \hline
 
 \subsection{Multi-fidelity Analyses}
 
-For node $v \in V$ the edges directed out are given by $E(v)$ and the edges directed into $v$ are given by $E^{-1}(v)$; $E(E(v))$ is denoted as $E^2(v)$, and likewise for additional levels. 
-The \emph{indegree} of a node is the number of edges directed in and is denoted as $\txt{deg}^-(v)$, and the \emph{outdegree} is the number of edges directed out and it is denoted as $\txt{deg}^+(v)$.
-We also define the \emph{upper indegree limit} 
-\begin{equation}
-\txt{deg}_u^-(v):V \to \mathbb{N}
-\end{equation} 
-and the \emph{lower indegree limit}
-\begin{equation}
-\txt{deg}_l^-(v):V \to \mathbb{N}.
-\end{equation}
-These user-specified limits set the number of edges that may be directed into a node for a problem formulation to be valid. For example, a variable node $v$ will have $\txt{deg}_u^-(v) = \txt{deg}_l^-(v) = 1$, unless it is a multi--fidelity variable, in which case the user may specify some upper limit higher than one.
-
-To keep track of which nodes and edges are which type, let $T_\txt{node}$ and $T_\txt{edge}$ be sets containing the possible node types and edge types, respectively, and then define mappings $t_\txt{node}:V \to T_\txt{node}$ and $t_\txt{edge}:E \to T_\txt{edge}$ to assign a type to each node and edge.
-Then, for example, for a variable node $v$ we have $t_\txt{node}(v) = \txt{`variable'}$.
-
- % A \emph{path} is a nonempty graph $P = (V,E)$ with $V = \{x_0,x_1,\ldots,x_k\}$ and $E = \{x_0x_1,x_1x_2,\ldots,x_{k-1}x_k\}$, where $x_i$ are all distinct. A graph $G$ is \emph{connected} if any two of its vertices are linked by a path in $G$. A \emph{tree} is a connected and acyclic graph.
-%%% this needs to be changed to fit the definition using a directed graph
-
-\section{Building MCG, FPF, and SPF Graphs}
+\section{Building MCG, FPG, and PSG}
 
 
 \subsection{Maximal Connectivity Graph}
@@ -299,7 +307,7 @@ Then we may construct the maximal connectivity graph $M=(V_M,E_M)$ as
 V_M & = & V_\txt{in} \cup V_\txt{out} \cup \left( \bigcup_{i \in I} V_{A_i} \right), \\
 E_M & = & C_M \cup \left( \bigcup_{i \in I} E_{A_i} \right),
 \end{IEEEeqnarray*}
-The MCG $M$ is uniquely determined by the given set of analysis blocks, the required outputs, and the given global inputs. In the cases where the set of global inputs $I$ is not known a priori, the process of obtaining the FPF will reveal the required inputs, as discussed subsequently.
+The MCG $M$ is uniquely determined by the given set of analysis blocks, the required outputs, and the given global inputs. In the cases where the set of global inputs $I$ is not known a priori, the process of obtaining the FPG will reveal the required inputs, as discussed subsequently.
 
 \subsection{Fundamental Problem Formulation Graph}
 We now define the fundamental problem formulation graph, $F=(V_F,E_F)$, as a directed graph meeting the following conditions
@@ -318,10 +326,10 @@ The set $I_F$ is an index set containing the indices of the analysis blocks in $
 The set $C_F$ is a set containing explicit edges representing connections. Since $C_M$ is the set of all potential connections, we must have $C_F \subset C_M$. While no other conditions are explicitly stated for $C_F$, requirement (6) is actually a requirement on both $I$ and $C_F$.
 
 \subsection{Obtaining the Fundamental Problem Formulation Graph}
-In general, there may be multiple different graphs that satisfy the FPF conditions, though there may be none at all. Here, we describe a process for obtaining an FPF by starting with the MCG and disconnecting explicit edges until the FPF conditions are met. Then the problem is reduced to deciding which explicit edges to remove.
+In general, there may be multiple different graphs that satisfy the FPG conditions, though there may be none at all. Here, we describe a process for obtaining an FPG by starting with the MCG and disconnecting explicit edges until the FPG conditions are met. Then the problem is reduced to deciding which explicit edges to remove.
 
-%Then, mathematically, the FPF starts with $\mathcal A_1 = \{1,\ldots,m\}$, $I_{F,1} = I$, and $C_{F,1} = C_M$.
-Then, mathematically, the FPF starts with $C_{F,0} = C_M$.
+%Then, mathematically, the FPG starts with $\mathcal A_1 = \{1,\ldots,m\}$, $I_{F,1} = I$, and $C_{F,1} = C_M$.
+Then, mathematically, the FPG starts with $C_{F,0} = C_M$.
 First address the nodes where $\txt{deg}^-(v) < \txt{deg}_l^-(v)$ then the ones where $\txt{deg}^-(v) > \txt{deg}_u^-(v)$
 
 \begin{enumerate}
@@ -412,7 +420,7 @@ F = (V_F,C_F).
         \item Cycles indicate convergence loops or design variable loops
         \item Problem can't be solved until all loops are *removed* by adding solvers/optimizers
         \item *Special* nodes for solvers and optimizers that *break* loops (from an algorithmic point of view)
-        \item FPF represents the minimal amount of information necessary to define a problem
+        \item FPG represents the minimal amount of information necessary to define a problem
         \item Any solution path grows the graph complexity by adding edges and nodes (or possibly have an empty solution graph, which you build up
         as you remove edges from problem formulation graph?)
     \end{itemize}
