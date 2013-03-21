@@ -86,7 +86,7 @@
     MDAO solution strategies depending on the specifics of the problem\cite{Alex2000}.
 
 
-\section{Existing Graph--Based Problem Formulation Syntax}
+\section{Existing Graph--Based Syntax}
 
     As shown above, the mathematical language for specifying problem formulations is very general and can be used both for 
     fundamental and specific problem formulations. Tedford and Martins used the above mathematical syntax to specify the 
@@ -172,11 +172,11 @@
     Hence XDSM is too specific for use with a fundamental problem formulation. 
 
     Of the three methods, XDSM comes the closest to fully describing a problem formulation. 
-    Thought it does not contain specific variable information, this could be easily added back in
-    simply by putting the variables back into the graph and drawing the apprpriat connections
+    Thought it does not contain specific variable information on the diaganol of the DSM, this could be easily added back in
+    simply by putting the variables back into the graph and drawing the appropriate connections
     between them and the relevant analysis nodes. However, it's dependence on 
     solution strategy specifics to represent couplings can not be removed without 
-    stripping it of the useful information contained in an FDT. In the following sections
-    we describe a new graph syntax that retains the features of XDSM, without the dependence on 
+    stripping it of the useful information contained in an FDT. We propose
+    a new graph syntax that retains the features of XDSM, without the dependence on 
     solution strategy (although it does allow for that information to be present). This 
-    new syntax allows for the compelete specification of an FPF. 
+    new syntax allows for the compelete specification of an MDAO problem.

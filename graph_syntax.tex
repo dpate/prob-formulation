@@ -2,10 +2,10 @@
 
 \section{Requirements for New Graph Syntax}
 The ultimate goal of the new graph--based syntax presented here is to be able to 
-fully describe the fundamental problem formulation for a complex design task, 
+fully describe the general structure of an MDAO problem indpendently of any solution information, 
 while still being able to accomodate the more specific case when a solution 
-strategy is applied to the problem formulation. In order to achieve that goal 
-the graph needs to accomodate a number of constructs from MDAO problems: 
+strategy is applied. In order to achieve that goal 
+the graph needs to accomodate a number of constructs of MDAO problems: 
 
 \begin{itemize}
     \item Analysis tools and connections between them
@@ -42,7 +42,8 @@ multiple FPGs from a single maximal connectivity graph. This  may correspond to
 different down--selections of analysis codes, different connections between them, 
 or both. Each down--selection shrinks the number of possible FPGs that could be reached 
 untill only one is remaining. Then, from a single FPG, different PSGs may be obtained by implementing 
-different solution strategies. The hourglass shape in Fig. \ref{f:hourglass} illustrates how 
+different solution strategies. If you consider the size of a graph to be the sum of all its
+edges and nodes then the hourglass shape in Fig. \ref{f:hourglass} illustrates how
 the MCG gets reduced to a single FPG, then multiple possible PSGs exist to solve the problem.
 In other words the FPG is obtained from the MCG by removing nodes and edges, 
 and the PSG is obtained from the FPG by adding nodes and edges.
@@ -76,7 +77,9 @@ contains the \emph{vertices} or \emph{nodes} and the set $E$ contains the \emph{
 For a \emph{directed graph*} we construct $E$ as a set of ordered pairs instead 
 of a set of sets. Each ordered pair represents an edge starting at the node 
 indicated by the first entry and directed to the node indicated by the second 
-entry. Edge $e$ = $(x,y)$ may be referred to simply as $xy$ and we say $y = E(x)$. 
+entry. Edge $e$ = $(x,y)$ may be referred to simply as $xy$. For node $v \in V$ 
+the edges directed out are given by $E(v)$ and the edges directed into $v$ are given 
+by $E^{-1}(v)$; $E(E(v))$ is denoted as $E^2(v)$, and likewise for additional levels. 
 
 \begin{figure}[htb!]
 	\begin{center}
@@ -92,6 +95,7 @@ V & = & \{1,2,3,4,5\}, \\
 E & = & \big\{(1,2),(3,2),(1,3),(3,4)\big\}.
 \end{IEEEeqnarray*}
 
+%does this belong in the analysis block section???? 
 Let $I$ be a nonempty set such that for each $i \in I$ there is a corresponding set $A_i$. 
 The family $\{A_i \st i \in I\}$ is an indexed family of sets with index $i$ and 
 indexing set $I$, and we can say $\mathcal A = \{A_i \st i \in I\}$\cite{smith2006}. 
@@ -100,7 +104,11 @@ Then the union over this family of sets is
 \begin{equation}
 \bigcup_{i \in I} A_i = \bigcup_{A \in \mathcal A} A = \{x \st x \in A \txt{ for } A \in \mathcal A\}.
 \end{equation}
+
 Lastly, the cardinality of a set $B$ is the number of elements in $B$ and is denoted as $|B|$.
+
+
+\subsection{Node and Edge Types}
 
 There are four node types:  
 \begin{description}
@@ -108,7 +116,7 @@ There are four node types:
 \item[model:] responsible for mapping inputs to outputs
 \item[expression:] simple algebreic combinations of variables (such as for 
   constraint of objective functions)
-\item[driver:] constrol structures capable of managing iteration
+\item[driver:] control logic capable of managing iteration
 \end{description}
 
 In addition to the four node types, there are three edge types: 
@@ -127,6 +135,8 @@ edges can never be removed from a graph.
 
 [[Insert legend for node and edge types]]
 
+\subsection{Rules for Nodes and Edges}
+
 The driver node and the implicit edge are only allowed to be pressent in PSGs. All 
 other node and edge types can be present in any of the three graphs, subject to a 
 few restrictions: 
@@ -141,17 +151,17 @@ few restrictions:
   incomming implicit edges. 
 \end{enumerate}
 
-For node $v \in V$ the edges directed out are given by $E(v)$ and the edges 
-directed into $v$ are given by $E^{-1}(v)$; $E(E(v))$ is denoted as $E^2(v)$, 
-and likewise for additional levels. The \emph{indegree} of a node is the number 
-of explicit edges directed in and is denoted as $\txt{deg}^-(v)$, and the \emph{outdegree} 
-is the number of explicit edges directed out and it is denoted as $\txt{deg}^+(v)$.
-We also define the \emph{upper indegree limit} 
+\subsection{In-degree and Out-degree}
+
+The \emph{in-degree} of a node is the number of fixed or explicit edges directed in and 
+is denoted as $\txt{deg}^-(v)$, and the \emph{out-degree} 
+is the number of fixed or explicit edges directed out and it is denoted as $\txt{deg}^+(v)$.
+We also define the \emph{upper in-degree limit} 
 
 \begin{equation}
 \txt{deg}_u^-(v):V \to \mathbb{N}
 \end{equation} 
-and the \emph{lower indegree limit}
+and the \emph{lower in-degree limit}
 \begin{equation}
 \txt{deg}_l^-(v):V \to \mathbb{N}.
 \end{equation}
@@ -162,13 +172,14 @@ $\txt{deg}_u^-(v) = \txt{deg}_l^-(v) = 1$. In this case, that node must have one
 incomming explicit edge or the graph is not valid. Two possiblities exists for voilating 
 the limit conditions: 
 \begin{description}
-  \item[hole: ] $\txt{deg}_u^-(v) < \txt{deg}_l^-(v)$. The number of incomming edges 
-  is less than $\txt{deg}_l^-(v)$. 
-  \item[collision: ]$\txt{deg}_u^-(v) > \txt{deg}_u^-(v)$. The number of incomming edges 
-  is greater than $ \txt{deg}_u^-(v)$.
+  \item[hole: ] The number of incomming edges is less than $\txt{deg}_l^-(v)$. 
+    \begin{equation} \txt{deg}_u^-(v) < \txt{deg}_l^-(v) \label{e:hole} \end{equation} 
+
+  \item[collision: ] The number of incomming edges is greater than $ \txt{deg}_u^-(v)$. 
+    \begin{equation} \txt{deg}_u^-(v) > \txt{deg}_u^-(v) \end{equation}
 \end{description} 
 
-\section{Graph Representation of MDAO Features}
+\section{Graph Representation of MDAO Constructs}
 
 \subsection{Analysis Blocks and Connections}
 
@@ -179,9 +190,12 @@ shown in Fig. \ref{f:analysis block}. Within an analysis block each variable
 node represents a single input or output and is connected 
 to a single model node via a fixed edge. Note that in Fig. \ref{f:analysis block}, 
 the analysis block contains two model nodes, with a single edge connecting them. 
-This part of the graph represents the necessary calculations to map given inputs 
-to proper output values. Although analysis blocks are comprised of multiple nodes and edges, since all 
-the edges within them are fixed, they become fixed structures within a graph.
+This edge represents the necessary calculations to map given inputs 
+to proper output values. If constructing a weighted graph, the weight calculation edge 
+provides the opportunity to computational cost. However, it is also allowed to skip 
+this edge and have both incomming and outgoing edges to variables through a single model 
+node for a given analysis block. Although analysis blocks are comprised of multiple nodes and edges, since all 
+the edges within them are fixed, they become fixed sub-graphs within a graph.
 
 \begin{figure}[htb!]
     \begin{center}
@@ -205,7 +219,11 @@ block is passed, or connected, to the input of another analysis block, a new exp
 connecting the two variable nodes involved in the exchange. Explicit edges are free because, unlike the edges 
 within an analysis block, they could be added or removed depending on the demands of the specific problem. 
 In other words, explicit edges are created by engineers linking the output of one tool to the input 
-of another one. 
+of another one. Note that it is allowed for a single output to have outgoing explicit edges to multiple 
+other inputs. In Fig [insert ref], an output from analysis block A is connected 
+to the inputs for both blocks B and C. 
+
+[[insert graph fig here]]
 
 \subsection{Design Variables, Objectives, and Constraints}
 
@@ -223,10 +241,11 @@ have no incomming edges and could each be selected as design variables.
   \caption{Simple notional problem with two potential design variables \label{f:design vars}}
 \end{figure}
 
-More formally, all inputs that have no incomming fixed or explicit edges are defined
-as design variables. When working with a MCG or FPG, only fixed and explicit edges are allowed, 
+More formally, any input variable that can be defined as a hole by Eqn. \ref{e:hole}
+would be considered a design variable in the graph. When working with a MCG or FPG, only fixed and explicit edges are allowed, 
 in which case a design variable is simply a variable node with no incomming edges. For a valid PSG 
-any design variable node would have at least one incomming implicit edge from a driver node. 
+any design variable node would have at least one (but possible multiple) incomming 
+implicit edge from a driver node. 
 
 Objective and constraints are also constructs that need to be identified by engineers 
 as part of the design process. In the case of objective functions single output values 
@@ -284,14 +303,38 @@ model & model & function call \\ \hline
 \end{table}
 %`Connection' edges connect the local outputs from one analysis block to input nodes.
 \end{comment}
-\subsection{Local vs Global Properties}
+\subsection{Local vs Global Nodes}
 
-\begin{itemize}
-  \item what can be local or global? Variables, objectives, constraints, 
-  \item What does it really mean to be local vs global? 
-  \item What does the graph structure of local vs global look like? 
-  \item local is a frame of reference... a variable could be global when looking at two analyses, but local to the two when looking at the three
-\end{itemize}
+A simple definition of a global node is any node that involves information 
+from more than one analysis block. Likewise, a local node is any node 
+that involves information from only a single analysis block. As stated before, variable 
+nodes with fixed edges directed to model nodes (as part of an analysis block) are inherently local 
+and similarly model nodes are also local. Expression and driver nodes
+are not inherently local or global though. For these, their locality is determined 
+by the incomming and outgoing edges they posses. Consider the graph in Fig [insert ref], 
+where the expression node $g$ represents some kind of constraint for the optimziation problem. 
+Since $g$ only had edges comming from analysis block $B$, it would be considered a local constraint 
+on block $B$. 
+
+[[insert graph here]]
+
+Although we've already established that variable nodes in an analysis block are local to that 
+block, global design variables are a part of many MDAO problems. We've previously defined 
+a design variable as any 
+
+While this simple definition is valid, it glosses over a more subtle aspect of 
+some MDAO problems. Consider the graph in Fig. [insert ref], with three analysis 
+blocks A, B, and C. The expression node, $g$, is a constraint that requires information 
+from $A$ and $B$, so it would be considered global by the previous definition. Since $g$
+has incomming edges from block $C$, it would not be global with respect to $C$. 
+You could say that $g$ is local to the group $A,B$. In this sense, locality 
+becomes a relative term. A given node can be local to a specific sub-graph of a large
+problem. This subtle structure can become significant when determining how to partition 
+an MDAO problem for use with certain MDAO architectures. Martins and Marriage 
+demonstrate how Collaborative Optimization outperforms MultiDisciplinary Feasible
+when they separated a problem into two sub-problems with variables, objectives, and 
+constraints local to each one\cite{Marriage2008a}. 
+
 
 \subsection{Coupling Between Analyses}
 
@@ -321,7 +364,7 @@ We now define the fundamental problem formulation graph, $F=(V_F,E_F)$, as a dir
 \item[(5)] $\displaystyle{E_F = C_F \cup \left( \bigcup_{i \in I_F} E_{A_i} \right), \ C_F \subset C_M}$
 \item[(6)] $\displaystyle{\forall v \in V_F \txt{ with } t_\txt{node}(v) = \txt{`variable,'} \  \txt{deg}_l^-(v) \leq \txt{deg}^-(v) \leq \txt{deg}_u^-(v)}$
 \end{enumerate}
-The set $I_F$ is an index set containing the indices of the analysis blocks in $F$ and it may only include the analysis blocks $A_i$ that meet requirements (2) and (6). Requirement (2) stipulates that the analysis blocks in $F$ must each have at least one local output that is beging used. Requirement (3) stipulates that only the global inputs that are being used should be included. Lastly, requirement (6) stipulates that the number of edges directed into the variable nodes must be within the lower and upper indegree limits; if $\txt{deg}^-(v) < \txt{deg}_l^-(v)$ the node is called a \emph{hole}, and if $\txt{deg}^-(v) > \txt{deg}_u^-(v)$ the node is called a \emph{collision}. 
+The set $I_F$ is an index set containing the indices of the analysis blocks in $F$ and it may only include the analysis blocks $A_i$ that meet requirements (2) and (6). Requirement (2) stipulates that the analysis blocks in $F$ must each have at least one local output that is beging used. Requirement (3) stipulates that only the global inputs that are being used should be included. Lastly, requirement (6) stipulates that the number of edges directed into the variable nodes must be within the lower and upper in-degree limits; if $\txt{deg}^-(v) < \txt{deg}_l^-(v)$ the node is called a \emph{hole}, and if $\txt{deg}^-(v) > \txt{deg}_u^-(v)$ the node is called a \emph{collision}. 
 
 The set $C_F$ is a set containing explicit edges representing connections. Since $C_M$ is the set of all potential connections, we must have $C_F \subset C_M$. While no other conditions are explicitly stated for $C_F$, requirement (6) is actually a requirement on both $I$ and $C_F$.
 
@@ -337,7 +380,7 @@ First address the nodes where $\txt{deg}^-(v) < \txt{deg}_l^-(v)$ then the ones 
 \begin{equation}
 H = \{v \in V \st t_\txt{node}(v) = \txt{`variable'} \txt{ and } \txt{deg}^-(v) < \txt{deg}_l^-(v) \},
 \end{equation}
-which is the set of variable nodes with few incoming edges than are allowed by the lower indegree limit.
+which is the set of variable nodes with few incoming edges than are allowed by the lower in-degree limit.
 Then the updated set of edges is created by removing the first set of explicit edges following the hole:
 \begin{equation}
 C_{F,1} = C_{F,0} \setminus \{(x,y) \in E \st x=E^3(v) \txt{ for } v \in H\},
@@ -366,7 +409,7 @@ Let $J=\{1,2,\ldots,|S_\txt{edges}|\}$ be an indexing set for $S_\txt{edges}$ su
 \begin{equation}
 B_j = \big \{e_k \in S_{\txt{edges},j} \st k \in \{1,2,\ldots,K\} \txt{ with } K \leq \txt{deg}_u^-(v_j) \big \}, \ j \in J,
 \end{equation}
-which means that each set $B_j$ is constructed from the set $S_{\txt{edges},j}$ by taking only as many edges as are allowed by the upper indegree limit of $v_j$. The construction of each $B_j$ corresponds to making a decision on which edges to include and which edges not to include. Then let
+which means that each set $B_j$ is constructed from the set $S_{\txt{edges},j}$ by taking only as many edges as are allowed by the upper in-degree limit of $v_j$. The construction of each $B_j$ corresponds to making a decision on which edges to include and which edges not to include. Then let
 \begin{equation}
 C_{F,2} = \{ e \in C_{F,1} \st e \in B_j \txt{ for some } j \in J\}.
 \end{equation}
