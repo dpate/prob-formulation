@@ -238,7 +238,7 @@ have no incomming edges and could each be selected as design variables.
   \begin{center}
     \includegraphics[width=.6\textwidth]{images/design_vars_graph}
   \end{center}
-  \caption{Simple notional problem with two potential design variables \label{f:design vars}}
+  \caption{Notional graph with two potential design variables \label{f:design vars}}
 \end{figure}
 
 More formally, any input variable that can be defined as a hole by Eqn. \ref{e:hole}
@@ -260,10 +260,15 @@ For the proposed syntax, objectives and constraints are represented through the 
 expression nodes. These nodes contain the actual mathematical expression used to define the 
 objective or constraint value. Objective or constraint nodes are distinguished
 via the presence of a simple expression (objective) vs an inequality/equality (constraint). 
-Fig. [insert ref] shows the notional problem graph augmented with objective and 
+Fig. \ref{f:obj-cons} shows the notional problem graph augmented with objective and 
 constraint values. 
 
-[[INSERT ANOTHER GRAPH HERE]]
+\begin{figure}[htb!]
+  \begin{center}
+    \includegraphics[width=.6\textwidth]{images/obj_const_graph}
+  \end{center}
+  \caption{Notional graph with and objective and constraint nodes \label{f:obj-cons}}
+\end{figure}
 
 \begin{comment}
 The MDO problem formulation concepts represented by nodes are given in 
@@ -303,6 +308,8 @@ model & model & function call \\ \hline
 \end{table}
 %`Connection' edges connect the local outputs from one analysis block to input nodes.
 \end{comment}
+
+
 \subsection{Local vs Global Nodes}
 
 A simple definition of a global node is any node that involves information 
