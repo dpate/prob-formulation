@@ -96,13 +96,12 @@ E & = & \big\{(1,2),(3,2),(1,3),(3,4)\big\}.
 \end{IEEEeqnarray*}
 
 %does this belong in the analysis block section???? 
-Let $I$ be a nonempty set such that for each $i \in I$ there is a corresponding set $A_i$. 
-The family $\{A_i \st i \in I\}$ is an indexed family of sets with index $i$ and 
-indexing set $I$, and we can say $\mathcal A = \{A_i \st i \in I\}$\cite{smith2006}. 
-Then the union over this family of sets is
-
+Let $I$ be a nonempty set of counting numbers such that for each $i \in I$ there is a corresponding set $A_i$. 
+The set of sets $\mathcal A = \{A_i \st i \in I\}$ is called an indexed family of sets with index $i$ and 
+indexing set $I$\cite{smith2006}. 
+The union over this family of sets can be described in a few different ways:
 \begin{equation}
-\bigcup_{i \in I} A_i = \bigcup_{A \in \mathcal A} A = \{x \st x \in A \txt{ for } A \in \mathcal A\}.
+\bigcup_{i \in I} A_i = \bigcup_{A \in \mathcal A} A = \{x \st x \in A \txt{ for some } A \in \mathcal A\}.
 \end{equation}
 
 Lastly, the cardinality of a set $B$ is the number of elements in $B$ and is denoted as $|B|$.
@@ -165,18 +164,17 @@ and the \emph{lower in-degree limit}
 \begin{equation}
 \txt{deg}_l^-(v):V \to \mathbb{N}.
 \end{equation}
-
 These user-specified limits govern the number of explicit edges that may be directed into a 
 node for a valid graph. Consider a variable node $v$ with
-$\txt{deg}_u^-(v) = \txt{deg}_l^-(v) = 1$. In this case, that node must have one, and only one
-incomming explicit edge or the graph is not valid. Two possiblities exists for voilating 
+$\txt{deg}_u^-(v) = \txt{deg}_l^-(v) = 1$. In this case, that node must have exactly one
+incomming explicit edge or the graph is invalid. Two possiblities exist for voilating 
 the limit conditions: 
 \begin{description}
   \item[hole: ] The number of incomming edges is less than $\txt{deg}_l^-(v)$. 
-    \begin{equation} \txt{deg}_u^-(v) < \txt{deg}_l^-(v) \label{e:hole} \end{equation} 
+    \begin{equation} \txt{deg}^-(v) < \txt{deg}_l^-(v) \label{e:hole} \end{equation} 
 
   \item[collision: ] The number of incomming edges is greater than $ \txt{deg}_u^-(v)$. 
-    \begin{equation} \txt{deg}_u^-(v) > \txt{deg}_u^-(v) \end{equation}
+    \begin{equation} \txt{deg}^-(v) > \txt{deg}_u^-(v) \end{equation}
 \end{description} 
 
 \section{Graph Representation of MDAO Constructs}
@@ -351,19 +349,20 @@ constraints local to each one\cite{Marriage2008a}.
 
 
 \subsection{Maximal Connectivity Graph}
-To construct the maximal connectivity graph, we assume that a set of codes, global inputs, and objectives and constraints (collectively called global outputs). The codes are represented by analysis blocks $A_i=(V_{A_i},E_{A_i}), \ i\in \{1,2,\ldots,m\}=I$, the global inputs are represented a set of variable nodes $V_\txt{in}$, and the global outputs are represented by a set of variable nodes $V_\txt{out}$. We assume that $V_\txt{in}$, $V_\txt{out}$, and $A_i$ are given, and that any potential connection between variables is given in the form of the explicit edges in the set $C_M$. 
+To construct the maximal connectivity graph, we assume that a set of codes, global inputs, and objectives and constraints (collectively called global outputs) are provided. The codes are represented by analysis block graphs ((ABGs?)) $A_i=(V_{A_i},E_{A_i}), \ i\in I$, where $m$ is the number of codes and $I=\{1,2,\ldots,m\}$. The global inputs are represented as a set of variable nodes $V_\txt{in}$, and the global outputs are represented by a set of variable nodes $V_\txt{out}$. 
+We assume that $V_\txt{in}$, $V_\txt{out}$, and each $A_i$ are given, and that any potential connection between variables is given in the form of explicit edges in the set $C_M$. 
 Then we may construct the maximal connectivity graph $M=(V_M,E_M)$ as
 \begin{IEEEeqnarray*}{rCl}
 V_M & = & V_\txt{in} \cup V_\txt{out} \cup \left( \bigcup_{i \in I} V_{A_i} \right), \\
 E_M & = & C_M \cup \left( \bigcup_{i \in I} E_{A_i} \right),
 \end{IEEEeqnarray*}
-The MCG $M$ is uniquely determined by the given set of analysis blocks, the required outputs, and the given global inputs. In the cases where the set of global inputs $I$ is not known a priori, the process of obtaining the FPG will reveal the required inputs, as discussed subsequently.
+The MCG $M$ is uniquely determined by the given set of analysis blocks, the required outputs, and the given global inputs. In the cases where the set of global inputs is not known a priori, the process of obtaining the FPG will reveal the required inputs, as discussed subsequently.
 
 \subsection{Fundamental Problem Formulation Graph}
-We now define the fundamental problem formulation graph, $F=(V_F,E_F)$, as a directed graph meeting the following conditions
+We now define the fundamental problem formulation graph $F=(V_F,E_F)$ as a directed graph meeting the following conditions, which are explained subsequently,
 \begin{enumerate}
-\item[(1)] $\displaystyle{I_F \subset I}$ such that the following conditions hold
-\item[(2)] $\displaystyle{ \forall i \in I, \ \exists v \in V_{A_i} \txt{ with } t_\txt{node}(E^{-1}(v))=\txt{`model'} \txt{ and } \txt{deg}^+(v)>0 }$
+\item[(1)] $\displaystyle{I_F \subset I}$ such that the remaining conditions hold
+\item[(2)] $\displaystyle{ \forall i \in I_F, \ \exists v \in V_{A_i} \txt{ with } t_\txt{node}(E^{-1}(v))=\txt{`model'} \txt{ and } \txt{deg}^+(v)>0 }$
 %\item[(3)] $\displaystyle{ \forall i \in I, \forall v \in V_{A_i} \txt{ with } t_\txt{node}(v) = \txt{`variable,'} \  \txt{deg}_l^-(v) < \txt{deg}^-(v) \leq \txt{deg}_u^-(v)}$
 %\item[(3)] $\displaystyle{ \forall i \in I, \forall v \in V_\txt{out} \txt{ with } t_\txt{node}(v) = \txt{`variable,'} \  \txt{deg}_l^-(v) < \txt{deg}^-(v) \leq \txt{deg}_u^-(v)}$
 \item[(3)] $\displaystyle{V_{\txt{in},F} = \{v \in V_\txt{in} \st \txt{deg}^+(v) > 0\} }$ ((maybe this should be 1 instead of 0 to match the previous definition of global input))
@@ -371,26 +370,29 @@ We now define the fundamental problem formulation graph, $F=(V_F,E_F)$, as a dir
 \item[(5)] $\displaystyle{E_F = C_F \cup \left( \bigcup_{i \in I_F} E_{A_i} \right), \ C_F \subset C_M}$
 \item[(6)] $\displaystyle{\forall v \in V_F \txt{ with } t_\txt{node}(v) = \txt{`variable,'} \  \txt{deg}_l^-(v) \leq \txt{deg}^-(v) \leq \txt{deg}_u^-(v)}$
 \end{enumerate}
-The set $I_F$ is an index set containing the indices of the analysis blocks in $F$ and it may only include the analysis blocks $A_i$ that meet requirements (2) and (6). Requirement (2) stipulates that the analysis blocks in $F$ must each have at least one local output that is beging used. Requirement (3) stipulates that only the global inputs that are being used should be included. Lastly, requirement (6) stipulates that the number of edges directed into the variable nodes must be within the lower and upper in-degree limits; if $\txt{deg}^-(v) < \txt{deg}_l^-(v)$ the node is called a \emph{hole}, and if $\txt{deg}^-(v) > \txt{deg}_u^-(v)$ the node is called a \emph{collision}. 
+The set $I_F$ is an index set containing the indices of the analysis blocks in $F$ and it may only include the analysis blocks $A_i$ that meet requirements (2) and (6). 
+Requirement (2) stipulates that each analysis blocks in $F$ must have at least one local output that is being used. 
+Requirement (3) stipulates that only the global inputs that are being used should be included. 
+Requirements (4) and (5) provide the construction of the sets of nodes and edges, respectively. 
+Lastly, requirement (6) stipulates that the number of edges directed into the variable nodes must be within the lower and upper in-degree limits; if $\txt{deg}^-(v) < \txt{deg}_l^-(v)$ the node is called a \emph{hole}, and if $\txt{deg}^-(v) > \txt{deg}_u^-(v)$ the node is called a \emph{collision}. 
 
-The set $C_F$ is a set containing explicit edges representing connections. Since $C_M$ is the set of all potential connections, we must have $C_F \subset C_M$. While no other conditions are explicitly stated for $C_F$, requirement (6) is actually a requirement on both $I$ and $C_F$.
+The set $C_F$ is a set containing explicit edges representing connections. Since $C_M$ is the set of all potential connections, we must have $C_F \subset C_M$. While no other conditions are explicitly stated for $C_F$, requirement (6) is actually a requirement on both $I_F$ and $C_F$.
 
 \subsection{Obtaining the Fundamental Problem Graph}
 In general, there may be multiple different graphs that satisfy the FPG conditions, though there may be none at all. Here, we describe a process for obtaining an FPG by starting with the MCG and disconnecting explicit edges until the FPG conditions are met. Then the problem is reduced to deciding which explicit edges to remove.
 
 %Then, mathematically, the FPG starts with $\mathcal A_1 = \{1,\ldots,m\}$, $I_{F,1} = I$, and $C_{F,1} = C_M$.
-Then, mathematically, the FPG starts with $C_{F,0} = C_M$.
-First address the nodes where $\txt{deg}^-(v) < \txt{deg}_l^-(v)$ then the ones where $\txt{deg}^-(v) > \txt{deg}_u^-(v)$
-
+Then, mathematically, the FPG starts with $C_{F,0} = C_M$, $E_{F,0} = E_M$, $V_{F,0} = V_M$.
+The nodes where $\txt{deg}^-(v) < \txt{deg}_l^-(v)$ are considered first.
 \begin{enumerate}
 \item The first step is to detect holes and disconnect the explicit edges following them. These explicit edges are removed because they represent variables which cannot be determined because the analysis function does not have adequate inputs. The set of variable nodes which are holes is created as
 \begin{equation}
-H = \{v \in V \st t_\txt{node}(v) = \txt{`variable'} \txt{ and } \txt{deg}^-(v) < \txt{deg}_l^-(v) \},
+H = \{v \in V_M \st t_\txt{node}(v) = \txt{`variable'} \txt{ and } \txt{deg}^-(v) < \txt{deg}_l^-(v) \},
 \end{equation}
-which is the set of variable nodes with few incoming edges than are allowed by the lower in-degree limit.
+which is the set of variable nodes with fewer incoming edges than are allowed by the lower in-degree limit.
 Then the updated set of edges is created by removing the first set of explicit edges following the hole:
 \begin{equation}
-C_{F,1} = C_{F,0} \setminus \{(x,y) \in E \st x=E^3(v) \txt{ for } v \in H\},
+C_{F,1} = C_{F,0} \setminus \{(x,y) \in E_M \st x=E_M^3(v) \txt{ for } v \in H\},
 \end{equation}
 %deg-v is now recaculated for the new C. 
 and this step is demonstrated by Fig.~\ref{f:hole}. Because removing these edges can create new holes, this step must be repeated until no more holes are found.
@@ -403,22 +405,31 @@ and this step is demonstrated by Fig.~\ref{f:hole}. Because removing these edges
 \label{f:hole}
 \end{figure}
 
-
 \item The second step is to detect collisions and to then disconnect enough explicit edges so that the collisions are resolved. The set of variable nodes which contain collisions is created as
 \begin{equation}
-S_\txt{nodes} = \{v \in V \st t_\txt{node}(v) = \txt{`variable'} \txt{ and } \txt{deg}^-(v) > \txt{deg}_u^-(v) \}.
+S_\txt{nodes} = \{v \in V_M \st t_\txt{node}(v) = \txt{`variable'} \txt{ and } \txt{deg}^-(v) > \txt{deg}_u^-(v) \}.
 \end{equation}
 For each collision node we can construct a set contained the edges directed in. The set containing all of these sets is constructed as
 \begin{equation}
-S_\txt{edges} = \big \{ \{(x,y) \in E\} \st y \in S_\txt{nodes} \big \}
+S_\txt{edges} = \big \{ \{(x,y) \in E_M\} \st y \in S_\txt{nodes} \big \}
 \end{equation}
-Let $J=\{1,2,\ldots,|S_\txt{edges}|\}$ be an indexing set for $S_\txt{edges}$ such that each $S_{\txt{edges},j}$ corresponds to a set in $S_\txt{edges}$ for $j \in J$. An examle collision is shown in Fig.~\ref{f:collision} to indicate the definition of $S_{\txt{edges},j}$. We can assume that $J$ also indexes $S_\txt{nodes}$ because there is a one--to--one correspondence between the elements in $S_\txt{nodes}$ and the elements in $S_\txt{edges}$. Then we may construct sets of edges as
+Let $J=\{1,2,\ldots,|S_\txt{edges}|\}$ be an indexing set for $S_\txt{edges}$ such that each $S_{\txt{edges},j}$ corresponds to a set in $S_\txt{edges}$ for $j \in J$. 
+An example collision is shown in Fig.~\ref{f:collision} to indicate the definition of $S_{\txt{edges},j}$. 
+We can assume that $J$ also indexes $S_\txt{nodes}$ because there is a one--to--one correspondence between the elements in $S_\txt{nodes}$ and the elements in $S_\txt{edges}$ (which are sets). 
+Then we may construct sets of edges as
 \begin{equation}
 B_j = \big \{e_k \in S_{\txt{edges},j} \st k \in \{1,2,\ldots,K\} \txt{ with } K \leq \txt{deg}_u^-(v_j) \big \}, \ j \in J,
 \end{equation}
-which means that each set $B_j$ is constructed from the set $S_{\txt{edges},j}$ by taking only as many edges as are allowed by the upper in-degree limit of $v_j$. The construction of each $B_j$ corresponds to making a decision on which edges to include and which edges not to include. Then let
+which means that each set $B_j$ is constructed from the set $S_{\txt{edges},j}$ by taking only as many edges as are allowed by the upper in--degree limit of $v_j$. The construction of each $B_j$ corresponds to making a decision on which edges to include and which edges not to include. Then let
 \begin{equation}
-C_{F,2} = \{ e \in C_{F,1} \st e \in B_j \txt{ for some } j \in J\}.
+C_{F,2} = \{ e \in C_{F,1} \st e \in B_j \txt{ for some } j \in J\},
+\end{equation}
+\begin{equation}
+E_{F,2} = E_M \setminus (C_M \setminus C_{F,2})
+\end{equation}
+and
+\begin{equation}
+F_2 = (V_M,E_{F,2})
 \end{equation}
 \begin{figure}[htb!]
 	\begin{center}
@@ -429,19 +440,17 @@ C_{F,2} = \{ e \in C_{F,1} \st e \in B_j \txt{ for some } j \in J\}.
 \label{f:collision}
 \end{figure}
 
-\item The third and final step is to remove any unused nodes and edges. The set of unused variable nodes representing local outputs is
+\item The third and final step is to remove any unused nodes and edges. The indexing set for only the analysis blocks with at least one used local output may be constructed as
 \begin{equation}
-V_\txt{empty} = \{v \in V_M \st t_\txt{node}(E^{-1}(v))=\txt{`model'} \txt{ and } \txt{deg}^+(v) = 0\},
+I_F =  \{i \in I \ | \ \exists v \in V_{A_i} \txt{ such that }  t_\txt{node}(E_{F,2}^{-1}(v))=\txt{`model'} \txt{ and } \txt{deg}^+(v) > 0 \},
 \end{equation}
-and so then the indexing set for only the analysis blocks with at least one used local output may be constructed as
-\begin{equation}
-I_F =  \{i \in I \ | \ \nexists v \in V_{A_i} \txt{ such that }  v \in V_\txt{empty} \}.
-\end{equation}
+where the degree is calculated with respect to $F_2$. This set excludes both the analysis blocks that were unused in the original MCG and those that became unused in step 1 or step 2.
+
 The set of used global inputs is constructed as
 \begin{equation}
-V_{\txt{in},F} = \{v \in V_\txt{in} \st |\{(x,y) \in E(v) \st y \in V_{A_i} \txt{ for } i \in I_F  \}| > 1\},
+V_{\txt{in},F} = \Big\{v \in V_\txt{in} \ \Big| \ |\{(x,y) \in E_{F,2}(v) \st y \in V_{A_i} \txt{ for } i \in I_F  \}| > 1 \Big\},
 \end{equation}
-which requires that at least two edges directed out of the nodes in $V_{\txt{in},F}$ must be two the analysis blocks indexed by $I_F$.
+which requires that at least two edges directed out of the nodes in $V_{\txt{in},F}$ must be to the analysis blocks indexed by $I_F$.
 
 Finally, the set of nodes and edges describing a fundamental problem formulation is given by
 \begin{equation}
@@ -451,7 +460,10 @@ V_F = V_{\txt{in},F} \cup V_\txt{out} \cup \left( \bigcup_{i \in I_F} V_{A_i} \r
 C_{F} = \{ (x,y) \in C_{F,2} \st x,y \in V_F\},
 \end{equation}
 \begin{equation}
-F = (V_F,C_F).
+E_F = C_F \cup \left( \bigcup_{i \in I_F} E_{A_i} \right),
+\end{equation}
+\begin{equation}
+F = (V_F,E_F).
 \end{equation}
 
 
