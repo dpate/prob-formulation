@@ -146,8 +146,6 @@ few restrictions:
   directed out.
 \item If a variable node has an outgoing edge to a model node then it may not have 
   any other outgoing edges.
-\item If a variable node has any incomming explicit edges, it may not have any 
-  incomming implicit edges. 
 \end{enumerate}
 
 \subsection{In-degree and Out-degree}
@@ -227,7 +225,7 @@ to the inputs for both blocks B and C.
 
 Design variables, objectives, and constraints all require external decisions 
 to be made about a given system to identify them. Consider 
-a notional problem given by the graph in Fig. \ref{f:design vars} There are three input variables 
+a notional problem given by the graph in Fig. \ref{f:designvars} There are three input variables 
 which, could potentially become design variables: $w$, $x$, and $y$. Because the output, $x$, of $A$
 is connected to the input, $x$, of $B$ x can't actually be a design variable. The inputs $w$ and $y$
 have no incomming edges and could each be selected as design variables. 
@@ -236,7 +234,7 @@ have no incomming edges and could each be selected as design variables.
   \begin{center}
     \includegraphics[width=.6\textwidth]{images/design_vars_graph}
   \end{center}
-  \caption{Notional graph with two potential design variables \label{f:design vars}}
+  \caption{Notional graph with two potential design variables \label{f:designvars}}
 \end{figure}
 
 More formally, any input variable that can be defined as a hole by Eqn. \ref{e:hole}
@@ -249,7 +247,7 @@ Objective and constraints are also constructs that need to be identified by engi
 as part of the design process. In the case of objective functions single output values 
 could be selected, but commonly multiple values are assembeled together via simple 
 athrimetic opperations to form the final objective function. For example, the problem from 
-Fig. \ref{f:design vars} might have an objective function of $z^2$ or $2y + z$. Constraints are 
+Fig. \ref{f:designvars} might have an objective function of $z^2$ or $2y + z$. Constraints are 
 always given in the form of either an inequality of an equality, e.g. 
 $\frac{2y}{10}-1<0$ or $3x+2y - 5=0$. In both cases, an engineer explictly identifies variables 
 or groups of variables and assigns a simple, explicit relationship between them. 
@@ -340,13 +338,11 @@ demonstrate how Collaborative Optimization outperforms MultiDisciplinary Feasibl
 when they separated a problem into two sub-problems with variables, objectives, and 
 constraints local to each one\cite{Marriage2008a}. 
 
-
 \subsection{Coupling Between Analyses}
 
 \subsection{Multi-fidelity Analyses}
 
 \section{Building MCG, FPG, and PSG}
-
 
 \subsection{Maximal Connectivity Graph}
 To construct the maximal connectivity graph, we assume that a set of codes, global inputs, and objectives and constraints (collectively called global outputs) are provided. The codes are represented by analysis block graphs ((ABGs?)) $A_i=(V_{A_i},E_{A_i}), \ i\in I$, where $m$ is the number of codes and $I=\{1,2,\ldots,m\}$. The global inputs are represented as a set of variable nodes $V_\txt{in}$, and the global outputs are represented by a set of variable nodes $V_\txt{out}$. 

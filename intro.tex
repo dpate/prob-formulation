@@ -1,35 +1,83 @@
 \section{Introduction}
     
+    The number of analysis tools required in multidisciplinary design optimization (MDO) studies is growing
+    in parallel with the increasing scope of typical MDO problems. An example of this growth in scope can
+    be observed in the historical evolution of the disciplines involved in MDO problems in aircraft design.
+    Multidisciplinary optimization emerged as a separate field from structural optimization through the
+    need to introduce formal techniques for managing the coupling of aerodynamic loads and structural
+    deformations, through the linking of aerodynamic vortex lattice or panel methods with structural finite
+    element models [[REF]]. Subsequently, flight performance and life cycle economics tools were integrated
+    into MDO analysis workflows for conceptual and preliminary design studies [[REF]]. Currently, MDO
+    problems for aircraft design also often include tools for aircraft noise and emissions. In sum, it is now
+    commonplace for 5-10 analysis tools to be employed for typical aircraft design optimization studies [[REF]].
+    
+    The number of analysis tools is expected to grow in the future as the scope of MDO problems continues
+    to evolve, and as computing is increasingly commoditized. This expansion of scope will be driven, in
+    part, by consideration of additional disciplines. Current trends on the horizon for aircraft MDO studies
+    include incorporation of manufacturing analyses [[REF]], subsystem performance [[REF]], and fleet-level
+    aggregate models of emissions, noise, or economics [[REF]].
+
     As the size and complexity of engineering systems grow, the time and expense for setting up 
     analysis models grow with them. Multidisciplinary Design Analysis and Optimization (MDAO)
     frameworks such as OpenMDAO\cite{Gray2012} and ModelCenter have enabled a new level of analysis tool integration 
     and paved the way for models with more analyses and increasing numbers of interdisciplinary couplings. That 
-    new capability has created a new challenge since configuring a model with the larger nubmer of analyses, associated inputs and outputs
-    can be very difficult. Even for models with 10's of analyses, there could be hundreds of variables that need to be managed. 
-    It is not hard to imagine that the task of combining all the analyses into a consistent system model capable of solving a relevant 
-    engineering design problem could easily become much more costly than createing the discipline analyses themselves. Thus, for a large system
-    as the couplings between the disciplines begin to dominate the design space, the couplings between the analyses begin to dominate 
-    the job of setting up the model. 
-    
-    When building a model, coupling represents the reciprical flow of information between two analyses. 
-    We propose the use of graph-based syntax to describe the flow of information from inputs, 
-    through analyses, to outputs. If you allow for any free inputs to become design
-    variables and some set of the outputs to become design objectives and constraints, then the graph 
-    represents the problem formulation for a given design effort. 
-    The graph-based syntax presented has application in all phases of the design process. 
-    It can be used early on, to help construct a valid problem formulation from the set of available analysis tools. 
-    It also provides a consistent structure to describe problem formulation that provides a foundation to apply
-    algorithmic methods for selecting and then implementing effective solution strategies inside an MDAO framework. 
+    new capability has created a new challenge. Even for models with 10's of analyses there could be hundreds or thousands
+    of variables that need to be linked together. Commonly different analyses will provide competing values for the 
+    same physical quantity, and these conflicts need to be resolved somehow. To make matters worse, the competeing values 
+    may not even be in the same format. These occurrences are particularly acute when analysis tools have differing fidelities. For
+    example, an abstracted aerodynamic analysis such as an empirical drag buildup model may return only
+    integrated drag, whereas a CFD tool may return pressure and shear stress distributions across the entire
+    surface grid. If an analysis downstream of the aerodynamics tool needs only integrated drag as an input,
+    then the designer has a free choice of which of the two possible aerodynamics analysis tools to select to
+    provide the drag estimate (presuming that drag can be computed from surface distributions by a simple
+    integration algorithm). On the other hand, if a downstream analysis needs a pressure distribution in
+    order to compute pitching moment, for example, then any feasible MDO problem formulation must
+    include CFD or similar analysis in the data flow, regardless of whether the empirical drag buildup model
+    is also included.
 
-    We've already identifed that a problem formulation graph should include design variables, analysis tools and their 
-    associated inputs and outputs, and objectives and constraints. Notably absent from that list are any kind of 
-    solvers, optimizers, or other iterative solution finding tools. At its most fundamental state, a problem formulation 
-    includes only information about what is being sought after in a design or what the
-    goals of a given problem are. It need not contain any information about solution paths or strategies to reach those goals. 
-    While solution information can be represented with the graph syntax presented here, a unique aspect of this syntax is that 
-    such information always remains seperable from the underlying problem formulation. In other words, a given a graph representing 
-    a specific solution strategy for a specific problem formulation, it is possible to remove the solution information from the 
-    graph and reclaim the more basic problem formulation. 
+    With all the added complexity from larger models it is not hard to imagine that the task of combining all the analyses into a 
+    consistent system model capable of solving a relevant engineering design 
+    problem could easily become much more costly than createing the discipline 
+    analyses themselves. Just as for a large system the couplings between the 
+    disciplines begin to dominate the design space, the couplings between the 
+    analyses begin to dominate the job of setting up the model. It is this problem of 
+    determining sets of analysis tools and their interconnectivities to form realistic
+    multidisciplinary problems that is the subject of this paper. We are motivated by the following notional
+    but real problem of organizing an MDO study for a complex system:
+
+    A new system is being designed for which there is little or no historical precedent. The system
+    is complex, as measured by the number of disciplines and/or components involved in the
+    analysis. A general optimization problem statement has been formulated based on system-
+    level objectives and constraints; however, it is unclear which engineering analysis tools should
+    be interconnected in order to solve the optimization problem. A team of disciplinary and/
+    or component design engineers has been formed in which each engineer has expertise in a
+    particular analysis tool or component model. The engineers meet to discuss the approach to
+    interconnecting their tools to achieve the required system-level MDO model.
+    
+    Our goal is to develop formalism for expressing analysis interconnectivity and for determining feasible
+    data flows to assist an engineering team conducting this task. Because the problem deals with
+    interconnectivity, we base our approach on the representations and techniques of graph theory. The 
+    proposed graph syntax is closely related to the REMS system proposed by 
+    Alexandrov and Lewis\cite{alexandrov2004}. The approach taken here should be viewed as an extention 
+    of the concepts proposed in REMS with the goal of allowing the graphs to more closely interact with 
+    existing design processes and MDAO frameworks. The approach begins by 
+    constructing the \emph{maximal connectivity graph (MCG)} describing all possible
+    interconnections between the analysis tools proposed by the engineers. Graph operations are then
+    conducted reduce the MCG down to a \emph{fundamental problem graphs (FPG)} that describes the minimum set of analysis
+    tools needed to solve the specified system-level design problem. The FPG does not predispose
+    any particular solution procedure for the problem; any relevant MDO solution architecture, e.g. MDF,
+    IDF, CO, BLISS, could be selected \emph{post facto} to implement the system-level optimization by
+    constructing a \emph{problem solution graph (PSG)} and the corresponding problem solution approach.
+    The concept of the FPG and the identification of feasible FPGs are the main contributions of the paper.
+
+    The paper is organized as follows. First, we describe the differences between a fundamental problem
+    formulation, which is based only on the system-level optimization problem statement that the
+    engineers desire to solve and on the available analysis tools, and a specific problem formulation, which
+    additionally presumes a specific solution to the problem. Next, we survey the literature in applying
+    graph theoretic and formal language approaches to multidisciplinary design problem formulation. 
+    We then discuss our graph syntax and representation of MDO problems and describe the procedures for 
+    determining the MCG and FPG. Finally, we present an example problem based on an MDO analysis of a 
+    commercial aircraft and discuss additional applications enabled by our approach.
 
 
 \section{Specific vs Fundamental Problem Formulation }
@@ -80,19 +128,21 @@
 
     The FPF in Eq. \ref{eqn:simple_fpf} differs from both Eq. \ref{eqn:simple} and Eq. \ref{eqn:simple2} because it has 
     two constraints which both must be met. The presence of both of these constraints fully decouples the problem so that 
-    either $A$ or $B$ could be run first or both could be run simultaneously. By removing either constraint and replacing 
-    it with a direct dependence between the two analyses you could regain the earlier two problem formulations. Alexandrov
-    and Lewis demonstrated the value of a more modular approach to problem formulation because it enables one to transition between different 
-    MDAO solution strategies depending on the specifics of the problem\cite{Alex2000}.
+    either $A$ or $B$ could be run first or both could be run simultaneously. Alexandrov and Lewis investigated problem 
+    formulation in this fully decoupled way as part of their work on 
+    Reconfigurability in MDO Problem Synthesis (REMS) \cite{alexandrov2004}.
+    In this work they show how removing either constraint and replacing 
+    it with a direct dependence between the two analyses, a process they term ``collapsing'', 
+    you could regain the earlier two problem formulations. 
 
 
-\section{Existing Graph--Based Syntax}
+\section{Existing Graph-Based Syntax}
 
     As shown above, the mathematical language for specifying problem formulations is very general and can be used both for 
     fundamental and specific problem formulations. Tedford and Martins used the above mathematical syntax to specify the 
     FPF for a set of test problems and also to describe specific formulations for solving them with a 
     number of optimization architectures\cite{Tedford2009}. Their work demonstrates clearly how multiple specific 
-    problem formulations can all relate back to a common FPF. The challenge with using this 
+    problem formulations can all relate back to a common FPG. The challenge with using this 
     traditional mathematical syntax is that it is not easily manipulated or analyzed. 
     A number of graph-based methods have been used successfully to translate the 
     mathematical syntax into a more useful computational form. 
@@ -140,14 +190,29 @@
         \end{center}
     \end{figure}
 
-    Lamb and Martins included objectives and constraint functions as nodes in an Extended 
+    Alexandrov and Lewis introduced a graph based syntax called REMS which 
+    incorporates objectives and constraints into a graph, effectively combining 
+    FDT and DSM\cite{alexandrov2004}. REMS retains the square adjacency 
+    matrix form from DSM, but by adding in the new elements it partially 
+    combined a traditional DSM with an FDT. This allows REMS to represent data 
+    dependency between multiple analysis tools as well as between analysis tools and
+    objective/constraint functions. One significant conclusion from REMS is 
+    the need for variables that are local to discipline analyses. This allows 
+    all information exchange to be stated as equality constraints, which become 
+    edges in the graph. Additionaly, REMS address the need to be able to 
+    transition between multiple solution strategies while keeping a constant 
+    graph representation of the fundamental problem formulation. REMS only provides
+    syntax for variables and functions, but does not provide for inclusion 
+    of solvers or optimizers in the graph. 
+
+    Lamb and Martins also included objectives and constraint functions as nodes in an Extended 
     DSM (XDSM) in order to capture a more complete description of solution strategies for MDAO problems\cite{Lambe2012}. 
-    XDSM retains the square adjacency matrix form from DSM, but by adding in the 
-    new elements they partially combined a traditional DSM with an FDT. 
-    This allows XDSM to represent data dependency between multiple analysis tools as well as between analysis tools and
-    objective/constraint functions. With the additional information included in an 
-    XDSM, Lu and Martins applied both ordering and partitioning 
-    algorithms on an MDAO test problem named the Scalable Problem \cite{Lu2012}. 
+    Unlike REMS, XDSM also includes nodes for solvers and optimziers to enable complete definition of 
+    MDAO architectures. Martins uses XDSM to describe 13 different optimziation architectures in 
+    a survey paper that provides a novel classification of the different 
+    techniques \cite{Lambe2011}. With the additional information included in an 
+    XDSM, Lu and Martins applied both ordering and partitioning algorithms on an 
+    MDAO test problem named the Scalable Problem \cite{Lu2012}. 
 
     \begin{figure}
         \begin{center}
@@ -171,12 +236,10 @@
     assumed gauss-siedel iteration scheme and a MDF solution architecture. 
     Hence XDSM is too specific for use with a fundamental problem formulation. 
 
-    Of the three methods, XDSM comes the closest to fully describing a problem formulation. 
-    Thought it does not contain specific variable information on the diaganol of the DSM, this could be easily added back in
-    simply by putting the variables back into the graph and drawing the appropriate connections
-    between them and the relevant analysis nodes. However, it's dependence on 
-    solution strategy specifics to represent couplings can not be removed without 
-    stripping it of the useful information contained in an FDT. We propose
-    a new graph syntax that retains the features of XDSM, without the dependence on 
-    solution strategy (although it does allow for that information to be present). This 
-    new syntax allows for the compelete specification of an MDAO problem.
+    Of all the methods, REMS comes the closest to fully describing a problem formulation,
+    but lacks the ability to represent optimziers and solvers in more specific problem 
+    formulations. While XDSM does include optimizers and constraints, it relies on 
+    their presence and can't be used for a more fundamental problem statement. 
+    We propose a new graph syntax that combines the key features of REMS and XDSM
+    and provides new language to enable more complete description of MDAO problems. 
+
