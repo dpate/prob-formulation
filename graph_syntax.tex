@@ -6,7 +6,6 @@ fully describe the general structure of an MDAO problem indpendently of any solu
 while still being able to accomodate the more specific case when a solution 
 strategy is applied. In order to achieve that goal 
 the graph needs to accomodate a number of constructs of MDAO problems: 
-
 \begin{itemize}
     \item Analysis tools and connections between them
     \item Design variables, objectives, and constraints
@@ -21,8 +20,7 @@ phase where the specific analysis tools and design goals are identified. At the 
 a single formal problem formulation is selected specifying design variables, constraints, objectives, 
 analysis tools, etc. Lastly some specifc procedure for solving the problem is selected, for example 
 picking an MDAO optimization architecture. Using the proposed graph syntax, each of these phases 
-can be represented with a related graph. 
-
+can be represented with the following three graphs:
 \begin{itemize}
     \item Maximal Connectivity Graph (MCG)
     \item Fundamental Problem  (FPG)
@@ -31,7 +29,7 @@ can be represented with a related graph.
 
 The \emph{maximal connectivity graph} represents the first phase with all 
 analysis codes being considered and all possible connections between them also present. The second graph 
-is \emph{fundamental problem formulation graph}, which is the smallest possible graph 
+is the \emph{fundamental problem formulation graph}, which is the smallest possible graph 
 that still fully defines a given problem formulation. Finally, a \emph{specific problem formulation} 
 may be represented by including additional edges and node types to represent the 
 solution strategy being employed to solve the problem. 
@@ -41,8 +39,8 @@ The tree diagram demonstrates the fact that it is generally possible to obtain
 multiple FPGs from a single maximal connectivity graph. This  may correspond to 
 different down--selections of analysis codes, different connections between them, 
 or both. Each down--selection shrinks the number of possible FPGs that could be reached 
-untill only one is remaining. Then, from a single FPG, different PSGs may be obtained by implementing 
-different solution strategies. If you consider the size of a graph to be the sum of all its
+until only one is remaining. Then, from a single FPG, different PSGs may be obtained by implementing 
+different solution strategies. If you consider the size of a graph to be the sum of all of its
 edges and nodes then the hourglass shape in Fig. \ref{f:hourglass} illustrates how
 the MCG gets reduced to a single FPG, then multiple possible PSGs exist to solve the problem.
 In other words the FPG is obtained from the MCG by removing nodes and edges, 
@@ -74,13 +72,13 @@ The notation used in this work is adapted from Diestel \cite{Diestel2010}.
 A \emph{graph} is a pair $G = (V,E)$ of sets such that $E \subseteq V \times V$, 
 which means that the elements of $E$ are 2--element subsets of $V$. The set $V$ 
 contains the \emph{vertices} or \emph{nodes} and the set $E$ contains the \emph{edges}.
-For a \emph{directed graph*} we construct $E$ as a set of ordered pairs instead 
+For a \emph{directed graph*} (or \emph{digraph}) we construct $E$ as a set of ordered pairs instead 
 of a set of sets. Each ordered pair represents an edge starting at the node 
 indicated by the first entry and directed to the node indicated by the second 
 entry. Edge $e$ = $(x,y)$ may be referred to simply as $xy$. For node $v \in V$ 
 the edges directed out are given by $E(v)$ and the edges directed into $v$ are given 
 by $E^{-1}(v)$; $E(E(v))$ is denoted as $E^2(v)$, and likewise for additional levels. 
-
+If $E$ is not a one--to--one mapping, $E(v)$ may be the empty set, a single node, or a set of nodes.
 \begin{figure}[htb!]
 	\begin{center}
 	\includegraphics[width=1.5in]{images/example_directed_graph}
@@ -108,24 +106,23 @@ Lastly, the cardinality of a set $B$ is the number of elements in $B$ and is den
 
 
 \subsection{Node and Edge Types}
-
+We now define different types of nodes and edges with specific properties to compose graphs used to represent an MDAO problem. 
 There are four node types:  
 \begin{description}
 \item[variable: ] represents scalar or array data
 \item[model:] responsible for mapping inputs to outputs
-\item[expression:] simple algebreic combinations of variables (such as for 
-  constraint of objective functions)
+\item[expression:] simple algebraic combinations of variables (such as for 
+  constraint or objective functions)
 \item[driver:] control logic capable of managing iteration
 \end{description}
 
 In addition to the four node types, there are three edge types: 
-
 \begin{description}
 \item[fixed edge:] Fundamental, non-changeable property of a problem, such as 
   connections between related variable nodes. These 
 edges can never be removed from a graph. 
 \item[explicit edge:] Explicit exchange of information between two nodes. No node 
-  can have more than a single incomming explicit edge. These edges are free and
+  can have more than a single incomming explicit edge ((?)). These edges are free and
   can be added or removed from the graph. 
 \item [implicit edge:] Implicit passing of information from a driver node to a 
   variable node. A single variable node can have many incomming implicit edges. These edges are 
@@ -135,10 +132,9 @@ edges can never be removed from a graph.
 [[Insert legend for node and edge types]]
 
 \subsection{Rules for Nodes and Edges}
-
-The driver node and the implicit edge are only allowed to be pressent in PSGs. All 
-other node and edge types can be present in any of the three graphs, subject to a 
-few restrictions: 
+There are specific rules for the usage of these nodes and edges.
+The driver node and the implicit edge are only allowed to be present in PSGs. All 
+other node and edge types can be present in any of the three graphs, subject to these restrictions: 
 \begin{enumerate}
 \item A model node can only have one edge directed to or from another model node.
 \item A model node can only have fixed edges directed in or out.
@@ -149,39 +145,36 @@ few restrictions:
 \end{enumerate}
 
 \subsection{In-degree and Out-degree}
-
 The \emph{in-degree} of a node is the number of fixed or explicit edges directed in and 
 is denoted as $\txt{deg}^-(v)$, and the \emph{out-degree} 
-is the number of fixed or explicit edges directed out and it is denoted as $\txt{deg}^+(v)$.
-We also define the \emph{upper in-degree limit} 
-
+is the number of fixed or explicit edges directed out and is denoted as $\txt{deg}^+(v)$.
+We also define the \emph{upper in-degree limit} as
 \begin{equation}
 \txt{deg}_u^-(v):V \to \mathbb{N}
 \end{equation} 
-and the \emph{lower in-degree limit}
+and the \emph{lower in-degree limit} as
 \begin{equation}
 \txt{deg}_l^-(v):V \to \mathbb{N}.
 \end{equation}
-These user-specified limits govern the number of explicit edges that may be directed into a 
+These user-specified limits govern the number of explicit edges that may be directed into a variable
 node for a valid graph. Consider a variable node $v$ with
-$\txt{deg}_u^-(v) = \txt{deg}_l^-(v) = 1$. In this case, that node must have exactly one
+$\txt{deg}_u^-(v) = \txt{deg}_l^-(v) = 1$. In this case, $v$ must have exactly one
 incomming explicit edge or the graph is invalid. Two possiblities exist for voilating 
-the limit conditions: 
+these limit conditions: 
 \begin{description}
-  \item[hole: ] The number of incomming edges is less than $\txt{deg}_l^-(v)$. 
+  \item[hole: ] The number of incomming edges is less than the lower indegree limit:
     \begin{equation} \txt{deg}^-(v) < \txt{deg}_l^-(v) \label{e:hole} \end{equation} 
-
-  \item[collision: ] The number of incomming edges is greater than $ \txt{deg}_u^-(v)$. 
+  \item[collision: ] The number of incomming edges is greater than the upper indegree limit:
     \begin{equation} \txt{deg}^-(v) > \txt{deg}_u^-(v) \end{equation}
 \end{description} 
+These violations will be managed in order to seek a working problem formulation.
 
 \section{Graph Representation of MDAO Constructs}
-
+%As discussed in Sec.((intro)), the digraph must be able to describe the individual aspects of an MDAO problem.
 \subsection{Analysis Blocks and Connections}
-
-Analysis tools take in a number input variables, then perform some work to calculate 
+Analysis tools take in a number input variables and then perform some work to calculate 
 the values for their respective outputs. In an MDAO graph, this process is 
-represented by an group of nodes and edges called an \emph{analysis block}, 
+represented by a group of nodes and edges called an \emph{analysis block}, 
 shown in Fig. \ref{f:analysis block}. Within an analysis block each variable 
 node represents a single input or output and is connected 
 to a single model node via a fixed edge. Note that in Fig. \ref{f:analysis block}, 
@@ -203,11 +196,10 @@ the edges within them are fixed, they become fixed sub-graphs within a graph.
 \end{figure}
 
 Via the analysis block structure, we can also distinguish between input and ouptut
-variable nodes. Inputs are any variable nodes that have an outgoing edge into a model 
+variable nodes, as shown in Fig.~\ref{f:analysis block}. Inputs are any variable nodes that have an outgoing edge into a model 
 node. Conversely, outputs are any variable nodes that have an incoming edge from a model node. 
 Note that by this definition, inputs and outputs can only exist when variable nodes poses an 
-edge joining them to a model node. In Fig. \ref{f:analysis block} these are labeled out as 
-local inputs and local outputs. The variables are local because they are explicitely tied
+edge joining them to a model node. These variables are local because they are explicitely tied
 to the analysis block and have no relevance without it. 
 
 MDAO problems require that information be passed between sets of analyses. When information from the output of one analysis 
@@ -222,14 +214,12 @@ to the inputs for both blocks B and C.
 [[insert graph fig here]]
 
 \subsection{Design Variables, Objectives, and Constraints}
-
 Design variables, objectives, and constraints all require external decisions 
 to be made about a given system to identify them. Consider 
 a notional problem given by the graph in Fig. \ref{f:designvars} There are three input variables 
-which, could potentially become design variables: $w$, $x$, and $y$. Because the output, $x$, of $A$
-is connected to the input, $x$, of $B$ x can't actually be a design variable. The inputs $w$ and $y$
-have no incomming edges and could each be selected as design variables. 
-
+which, could potentially become design variables: $w$, $x$, and $y$. Because the variable $x$ is connected from $A$ to $B$,
+ $x$ can't actually be a design variable. On the other hand, the inputs $w$ and $y$
+have no incomming edges and could each be selected as design variables.
 \begin{figure}[htb!]
   \begin{center}
     \includegraphics[width=.6\textwidth]{images/design_vars_graph}
@@ -238,19 +228,27 @@ have no incomming edges and could each be selected as design variables.
 \end{figure}
 
 More formally, any input variable that can be defined as a hole by Eqn. \ref{e:hole}
-would be considered a design variable in the graph. When working with a MCG or FPG, only fixed and explicit edges are allowed, 
+would be considered a design variable in the graph. When working with an MCG or FPG, only fixed and explicit edges are allowed, 
 in which case a design variable is simply a variable node with no incomming edges. For a valid PSG 
-any design variable node would have at least one (but possible multiple) incomming 
+any design variable node would have at least one incomming 
 implicit edge from a driver node. 
 
-Objective and constraints are also constructs that need to be identified by engineers 
+((DP: I think we are struggling to define the exact boundary between a hole and design variable and when one can become the other.
+This stems from the fact that they are identical with respect to the graph structure: they are both variable nodes representing local inputs without any edges directed in.
+Therefore, I suggest we let the difference be strictly determined by the user--set indegree limits: given a node in question, it is a hole if the lower indegree limit is greater than zero. 
+Then, a few things can happen. A) the hole can become irrelevant if the analysis block is not needed. B) the hole can cause the graph to be invalid and the user can change the lower indegree limit or change the maximal connectivity graph to include a new edge (and presumably other new nodes and edges as well). 
+C) the user could have set the \emph{upper} indegree limit to be zero, meaning that it is supposed to be a design variable.
+Having written this, I feel that (if you agree) we should probably have it in the paper somewhere)).
+
+Objectives and constraints are also constructs that need to be identified by engineers 
 as part of the design process. In the case of objective functions single output values 
 could be selected, but commonly multiple values are assembeled together via simple 
 athrimetic opperations to form the final objective function. For example, the problem from 
-Fig. \ref{f:designvars} might have an objective function of $z^2$ or $2y + z$. Constraints are 
-always given in the form of either an inequality of an equality, e.g. 
+Fig.~\ref{f:designvars} may have an objective function of $z^2$ or $2y + z$. Constraints are 
+always given in the form of either an inequality or an equality, e.g., 
 $\frac{2y}{10}-1<0$ or $3x+2y - 5=0$. In both cases, an engineer explictly identifies variables 
 or groups of variables and assigns a simple, explicit relationship between them. 
+((DP:I think we can probably just say ``alegbraic expression'' and not have to show any, especially since the variables aren't given meaning))
 
 For the proposed syntax, objectives and constraints are represented through the use of 
 expression nodes. These nodes contain the actual mathematical expression used to define the 
@@ -258,6 +256,8 @@ objective or constraint value. Objective or constraint nodes are distinguished
 via the presence of a simple expression (objective) vs an inequality/equality (constraint). 
 Fig. \ref{f:obj-cons} shows the notional problem graph augmented with objective and 
 constraint values. 
+
+((DP: I think this definition of objective/constraint is disharmoneous with our other node types. I think it should also have local inputs represented by variables nodes))
 
 \begin{figure}[htb!]
   \begin{center}
@@ -307,7 +307,6 @@ model & model & function call \\ \hline
 
 
 \subsection{Local vs Global Nodes}
-
 A simple definition of a global node is any node that involves information 
 from more than one analysis block. Likewise, a local node is any node 
 that involves information from only a single analysis block. As stated before, variable 
@@ -337,6 +336,11 @@ an MDAO problem for use with certain MDAO architectures. Martins and Marriage
 demonstrate how Collaborative Optimization outperforms MultiDisciplinary Feasible
 when they separated a problem into two sub-problems with variables, objectives, and 
 constraints local to each one\cite{Marriage2008a}. 
+((DP: it is not clear to me how the difference between local and global should change in the process of obtaining the FPG from the MCG. For example,
+in the MCG a node representing a global input may have several edges directed out to multiple analysis blocks, but in the FPG all but one have been removed. 
+From my point of view, I was thinking that the difference between global and local wasn't a node's current state, but what it has the potential to be. Another way of saying this is: the definition of global vs local shouldn't depend on explicit edges because they are free to be removed, unless we also want a node to be able to change from being global or local. Lastly, a global input in an FPG that only has one edge directed out could be removed and the node it was directed in to could become a design variable.))
+
+((DP: along these lines, what if a design variable is a separate variable node outside of the analysis block. Then it doesn't need any indegree limits and being global or local can be directly tied to the number of edges directed out?))
 
 \subsection{Coupling Between Analyses}
 
