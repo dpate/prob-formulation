@@ -33,7 +33,7 @@ The \emph{maximal connectivity graph} represents the first phase with all
 analysis codes being considered and all possible connections between them also present. The second graph 
 is \emph{fundamental problem formulation graph}, which is the smallest possible graph 
 that still fully defines a given problem formulation. Finally, a \emph{specific problem formulation} 
-may be represented by including additional edges and node types to represent the 
+may be represented by including additional edges and nodes to represent the 
 solution strategy being employed to solve the problem. 
 
 The relationship between these three graphs is depicted in Figs.~\ref{f:tree} and \ref{f:hourglass}. 
@@ -118,21 +118,23 @@ There are four node types:
 \item[driver:] control logic capable of managing iteration
 \end{description}
 
-In addition to the four node types, there are three edge types: 
+In addition to the four node types, there are two edge types: 
 
 \begin{description}
-\item[fixed edge:] Fundamental, non-changeable property of a problem, such as 
-  connections between related variable nodes. These 
-edges can never be removed from a graph. 
-\item[explicit edge:] Explicit exchange of information between two nodes. No node 
-  can have more than a single incomming explicit edge. These edges are free and
-  can be added or removed from the graph. 
+\item[connection edge:] Exchange of information between two nodes. These edges 
+can either be fixed (can not be removed from graph) or free (can be removed). 
 \item [implicit edge:] Implicit passing of information from a driver node to a 
   variable node. A single variable node can have many incomming implicit edges. These edges are 
   free and can be added or removed from the graph. 
 \end{description}
 
 [[Insert legend for node and edge types]]
+
+In Alexandrov and Lewis's REMS syntax only two node types were present, variable 
+and function, and only one edge type\cite{alexandrov2004}. We've chosen to rename the ``function'' node 
+type to ``model'' to be more consistent with modern MDAO frameworks. This work 
+adds two more node types and one more edge type to the syntax to allow descriptive
+graphs for all three phases of the design process. 
 
 \subsection{Rules for Nodes and Edges}
 
@@ -141,7 +143,7 @@ other node and edge types can be present in any of the three graphs, subject to 
 few restrictions: 
 \begin{enumerate}
 \item A model node can only have one edge directed to or from another model node.
-\item A model node can only have fixed edges directed in or out.
+\item A model node can only have fixed connection edges directed in or out.
 \item A model node must have at least one edge directed in and at least one edge 
   directed out.
 \item If a variable node has an outgoing edge to a model node then it may not have 
@@ -149,10 +151,18 @@ few restrictions:
 \end{enumerate}
 
 \subsection{In-degree and Out-degree}
-
-The \emph{in-degree} of a node is the number of fixed or explicit edges directed in and 
+\label{s:indegree-outdegree}
+The \emph{in-degree} of a node is the number of connection edges directed in and 
 is denoted as $\txt{deg}^-(v)$, and the \emph{out-degree} 
-is the number of fixed or explicit edges directed out and it is denoted as $\txt{deg}^+(v)$.
+is the number of connection edges directed out and it is denoted as $\txt{deg}^+(v)$.
+The degree of a given node is only a function of the connection edges 
+attached to it. The number of implicit edges is not relevant since any number 
+of drivers could be involved, at different parts of an solution process. For 
+example in a sequential optimization where a global optimizer is first applied
+and a gradient based one is applied second, design variables would have incomming 
+implicit edges from both optimizers but this would not affect the in-degree of those
+variable nodes. 
+
 We also define the \emph{upper in-degree limit} 
 
 \begin{equation}
@@ -162,17 +172,17 @@ and the \emph{lower in-degree limit}
 \begin{equation}
 \txt{deg}_l^-(v):V \to \mathbb{N}.
 \end{equation}
-These user-specified limits govern the number of explicit edges that may be directed into a 
-node for a valid graph. Consider a variable node $v$ with
+These user-specified limits govern the number of fixed and connection edges that 
+may be directed into a node for a valid graph. Consider a variable node $v$ with
 $\txt{deg}_u^-(v) = \txt{deg}_l^-(v) = 1$. In this case, that node must have exactly one
-incomming explicit edge or the graph is invalid. Two possiblities exist for voilating 
+incomming edge or the graph is invalid. Two possiblities exist for voilating 
 the limit conditions: 
 \begin{description}
   \item[hole: ] The number of incomming edges is less than $\txt{deg}_l^-(v)$. 
     \begin{equation} \txt{deg}^-(v) < \txt{deg}_l^-(v) \label{e:hole} \end{equation} 
 
   \item[collision: ] The number of incomming edges is greater than $ \txt{deg}_u^-(v)$. 
-    \begin{equation} \txt{deg}^-(v) > \txt{deg}_u^-(v) \end{equation}
+    \begin{equation} \txt{deg}^-(v) > \txt{deg}_u^-(v) \label{e:collision} \end{equation}
 \end{description} 
 
 \section{Graph Representation of MDAO Constructs}
@@ -207,28 +217,28 @@ variable nodes. Inputs are any variable nodes that have an outgoing edge into a 
 node. Conversely, outputs are any variable nodes that have an incoming edge from a model node. 
 Note that by this definition, inputs and outputs can only exist when variable nodes poses an 
 edge joining them to a model node. In Fig. \ref{f:analysis block} these are labeled out as 
-local inputs and local outputs. The variables are local because they are explicitely tied
+local inputs and local outputs. The variables are local because they are explicitly tied
 to the analysis block and have no relevance without it. 
 
-MDAO problems require that information be passed between sets of analyses. When information from the output of one analysis 
-block is passed, or connected, to the input of another analysis block, a new explicit edge is added 
-connecting the two variable nodes involved in the exchange. Explicit edges are free because, unlike the edges 
-within an analysis block, they could be added or removed depending on the demands of the specific problem. 
-In other words, explicit edges are created by engineers linking the output of one tool to the input 
-of another one. Note that it is allowed for a single output to have outgoing explicit edges to multiple 
-other inputs. In Fig [insert ref], an output from analysis block A is connected 
-to the inputs for both blocks B and C. 
-
-[[insert graph fig here]]
+MDAO problems require that information be passed between sets of analyses. When 
+information from the output of one analysis block is passed, or connected, to the 
+input of another analysis block, a new connection edge is added connecting the two 
+variable nodes involved in the exchange. These connection edges are free, unlike the edges 
+within an analysis block, they could be added or removed depending on the needs
+of a given design problem. In other words, free connection edges are created by 
+engineers linking the output of one tool to the input of another one. Note that 
+it is allowed for a single output to have outgoing connection edges to multiple 
+downstream inputs. 
 
 \subsection{Design Variables, Objectives, and Constraints}
 
 Design variables, objectives, and constraints all require external decisions 
-to be made about a given system to identify them. Consider 
-a notional problem given by the graph in Fig. \ref{f:designvars} There are three input variables 
-which, could potentially become design variables: $w$, $x$, and $y$. Because the output, $x$, of $A$
-is connected to the input, $x$, of $B$ x can't actually be a design variable. The inputs $w$ and $y$
-have no incomming edges and could each be selected as design variables. 
+to be made about a given system to identify them. Consider a notional problem 
+given by the graph in Fig. \ref{f:designvars} There are three input variables 
+which, could potentially become design variables: $w$, $x$, and $y$. Because the 
+output, $x$, of $A$ is connected to the input, $x$, of $B$ x can't actually be a 
+design variable. The inputs $w$ and $y$ have no incomming edges and could each 
+be selected as design variables. 
 
 \begin{figure}[htb!]
   \begin{center}
@@ -238,10 +248,11 @@ have no incomming edges and could each be selected as design variables.
 \end{figure}
 
 More formally, any input variable that can be defined as a hole by Eqn. \ref{e:hole}
-would be considered a design variable in the graph. When working with a MCG or FPG, only fixed and explicit edges are allowed, 
-in which case a design variable is simply a variable node with no incomming edges. For a valid PSG 
-any design variable node would have at least one (but possible multiple) incomming 
-implicit edge from a driver node. 
+would be considered a design variable in the graph. When working with a MCG or 
+FPG, only connection edges are allowed, in which case a design variable 
+is simply a variable node with no incomming edges. For a valid PSG 
+any design variable node would have at least one, but possibly multiple, incomming 
+implicit edges from one or more driver nodes. 
 
 Objective and constraints are also constructs that need to be identified by engineers 
 as part of the design process. In the case of objective functions single output values 
@@ -249,8 +260,8 @@ could be selected, but commonly multiple values are assembeled together via simp
 athrimetic opperations to form the final objective function. For example, the problem from 
 Fig. \ref{f:designvars} might have an objective function of $z^2$ or $2y + z$. Constraints are 
 always given in the form of either an inequality of an equality, e.g. 
-$\frac{2y}{10}-1<0$ or $3x+2y - 5=0$. In both cases, an engineer explictly identifies variables 
-or groups of variables and assigns a simple, explicit relationship between them. 
+$\frac{2y}{10}-1<0$ or $3x+2y - 5=0$. In both cases, an engineer identifies variables 
+or groups of variables and assigns a simple relationship between them. 
 
 For the proposed syntax, objectives and constraints are represented through the use of 
 expression nodes. These nodes contain the actual mathematical expression used to define the 
@@ -266,93 +277,133 @@ constraint values.
   \caption{Notional graph with and objective and constraint nodes \label{f:obj-cons}}
 \end{figure}
 
-\begin{comment}
-The MDO problem formulation concepts represented by nodes are given in 
-Table \ref{t:node representation}, and the concepts represented by edges are 
-given in Table \ref{t:edge representation}.
-% \begin{itemize}
-% \item An objective or constraint is indicated by a variable node with no outgoing edges and with the incoming edges being directed from only other variable nodes.
-% \item A global input is a variable node with no edges directed in and with at least two edges directed out to different variable nodes.
-% \item A design variable is represented by a variable node with no edges directed in and on fixed edge directed out.
-% \end{itemize}
-\begin{table}[h!]
- \begin{center}
-  \caption{Problem formulation concept represented by a node}
-  \label{t:node representation}
-  \begin{tabular}{ccc} \hline 
-edges directed in & edges directed out & node representation \\ \hline
-only explicit edges & none & objective or constraint\\
-none & at least two explicit edges & global input \\
-none & one fixed edge & design variable \\ \hline
-  \end{tabular}
- \end{center}
- \vspace{-15pt}
-\end{table}
-\begin{table}[h!]
- \begin{center}
-  \caption{Problem formulation concept represented by an edge}
-  \label{t:edge representation}
-  \begin{tabular}{ccc} \hline 
-from node & to node & edge representation \\ \hline
-variable & variable & connection/passing of a variable\\
-variable & model & local input \\
-model & variable & local output \\
-model & model & function call \\ \hline
-  \end{tabular}
- \end{center}
- \vspace{-15pt}
-\end{table}
-%`Connection' edges connect the local outputs from one analysis block to input nodes.
-\end{comment}
-
 
 \subsection{Local vs Global Nodes}
 
-A simple definition of a global node is any node that involves information 
-from more than one analysis block. Likewise, a local node is any node 
-that involves information from only a single analysis block. As stated before, variable 
-nodes with fixed edges directed to model nodes (as part of an analysis block) are inherently local 
-and similarly model nodes are also local. Expression and driver nodes
-are not inherently local or global though. For these, their locality is determined 
-by the incomming and outgoing edges they posses. Consider the graph in Fig [insert ref], 
-where the expression node $g$ represents some kind of constraint for the optimziation problem. 
-Since $g$ only had edges comming from analysis block $B$, it would be considered a local constraint 
-on block $B$. 
+  A simple definition of a global node is any node that involves information 
+  from more than one analysis block. Likewise, a local node is any node 
+  that involves information from only a single analysis block. As stated before, variable 
+  nodes with fixed edges directed to model nodes (as part of an analysis block) are inherently local 
+  and similarly model nodes are also local. Expression and driver nodes
+  are not inherently local or global though. For these, their locality is determined 
+  by the incomming and outgoing edges they possess. Consider the graph in Fig. \ref{f:local_global}, 
+  where the expression node $g_1$ represents some kind of constraint for the optimziation problem. 
+  Since $g_1$ only has edges comming from analysis block $B$, it would be considered a local constraint 
+  on block $B$. $g_2$ has incomming edges from both $A$ and $B$ analysis blocks, so it would be a global constraint. 
 
-[[insert graph here]]
+  \begin{figure}
+      \begin{center}
+      %\includegraphics[height=.25\textheight]{XDSM/simple}
+      [[insert graph here]]
+      \caption{A simple graph with local and global nodes \label{f:local_global}}
+      \end{center}
+  \end{figure}
 
-Although we've already established that variable nodes in an analysis block are local to that 
-block, global design variables are a part of many MDAO problems. We've previously defined 
-a design variable as any 
+  Although we've already established that variable nodes in an analysis block are local to that 
+  block, global variables are a part of many MDAO problems and must be representable. A global variable 
+  would be any variable node with multiple outgoing connection edges. 
+  For example, in Fig. \ref{f:local_global} the global node $w^*$ has outgoing edges to 
+  the $w$ variable nodes feeding both $A$ and $B$ analysis blocks.
 
-While this simple definition is valid, it glosses over a more subtle aspect of 
-some MDAO problems. Consider the graph in Fig. [insert ref], with three analysis 
-blocks A, B, and C. The expression node, $g$, is a constraint that requires information 
-from $A$ and $B$, so it would be considered global by the previous definition. Since $g$
-has incomming edges from block $C$, it would not be global with respect to $C$. 
-You could say that $g$ is local to the group $A,B$. In this sense, locality 
-becomes a relative term. A given node can be local to a specific sub-graph of a large
-problem. This subtle structure can become significant when determining how to partition 
-an MDAO problem for use with certain MDAO architectures. Martins and Marriage 
-demonstrate how Collaborative Optimization outperforms MultiDisciplinary Feasible
-when they separated a problem into two sub-problems with variables, objectives, and 
-constraints local to each one\cite{Marriage2008a}. 
+  While this simple definition is valid, it glosses over a more subtle aspect of 
+  some MDAO problems. Fig. \ref{f:local_global}, has three analysis 
+  blocks A, B, and C. Above we identified node $g_2$ as global,  but
+  it has no incomming edges from block $C$. So you could say that $g_2$ is 
+  local to the the set of blocks $A,B$. In this sense, locality 
+  becomes a relative term. A given node can be local to a specific sub-graph of a large
+  problem. This subtle structure can become significant when determining how to 
+  effectively partition an MDAO problem into sub-problems 
+  \cite{krishnamachari1997optimal,allison2009optimal,michelena1997hypergraph}.
 
 \subsection{Coupling Between Analyses}
 
-\subsection{Multi-fidelity Analyses}
+  Coupling exists in a design problem when a set of two or more analyses each depend on the
+  others outputs. Consider the notional problem from section \ref{sec:spg_vs_fpg} where two 
+  analyses, $A$ and $B$ are coupled through their respective variables. The graph of this 
+  is shown in Fig. \ref{f:coupling}. In the graph $A.z$ has an outgoing connection 
+  edge to $B.z$, indicating that there is a connection between the two. 
+  Similarly a connection exists between $B.y$ and $A.y$. These two connections form 
+  a cycle which represent the coupling between them. This cycle means that blocks $A$ and $B$ need
+  to be iterated on untill they converge. 
 
-\section{Building MCG, FPG, and PSG}
+  \begin{figure}
+      \begin{center}
+      %\includegraphics[height=.25\textheight]{}
+      [INSERT GRAPH HERE]
+      \caption{Graph of a notional problem with simple coupling \label{f:coupling}}
+      \end{center}
+  \end{figure}
+
+  It is important to note that the cycle in graph in Fig. \ref{f:coupling} does not contain 
+  any driver nodes. That means that no solver, optimizer, or other iterative construct is 
+  invovled in the coupling. This absence is intentional, as the coupling is an inherant part 
+  of the problem. This corresponds directly To Eqn. \ref{eqn:simple_fpf}, where 
+  each equality constraint is one edge in the graph. Transitionining to either 
+  Eqn. \ref{eqn:simple} or Eqn. \ref{eqn:simple2} means selecting one of the nodes as the starting point 
+  for the iteration, indicating the associated analysis block should be executed first. 
+
+  Larger problems can contain more complex cycles in thier FPG, indicating more 
+  complex coupling between analyses. A cycle can contain more than 
+  just two analysis blocks. Multiple independent cycles can exist, indicating 
+  independent coupling relationships. Cycles can also overlap, where the same analysis 
+  blocks are involved in multiple different coupling cycles. All of these situations
+  arise naturally as the size of problems grows, and managing all of this coupling 
+  becomes difficult. From the perspective of the graph, the problem reduces down to 
+  a ordering challenge. For each cycle in the graph, you need to pick a analysis block
+  to start the iteration from. Rogers DEMAID tool uses a genetic algorithm to find an ordering 
+  that minimizes the overall coupling of the system by separating independent 
+  cycles in the graph \cite{rogers1996,rogers1996demaid}. 
+
+
+\subsection{Multi-fidelity Problems}
+  
+  A multi-fidelity problem can be characterized by two or more different analyses 
+  each calculating the same data. Mapping this type of multi-fidelity situation 
+  onto a graph will yeild two analysis blocks, each with thier own output 
+  variable nodes, having outgoing edges to a third analysis block that needs the 
+  data as input. Figure \ref{f:collision-example} shows a notional problem 
+  that exhibits this structure, where the key feature is that variable node $y$ in 
+  analysis block $C$ has two incomming edges. 
+
+  \begin{figure}
+      \begin{center}
+      %\includegraphics[height=.25\textheight]{}
+      [INSERT GRAPH HERE]
+      \caption{Graph of a notional multi-fidelity problem \label{f:collision-example}}
+      \end{center}
+  \end{figure}
+
+  When an input variable node has more than one incomming edge, designers must make
+  some kind of decision about how to manage the flow of information in their problem. 
+  In Eqn. \ref{e:collision} we defined a collision as the situation where
+  there are more incomming connection edges than the ${deg}_u^-(y)$. So desginers can
+  indicate how to handle conflicting edges in a problem graph by setting the ${deg}_u^-(y)$
+  for a given node. In more concrete terms, setting this limit equates to defining 
+  the part of the graph in question as single or multi-fidelity. 
+
+  When ${deg}_u^-(y)=1$, then any conflicting edges in the graph will cause a collision
+  and a choice between the colliding analysis blocks must be made. This results in a 
+  single fidelity design problem. On the other hand if ${deg}_u^-(y)=2$, then two 
+  different analysis blocks can co-exist with a given graph without causing a 
+  collision. The design problem is then a multi-fidelity problem.
+
+  Multi-fidelity problems are always charaterized by graphs with variable 
+  nodes that have an upper-degree-limit greater than one. These problems require 
+  special techniques for resolving the confliciting edges by introducing some mechanism
+  to manage when each of the different fidelity analyses are 
+  run\cite{march2012provably,alexandrov2001approximation,Huang_Allen_Notz_Miller_2006}.
+
+\section{Building MCG and FPG}
 
 \subsection{Maximal Connectivity Graph}
-To construct the maximal connectivity graph, we assume that a set of codes, global inputs, and objectives and constraints (collectively called global outputs) are provided. The codes are represented by analysis block graphs ((ABGs?)) $A_i=(V_{A_i},E_{A_i}), \ i\in I$, where $m$ is the number of codes and $I=\{1,2,\ldots,m\}$. The global inputs are represented as a set of variable nodes $V_\txt{in}$, and the global outputs are represented by a set of variable nodes $V_\txt{out}$. 
-We assume that $V_\txt{in}$, $V_\txt{out}$, and each $A_i$ are given, and that any potential connection between variables is given in the form of explicit edges in the set $C_M$. 
-Then we may construct the maximal connectivity graph $M=(V_M,E_M)$ as
-\begin{IEEEeqnarray*}{rCl}
-V_M & = & V_\txt{in} \cup V_\txt{out} \cup \left( \bigcup_{i \in I} V_{A_i} \right), \\
-E_M & = & C_M \cup \left( \bigcup_{i \in I} E_{A_i} \right),
-\end{IEEEeqnarray*}
-The MCG $M$ is uniquely determined by the given set of analysis blocks, the required outputs, and the given global inputs. In the cases where the set of global inputs is not known a priori, the process of obtaining the FPG will reveal the required inputs, as discussed subsequently.
+  To construct the maximal connectivity graph, we assume that a set of codes, global inputs, and objectives and constraints (collectively called global outputs) are provided. The codes are represented by analysis block graphs ((ABGs?)) $A_i=(V_{A_i},E_{A_i}), \ i\in I$, where $m$ is the number of codes and $I=\{1,2,\ldots,m\}$. The global inputs are represented as a set of variable nodes $V_\txt{in}$, and the global outputs are represented by a set of variable nodes $V_\txt{out}$. 
+  We assume that $V_\txt{in}$, $V_\txt{out}$, and each $A_i$ are given, and that any potential connection between variables is given in the form of connection edges in the set $C_M$. 
+  Then we may construct the maximal connectivity graph $M=(V_M,E_M)$ as
+  \begin{IEEEeqnarray*}{rCl}
+  V_M & = & V_\txt{in} \cup V_\txt{out} \cup \left( \bigcup_{i \in I} V_{A_i} \right), \\
+  E_M & = & C_M \cup \left( \bigcup_{i \in I} E_{A_i} \right),
+  \end{IEEEeqnarray*}
+  The MCG $M$ is uniquely determined by the given set of analysis blocks, the required outputs, and the given global inputs. In the cases where the set of global inputs is not known a priori, the process of obtaining the FPG will reveal the required inputs, as discussed subsequently.
 
 \subsection{Fundamental Problem Formulation Graph}
 We now define the fundamental problem formulation graph $F=(V_F,E_F)$ as a directed graph meeting the following conditions, which are explained subsequently,
@@ -372,21 +423,21 @@ Requirement (3) stipulates that only the global inputs that are being used shoul
 Requirements (4) and (5) provide the construction of the sets of nodes and edges, respectively. 
 Lastly, requirement (6) stipulates that the number of edges directed into the variable nodes must be within the lower and upper in-degree limits; if $\txt{deg}^-(v) < \txt{deg}_l^-(v)$ the node is called a \emph{hole}, and if $\txt{deg}^-(v) > \txt{deg}_u^-(v)$ the node is called a \emph{collision}. 
 
-The set $C_F$ is a set containing explicit edges representing connections. Since $C_M$ is the set of all potential connections, we must have $C_F \subset C_M$. While no other conditions are explicitly stated for $C_F$, requirement (6) is actually a requirement on both $I_F$ and $C_F$.
+The set $C_F$ is a set containing connection edges representing connections. Since $C_M$ is the set of all potential connections, we must have $C_F \subset C_M$. While no other conditions are explicitly stated for $C_F$, requirement (6) is actually a requirement on both $I_F$ and $C_F$.
 
 \subsection{Obtaining the Fundamental Problem Graph}
-In general, there may be multiple different graphs that satisfy the FPG conditions, though there may be none at all. Here, we describe a process for obtaining an FPG by starting with the MCG and disconnecting explicit edges until the FPG conditions are met. Then the problem is reduced to deciding which explicit edges to remove.
+In general, there may be multiple different graphs that satisfy the FPG conditions, though there may be none at all. Here, we describe a process for obtaining an FPG by starting with the MCG and disconnecting connection edges until the FPG conditions are met. Then the problem is reduced to deciding which connection edges to remove.
 
 %Then, mathematically, the FPG starts with $\mathcal A_1 = \{1,\ldots,m\}$, $I_{F,1} = I$, and $C_{F,1} = C_M$.
 Then, mathematically, the FPG starts with $C_{F,0} = C_M$, $E_{F,0} = E_M$, $V_{F,0} = V_M$.
 The nodes where $\txt{deg}^-(v) < \txt{deg}_l^-(v)$ are considered first.
 \begin{enumerate}
-\item The first step is to detect holes and disconnect the explicit edges following them. These explicit edges are removed because they represent variables which cannot be determined because the analysis function does not have adequate inputs. The set of variable nodes which are holes is created as
+\item The first step is to detect holes and disconnect the connection edges following them. These connection edges are removed because they represent variables which cannot be determined because the analysis function does not have adequate inputs. The set of variable nodes which are holes is created as
 \begin{equation}
 H = \{v \in V_M \st t_\txt{node}(v) = \txt{`variable'} \txt{ and } \txt{deg}^-(v) < \txt{deg}_l^-(v) \},
 \end{equation}
 which is the set of variable nodes with fewer incoming edges than are allowed by the lower in-degree limit.
-Then the updated set of edges is created by removing the first set of explicit edges following the hole:
+Then the updated set of edges is created by removing the first set of connection edges following the hole:
 \begin{equation}
 C_{F,1} = C_{F,0} \setminus \{(x,y) \in E_M \st x=E_M^3(v) \txt{ for } v \in H\},
 \end{equation}
@@ -401,7 +452,7 @@ and this step is demonstrated by Fig.~\ref{f:hole}. Because removing these edges
 \label{f:hole}
 \end{figure}
 
-\item The second step is to detect collisions and to then disconnect enough explicit edges so that the collisions are resolved. The set of variable nodes which contain collisions is created as
+\item The second step is to detect collisions and to then disconnect enough connection edges so that the collisions are resolved. The set of variable nodes which contain collisions is created as
 \begin{equation}
 S_\txt{nodes} = \{v \in V_M \st t_\txt{node}(v) = \txt{`variable'} \txt{ and } \txt{deg}^-(v) > \txt{deg}_u^-(v) \}.
 \end{equation}
@@ -470,15 +521,3 @@ F = (V_F,E_F).
 
 \end{enumerate}
 
-
-
-    \subsection{Solution Graph Syntax}
-    What is the difference between a problem formulation and a problem solution method? Convert from a cyclic graph, to an acyclic graph
-    \begin{itemize}
-        \item Cycles indicate convergence loops or design variable loops
-        \item Problem can't be solved until all loops are *removed* by adding solvers/optimizers
-        \item *Special* nodes for solvers and optimizers that *break* loops (from an algorithmic point of view)
-        \item FPG represents the minimal amount of information necessary to define a problem
-        \item Any solution path grows the graph complexity by adding edges and nodes (or possibly have an empty solution graph, which you build up
-        as you remove edges from problem formulation graph?)
-    \end{itemize}
