@@ -263,16 +263,19 @@ algebraic expression to form a objective function. For example, the problem from
 Fig. \ref{f:designvars} might have an objective function of $z^2$ or $2y + z$. Constraints are 
 always given in the form of either an inequality of an equality, e.g. 
 $\frac{2y}{10}-1<0$ or $3x+2y - 5=0$. In both cases, an engineer compiles an
-algebraic expression that is a function of existing variable nodes in the graph. 
+algebraic expression that can be evaluated to produce an output. 
 
-For the proposed syntax, objectives and constraints are represented through the use of 
-expression nodes. These nodes contain the actual mathematical expression used to define the 
-objective or constraint value. Objective or constraint nodes are distinguished
-via the presence of a simple expression (objective) vs an inequality/equality (constraint). 
-Fig. \ref{f:obj-cons} shows the notional problem graph augmented with objective and 
-constraint values. 
+These operations, though very simple, are effectively the same kind of task 
+performed by an analysis block. A constraint or objective function can therfore 
+be represented as another analysis block on the graph, with it's own input and 
+output variable nodes. Although fundamentally no different than an analysis block, 
+for clarity and convience it is useful to distinguish between regular analysis 
+blocks and those that arise from the addition of objectives or constraints to 
+the graph. So we define an expression block, as the collection of variable and model 
+nodes related to a given objective or constraint function. Fig. \ref{f:obj-cons}
+shows a notional problem graph augmented with expression blocks and appropriate 
+connection edges. 
 
-((DP: I think this definition of objective/constraint is disharmoneous with our other node types. I think it should also have local inputs represented by variables nodes))
 
 \begin{figure}[htb!]
   \begin{center}
