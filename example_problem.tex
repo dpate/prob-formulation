@@ -13,16 +13,19 @@ This section presents an example problem to demonstrate the process of obtaining
     VORLAX & aerodynamics using the vortex lattice method \\
     PMARC & aerodynamics using a low-order panel method \\
     WATE  & engine weight estimation \\
-    FLOPSa & mission performance and \\
-      & engine sizing and weight estimation \\
+    FLOPSa & mission performance, \\
+      & engine sizing, and weight estimation \\
     FLOPSb & mission performance only \\
     \bottomrule
     \end{tabular}%
   \label{t:analysis codes}%
 \end{table}%
-Each of these analysis codes contribute individual disciplinary analysis but they are not mutually exclusive. For example, VORLAX and PMARC are both aerodynamics codes that predict inviscid drag but with different levels of fidelity. The Flight Optimization System (FLOPS) is included twice to represent two different uses. FLOPSa denotes FLOPS being executed for both mission performance and engine analysis, while FLOPSb indicates that FLOPS is executed for only mission performance analysis.
+Each of these analysis codes contribute individual disciplinary analysis but they are not mutually exclusive. For example, VORLAX and PMARC are both aerodynamics codes that predict inviscid drag but with different levels of fidelity. The Flight Optimization System (FLOPS) is included twice to represent two different uses. FLOPSa denotes FLOPS being executed for both mission performance and engine analysis, while FLOPSb indicates that FLOPS is executed for only mission performance analysis. This sort of representation is useful for ``supercodes'' that care capable of being used in different ways and with different sets of inputs and outputs.
 
-In this example, the MCG is formed using a consistant naming convention and then connecting every variables with the same name, though this is not the only way to form an MCG. Table \ref{t:ins and outs} presents the full list of variables in the leftmost column and then indicates whether the variable is an input or an output of each analysis code. Some of the variables, such as geometry and performance, represent many different variables which have been bundled together due to there similarity. This bundling is not necessary and does not limit the generality of this example, it is done to simplify the presentation.
+In this example, the MCG is formed using a consistant variable naming convention and then connecting every variable with the same name, though this is not the only way to form an MCG. 
+Table \ref{t:ins and outs} presents the full list of variables in the leftmost column and then indicates whether the variable is an input or an output of each analysis code. 
+Some of the variables, such as geometry and performance, represent many different variables which have been bundled together due to there similarity. 
+This bundling is not necessary and does not limit the generality of this example, it is done to simplify the presentation.
 \begin{table}[htb!]
   \centering
   \caption{Analysis code input and output description}
@@ -50,7 +53,8 @@ In this example, the MCG is formed using a consistant naming convention and then
 
 The MCG $M$ is formed in four steps:
 \begin{enumerate}
-\item An analysis block is created for each analysis code using the information in each column of Table \ref{t:ins and outs}. Each analysis block is formed by creating variable nodes for each input and directing them into a single model node. This model node is then directed into another model node, which is then directed into a variable node for each output. A sample analysis block is shown for analysis code FLOPSb in Fig.~\ref{f:FLOPSb analysis block}.
+\item An analysis block is created for each analysis code using the information in each column of Table \ref{t:ins and outs}. Each analysis block is formed by creating variable nodes for each input and directing them into a single model node, which is directed into another model node, which is then directed into variable nodes corresponding to each output. 
+A sample analysis block is shown for analysis code FLOPSb in Fig.~\ref{f:FLOPSb analysis block}.
 \begin{figure}[htb!]
   \begin{center}
     \includegraphics[width=.6\textwidth]{images/FLOPSb_analysis_block}
@@ -59,11 +63,11 @@ The MCG $M$ is formed in four steps:
 \label{f:FLOPSb analysis block}
 \end{figure}
 
-\item Variable nodes are created to represent the objectives for performance and total weight.
+\item Variable ((change)) nodes are created to represent the objectives for performance and total weight.
 
-\item Variable nodes are created to represent the geometry variable and mission variable global inputs.
+\item Variable nodes are created to represent the geometry variable and mission variable as global inputs.
 
-\item Explicit edges are created from each variable node to every other variable node representing variables with the same name.
+\item Explicit edges are created from each variable node to every other variable node representing variables with the same name. The direction is determined by whether the variable node has an edge directed into or out of a model node (local input or local output).
 \end{enumerate}
 The resulting MCG is shown in Fig.~\ref{f:design vars}. Emerging cycles are shown in yellow and indicate potential cycles that may exist when an FPG is formed.
 \begin{figure}[htb!]
@@ -74,9 +78,23 @@ The resulting MCG is shown in Fig.~\ref{f:design vars}. Emerging cycles are show
 \end{figure}
 
 \subsection{Obtaining an FPG}
-As presented in Sec.(()), the first step to obtaining an FPG is to detect holes and, to start, we set the lower indegree limit for every node to be one. In this case, it turns out that the variable nodes representing the number of engines is a hole for NPSS, FLOPSa, and FLOPSb. This implies than an FPG cannot be obtained from the given MCG. Therefore, we may now create another variable node to represent the number of engines as a global input and also create explicit edges to supply this new input. Now this step is repeated with the new MCG and no holes are found.
+The process of obtaining an FPG from the given MCG, but it is expected to include the user because of required changes to the MCG or make decisions
 
-While Sec.(()) indicated the process for obtaining an FPG, it did not specify how to decide which edges to keep when resolving a collision, that freedom is left to the specific implementation. The benefit of this approach is that standard graph theory algorithms can be used to make these decisions. The first example of this is to obtain an FPG with the fewest possible number of cycles, which are found using the implementation of Johnson's algorithm \cite{Johnson1975} in the Python package NetworkX. The resulting FPG is shown in Fig.~\ref{f:FPG fewest cycles} and the only cycle is shown in yellow. A similar alternative would be to minimize the number of analysis blocks involved in cycles, counting multiplicity. While resulting graph has only one cycle, it may be more desirable to include the higher fidelity codes, such as NPSS.
+((I should show a figure of the MCG with edges and nodes colored as to when they were removed))
+((mention python))
+
+As presented in Sec.(()), the first step to obtaining an FPG is to detect holes. To start, we set the lower indegree limit for every node to be one to find any potential holes. In this case, it turns out that the variable nodes representing the number of engines is a hole for NPSS, FLOPSa, and FLOPSb. This implies than an FPG cannot be obtained from the given MCG, as shown in Fig.~\ref{f:MCG nengines}. In this figure, the green nodes indicate analysis blocks with a hole, and the cyan nodes indicate analysis blocks that became unused after the invalid analyses were removed ((connections were removed, color edges too)).
+\begin{figure}[htb!]
+  \begin{center}
+    \includegraphics[width=.6\textwidth]{images/MCG_nengines}
+  \end{center}
+  \caption{Simple notional problem with two potential design variables \label{f:design vars}}
+\label{f:MCG nengines}
+\end{figure}
+
+Therefore, we may now create another variable node to represent the number of engines as a global input and also create explicit edges to supply this new input. Now this step is repeated with the new MCG and no holes are found.
+
+While Sec.(()) indicated the process for obtaining an FPG, it did not specify how to decide which edges to keep when resolving a collision, that freedom is left to the specific implementation. The benefit of this approach is that standard graph theory algorithms can be used to make these decisions. The first example of this is to obtain an FPG with the fewest possible number of cycles, which are found using the implementation of Johnson's algorithm \cite{Johnson1975} in the Python package NetworkX. The FPG with the fewest cycles is shown in Fig.~\ref{f:FPG fewest cycles}, which indicates one cycle shown in yellow. A similar alternative would be to minimize the number of analysis blocks involved in cycles, counting multiplicity.
 \begin{figure}[htb!]
   \begin{center}
     \includegraphics[width=.6\textwidth]{images/FPG_fewest_cycles}
@@ -85,6 +103,7 @@ While Sec.(()) indicated the process for obtaining an FPG, it did not specify ho
 \label{f:FPG fewest cycles}
 \end{figure}
 
+Alternatively, it may be desirable to resolving collisions by including the higher fidelity codes, such as NPSS in this case.
 One method to ensure that the edges directed from certain analysis blocks are the ones chosen to resolve the conflicts is to use a ranking system. For this case, consider the rankings for each analysis code given in Table \ref{t:rankings}.
 \begin{table}[htbp]
   \centering
@@ -105,7 +124,7 @@ One method to ensure that the edges directed from certain analysis blocks are th
     \end{tabular}%
   \label{t:rankings}%
 \end{table}% 
-Step two in Sec.(()) (the resolution of collisions) is now conducted by selecting the edges directed from the analysis blocks with the highest rank for each collision. The resulting FPG is shown in Fig.~\ref{f:FPG highest rank} and this graph has four cycles, which are enumerated in Table \ref{t:cycles}.
+Step two in Sec.(()) (the resolution of collisions) is now conducted by selecting the edges directed from the analysis blocks with the highest rank for each collision. The resulting FPG is shown in Fig.~\ref{f:FPG highest rank}, and this graph has four cycles, which are enumerated in Table \ref{t:cycles}.
 \begin{figure}[htb!]
   \begin{center}
     \includegraphics[width=.6\textwidth]{images/FPG_highest_rank}
@@ -129,7 +148,7 @@ Step two in Sec.(()) (the resolution of collisions) is now conducted by selectin
   \label{t:cycles}
 \end{table}%
 
-Finally, now consider the case where it is desired to have the inviscid drag input into FLOPSb be a multi--fidelity input. This is done simply by setting the upper indegree limit for that node to two and repreating the (automated) process. In this case, both VORLAX and PMARC are retained, resulting in an FPG that omits only FLOPSa.
+Finally, now consider the case where it is desired to have the inviscid drag input into FLOPSb be a multi--fidelity input, meaning that it is sought to use multiple analysis codes to calculate the same variable. This is done simply by setting the upper indegree limit for this node as two and then repreating the (automated) process. In this case, both VORLAX and PMARC are retained, resulting in an FPG that omits only FLOPSa.
 
 
 %\begin{figure}[htb!]
