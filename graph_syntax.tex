@@ -142,28 +142,26 @@
 	  any other outgoing edges.
 	\end{enumerate}
 
-\subsection{In-degree and Out-degree}
+\subsection{indegree and outdegree}
 	\label{s:indegree-outdegree}
-	The \emph{in--degree} of a node is the number of connection edges directed in and 
-	is denoted as $\txt{deg}^-(v)$, and the \emph{out--degree} 
+	The \emph{indegree} of a node is the number of connection edges directed in and 
+	is denoted as $\txt{deg}^-(v)$, and the \emph{outdegree} 
 	is the number of connection edges directed out and it is denoted as $\txt{deg}^+(v)$.
 	The degree of a given node is only a function of the connection edges 
 	attached to it. The number of implicit edges is not relevant since any number 
 	of drivers could be involved, at different parts of an solution process. For 
 	example in a sequential optimization where a global optimizer is first applied
 	and a gradient based one is applied second, design variables would have incomming 
-	implicit edges from both optimizers but this would not affect the in--degree of those
+	implicit edges from both optimizers but this would not affect the indegree of those
 	variable nodes. 
-	((DP:I started to remove any reference to the edge type in these definitions but then saw that you needed it. The reason I did that was because in--degree and out--degree are basic graph theory terms. What if the reference to implicit edges is handled with the upper in--degree limit, i.e. after the FPG is obtained the upper indegree limit for the design variable nodes is relaxed (increased) so that it isn't a problem what is or isn't counted?))
+	((DP:I started to remove any reference to the edge type in these definitions but then saw that you needed it. The reason I did that was because indegree and outdegree are basic graph theory terms. What if the reference to implicit edges is handled with the upper indegree limit, i.e. after the FPG is obtained the upper indegree limit for the design variable nodes is relaxed (increased) so that it isn't a problem what is or isn't counted?))
 
-	((DP:the definitions were in/out degree were not in my book, I had to get them from wikipedia, where they are spelled indegree and outdegree))
-
-	We also define the \emph{upper in--degree limit} 
+	We also define the \emph{upper indegree limit} 
 
 	\begin{equation}
 	\txt{deg}_u^-(v):V \to \mathbb{N}
 	\end{equation} 
-	and the \emph{lower in--degree limit} as
+	and the \emph{lower indegree limit} as
 	\begin{equation}
 	\txt{deg}_l^-(v):V \to \mathbb{N}.
 	\end{equation}
@@ -178,7 +176,7 @@
 		This represents a lack of information being supplied to the node.
 
   \item[collision: ] The number of incomming edges is greater than $ \txt{deg}_u^-(v)$. 
-    \begin{equation} \txt{deg}^-(v) > \txt{deg}_u^-(v) \end{equation}
+    \begin{equation} \txt{deg}^-(v) > \txt{deg}_u^-(v) \label{e:collision}\end{equation}
 \end{description} 
 These violations will be managed in order to seek a working problem formulation.
 
@@ -200,7 +198,6 @@ this graph syntax.
 \label{f:sellar_graph_full}
 \end{figure}
 
-%As discussed in Sec.((intro)), the digraph must be able to describe the individual aspects of an MDAO problem.
 \subsection{Analysis Blocks and Connections}
 \label{ss:analysis blocks and connections}
 Analysis tools take in a number input variables and then perform some work to calculate 
@@ -208,7 +205,7 @@ the values for their respective outputs. In an MDAO graph, this process is
 represented by a group of nodes and edges called an \emph{analysis block}, 
 shown in Fig. \ref{f:analysis block}. Within an analysis block each variable 
 node represents a single input or output and is connected 
-to a single model node via a fixed edge. Note that in Fig. \ref{f:analysis block}, 
+to a single model node via a fixed edge. Note that in Fig.~\ref{f:analysis block}, 
 the analysis block contains two model nodes, with a single edge connecting them. 
 This edge represents the necessary calculations to map given inputs 
 to proper output values. If constructing a weighted graph, the weight calculation edge 
@@ -226,14 +223,10 @@ the edges within them are fixed, they become fixed sub-graphs within a graph.
 \label{f:analysis block}
 \end{figure}
 
-	Variable nodes in an analysis block can be distinguished as either an input or an output by the manner in which they are connected. As shown in Fig.~\ref{f:analysis block}, inputs are any variable nodes that have an outgoing edge into a model 
-	node. Conversely, outputs are any variable nodes that have an incoming edge from a model node. 
-	Note that by this definition, inputs and outputs can only exist when variable nodes poses an 
-	edge joining them to a model node. 
-	((DP:I'm not sure what the sentences before or after this comment mean))
-	These are labeled out as 
-	local inputs and local outputs. The variables are local because they are explicitely tied
-	to the analysis block and have no relevance without it. 
+Variable nodes in an analysis block can be distinguished as either an input or 
+an output by the manner in which they are connected. As shown in Fig.~\ref{f:analysis block}, 
+inputs are any variable nodes that have an outgoing edge into a model 
+node. Conversely, outputs are any variable nodes that have an incoming edge from a model node. 
 
 MDAO problems require that information be passed between sets of analyses. When 
 information from the output of one analysis block is passed, or connected, to the 
@@ -271,7 +264,7 @@ leave$\txt{deg}_l^-(v)=1$ and find a new analysis code to fill the hole in graph
 
 So a design variable is defined as any variable node with $\txt{deg}_l^-(v)=0$. 
 This, by definition, means that design variables are not holes in the graph, since 
-they have not violated their lower in-degree limit. Regardless, 
+they have not violated their lower indegree limit. Regardless, 
 when working with a MCG or FPG, only connection edges are allowed, so a design 
 variable in either graph will be a variable with no incomming edges edges. For a valid PSG 
 any design variable node would have at least one, but possibly multiple, incomming 
@@ -347,9 +340,11 @@ connection edges.
 
   Analysis and expression blocks can also have a locality defined for the set of 
   nodes and edges within the block. Their locality is determined by the 
-  incomming and outgoing edges from the block as a whole. Fig. \ref{f:sellar_graph_full} has expression blocks for each constraint, $G_1$ and $G_2$. Both constraints are 
-  local to their respective analysis blocks. But the expression block for $F$ 
-  has incomming edges from $D_1$ and $D_2$, so it would considered global. 
+  incomming and outgoing edges from the block as a whole. Fig. 
+  \ref{f:sellar_graph_full} has expression blocks for each constraint, 
+  $G_1$ and $G_2$. Both constraints are local to their respective analysis 
+  blocks. But the expression block for $F$ has incomming edges from $D_1$ and 
+  $D_2$, so it would considered global. 
 
   \begin{figure}
       \begin{center}
@@ -366,22 +361,33 @@ connection edges.
   to two separate analysis blocks, $A$ and $B$, but none to a third, $C$. Then 
   you could say that this node was global with respect to $A$ and $B$, but local 
   to the group $A,B$ with respect to $C$. This situation produces a natural 
-  hierarchy in a graph, where you can form increasingly smaller groups as you 
-  segment problem into finer localities. When solving a problem using 
-  a heirarchical decomposition approach, there are various techniques for 
-  partitioning that are effective in different scenarios 
-  \cite{krishnamachari1997optimal,Perez2004,sobieszczanski1997,allison2009optimal,michelena1997hypergraph}. 
+  hierarchy in a graph, where you could form increasingly smaller groups as you 
+  segment problem into finer localities. 
+
+  When solving a problem using a heirarchical decomposition approach, 
+  there are various techniques for partitioning that are effective in different 
+  scenarios \cite{krishnamachari1997optimal,michelena1997hypergraph,
+  sobieszczanski1997,Perez2004,allison2009optimal}. Tosserams et al proposed a 
+  language based syntax for describing the partitioning of problems, named $\Psi$
+  \cite{tosserams2010specification}. $\Psi$ provides an opposing perspective to 
+  this work, where they compose hierarchies from the bottom up, into larger and 
+  larger groups. However, $\Psi$ provides a compiler that can produce a standard 
+  problem representation of the assembled problem, and a number of example converters
+  from that standard representation to application specific formats. It would be 
+  possible to provide such a converter to build a graph form the $\Psi$ format.
+
+  [[Could probably build this and include it in appendix]] 
+
 
 \subsection{Coupling Between Analyses}
 
   Coupling exists in a design problem when a set of two or more analyses each depend on the
-  others outputs. Consider the notional problem from section \ref{sec:spg_vs_fpg} where two 
-  analyses, $A$ and $B$ are coupled through their respective variables. The graph of this 
-  is shown in Fig. \ref{f:coupling}. In the graph $A.z$ has an outgoing connection 
-  edge to $B.z$, indicating that there is a connection between the two. 
-  Similarly a connection exists between $B.y$ and $A.y$. These two connections form 
-  a cycle which represent the coupling between them. This cycle means that blocks $A$ and $B$ need
-  to be iterated on untill they converge. 
+  others outputs. In the Sellar problem from Eqn \ref{eqn:simple_fpf} the two 
+  coupling constraints, $G_1$ and $G_2$ provide a reciprical dependence between 
+  $D_1$ and $D_2$. In a graph, these constraints show up as connection edges between 
+  the outputs of each analysis block. The relevant connection edges are highlighted in 
+  Fig. \ref{f:coupling}, where they form a cycle. Cycles in a graph are the characteristic 
+  structure that represents coupling. 
 
   \begin{figure}
       \begin{center}
@@ -391,13 +397,15 @@ connection edges.
       \end{center}
   \end{figure}
 
-	It is important to note that the cycle in graph in Fig.~\ref{f:coupling} does not contain 
-	any driver nodes. That means that no solver, optimizer, or other iterative construct is 
-	invovled in the coupling. This absence is intentional, as the coupling is an inherent part 
-	of the problem. This corresponds directly to Eqn.~\ref{eqn:simple_fpf}, where 
-	each equality constraint is one edge in the graph. Transitioning to either 
-	Eqn.~\ref{eqn:simple} or Eqn.~\ref{eqn:simple2} means selecting one of the nodes as the starting point 
-	for the iteration and indicating which associated analysis block should be executed first. 
+	It is important to note that the coupling cycles do not contain 
+	any driver nodes. Solver, optimizer, or other iterative process is 
+	invovled in the coupling definition--though one will be necessary for a valid 
+  PSG. Additionally, a coupling cycle has no inherant start or end. It would be
+  valid to pick any node in the cycle as a starting point, and proceed around the
+  loop untill you get back to your starting point. For the Sellar Problem, picking 
+  $D_1$ as the starting point would yeild a problem as given in 
+	Eqn.~\ref{eqn:simple}, while picking $D_2$ would yield the problem as givne in 
+  Eqn.~\ref{eqn:simple2}.
 
 	Larger problems can contain more complex cycles in their FPG, indicating more 
 	complex coupling between analyses. A cycle can contain more than 
@@ -405,26 +413,44 @@ connection edges.
 	independent coupling relationships. Cycles can also overlap, where the same analysis 
 	blocks are involved in multiple different coupling cycles. All of these situations
 	arise naturally as the size of problems grows, and managing this coupling may
-	become difficult. From the perspective of the graph, the problem reduces down to 
-	an ordering challenge. For each cycle in the graph, an analysis block needs to be selected 
-	to start the iteration from. Rogers' DEMAID tool uses a genetic algorithm to find an ordering 
-	that minimizes the overall coupling of the system by separating independent 
-	cycles in the graph \cite{rogers1996,rogers1996demaid}. In the present work, Sec.~\ref{s:example problem}.\ref{ss:obtaining an FPG} will suggest that an FPG may be obtained with respect to the number of cycles or the length of these cycles, etc.
+	become difficult. In the present work, Sec.~\ref{s:example problem}.\ref{ss:obtaining an FPG} 
+  will demonstrate how building an FPG from an MCG provides an opportunity to 
+  identify and potentailly reduce the number of cycles in a graph. 
+
+  If large amounts of coupling are present it can help convergence 
+  rates to look for an effective ordering for the execution of analyses.
+  Rogers' DEMAID tool uses a genetic algorithm to find an ordering that minimizes 
+  the overall coupling of the system by separating independent cycles in the 
+  graph \cite{rogers1996,rogers1996demaid}. Rodgers work focused on the matrix 
+  form of the DSM for ordering optimization. Lu and Martins more recent work 
+  worked with a weighted form of the DSM and used an iterative clustering approach 
+  to perform a similar task to DEMAID \cite{Lu2012}. 
+
+  However, when using a graph representation, the ordering problem can be greatly 
+  simplified. For any given coupling cycle, a Gauss-Seidel iteration pattern 
+  is automatically given simply folowing the cycle around the graph. If only 
+  once cycle is present, then the task reduces down to selecting a starting point
+  in the cycle. When sub-cycles are present each sub-cycle ordering is also 
+  given automatically by following the graph, but now a there is freedom at which 
+  level to manage the iteration over the cycles. Ordering of many cycles and 
+  sub-cycles is still a challenge, but the total search space is reduced by 
+  always following the ordering from the graph from a selected starting node. 
 
 \subsection{Multi--fidelity Problems}
 	\label{ss:multi-fideliy problems}
 	A multi--fidelity problem can be characterized by two or more different analyses 
 	each calculating the same data. Mapping this type of multi--fidelity situation 
 	onto a graph will yield two analysis blocks, each with their own output 
-	variable nodes, having outgoing edges to a third analysis block that needs the 
-	data as input. Figure \ref{f:collision-example} shows a notional problem 
-	that exhibits this structure, where the key feature is that variable node $y$ in 
-	analysis block $C$ has two incoming edges. 
+	variable nodes, having outgoing edges to a single variable in a third analysis 
+  block that needs the data as input. Figure \ref{f:collision_example} shows 
+  a modified version of the Sellar problem with a new analysis, $D_0$, representing a 
+  low fidelity version of $D_1$. 
+
 	\begin{figure}
 	  \begin{center}
 	  %\includegraphics[height=.25\textheight]{}
 	  [INSERT GRAPH HERE]
-	  \caption{Graph of a notional multi-fidelity problem \label{f:collision-example}}
+	  \caption{Graph of a notional multi-fidelity problem \label{f:collision_example}}
 	  \end{center}
 	\end{figure}
 
@@ -447,6 +473,7 @@ connection edges.
 	special techniques for resolving the confliciting edges by introducing some mechanism
 	to manage when each of the different fidelity analyses are 
 	run\cite{march2012provably,alexandrov2001approximation,Huang_Allen_Notz_Miller_2006}.
+
 
 \section{Building MCG and FPG}
 	\label{s:building graphs}
@@ -478,7 +505,7 @@ connection edges.
 	Requirement (2) stipulates that each analysis blocks in $F$ must have at least one local output that is being used. 
 	Requirement (3) stipulates that only the global inputs that are being used should be included. 
 	Requirements (4) and (5) provide the construction of the sets of nodes and edges, respectively. 
-	Lastly, requirement (6) stipulates that the number of edges directed into the variable nodes must be within the lower and upper in-degree limits; if $\txt{deg}^-(v) < \txt{deg}_l^-(v)$ the node is called a \emph{hole}, and if $\txt{deg}^-(v) > \txt{deg}_u^-(v)$ the node is called a \emph{collision}. 
+	Lastly, requirement (6) stipulates that the number of edges directed into the variable nodes must be within the lower and upper indegree limits; if $\txt{deg}^-(v) < \txt{deg}_l^-(v)$ the node is called a \emph{hole}, and if $\txt{deg}^-(v) > \txt{deg}_u^-(v)$ the node is called a \emph{collision}. 
 
 	The set $C_F$ is a set containing connection edges representing connections. Since $C_M$ is the set of all potential connections, we must have $C_F \subset C_M$. While no other conditions are explicitly stated for $C_F$, requirement (6) is actually a requirement on both $I_F$ and $C_F$.
 
@@ -494,7 +521,7 @@ connection edges.
 	\begin{equation}
 	H = \{v \in V_M \st t_\txt{node}(v) = \txt{`variable'} \txt{ and } \txt{deg}^-(v) < \txt{deg}_l^-(v) \},
 	\end{equation}
-	which is the set of variable nodes with fewer incoming edges than are allowed by the lower in-degree limit.
+	which is the set of variable nodes with fewer incoming edges than are allowed by the lower indegree limit.
 	Then the updated set of edges is created by removing the first set of connection edges following the hole:
 	\begin{equation}
 	C_{F,1} = C_{F,0} \setminus \{(x,y) \in E_M \st x=E_M^3(v) \txt{ for } v \in H\},
@@ -525,7 +552,7 @@ connection edges.
 	\begin{equation}
 	B_j = \big \{e_k \in S_{\txt{edges},j} \st k \in \{1,2,\ldots,K\} \txt{ with } K \leq \txt{deg}_u^-(v_j) \big \}, \ j \in J,
 	\end{equation}
-	which means that each set $B_j$ is constructed from the set $S_{\txt{edges},j}$ by taking only as many edges as are allowed by the upper in--degree limit of $v_j$. The construction of each $B_j$ corresponds to making a decision on which edges to include and which edges not to include. Then let
+	which means that each set $B_j$ is constructed from the set $S_{\txt{edges},j}$ by taking only as many edges as are allowed by the upper indegree limit of $v_j$. The construction of each $B_j$ corresponds to making a decision on which edges to include and which edges not to include. Then let
 	\begin{equation}
 	C_{F,2} = \{ e \in C_{F,1} \st e \in B_j \txt{ for some } j \in J\},
 	\end{equation}
