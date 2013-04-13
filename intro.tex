@@ -1,5 +1,5 @@
 \section{Introduction}
-    
+    \label{s:intro}
     The number of analysis tools required in multidisciplinary design optimization (MDO) studies is growing
     in parallel with the increasing scope of typical MDO problems. An example of this growth in scope can
     be observed in the historical evolution of the disciplines involved in MDO problems in aircraft design.
@@ -15,10 +15,7 @@
     to evolve, and as computing is increasingly commoditized. This expansion of scope will be driven, in
     part, by consideration of additional disciplines. Current trends on the horizon for aircraft MDO studies
     include incorporation of manufacturing analyses [[REF]], subsystem performance [[REF]], and fleet-level
-    aggregate models of emissions, noise, or economics [[REF]]. A recent survey by Shan and Wang covered 
-    a range of different techniques proposed to solve High Dimentional, Expensive, Black-box (HEB) problems. 
-    The large amount of relevant research they identified demonstrates the growing interest large scale 
-    MDO problems that arise from multiple disciplines\cite{Shan2010}.
+    aggregate models of emissions, noise, or economics [[REF]].
 
     As the size and complexity of engineering systems grow, the time and expense for setting up 
     analysis models grow with them. Multidisciplinary Design Analysis and Optimization (MDAO)
@@ -60,10 +57,11 @@
     Our goal is to develop formalism for expressing analysis interconnectivity and for determining feasible
     data flows to assist an engineering team conducting this task. Because the problem deals with
     interconnectivity, we base our approach on the representations and techniques of graph theory. The 
-    proposed graph syntax is similar to the REMS system proposed by 
-    Alexandrov and Lewis\cite{alexandrov2004}. The approach taken here could be viewed as an extention 
-    of the concepts proposed in REMS with the goals of providing greater insight into design problem 
-    structure.  The approach begins by fconstructing the \emph{maximal connectivity graph (MCG)} describing all possible
+    proposed graph syntax is closely related to the REMS system proposed by 
+    Alexandrov and Lewis\cite{alexandrov2004}. The approach taken here should be viewed as an extention 
+    of the concepts proposed in REMS with the goal of allowing the graphs to more closely interact with 
+    existing design processes and MDAO frameworks. The approach begins by 
+    constructing the \emph{maximal connectivity graph (MCG)} describing all possible
     interconnections between the analysis tools proposed by the engineers. Graph operations are then
     conducted reduce the MCG down to a \emph{fundamental problem graphs (FPG)} that describes the minimum set of analysis
     tools needed to solve the specified system-level design problem. The FPG does not predispose
@@ -71,25 +69,19 @@
     IDF, CO, BLISS, could be selected \emph{post facto} to implement the system-level optimization by
     constructing a \emph{problem solution graph (PSG)} and the corresponding problem solution approach.
     The concept of the FPG and the identification of feasible FPGs are the main contributions of the paper.
-    For completeness we include node and edge types for building a PSG, but the details of how a given 
-    problem can be decomposed are beyond the scope of this work. 
 
-    The paper is organized as follows. First, we describe the differences between 
-    a fundamental problem formulation based only on the design problem
-    that the engineers desire to solve and on the available analysis tools, 
-    and a specific problem formulation, which additionally 
-    presumes a specific solution to the problem. Next, we survey the literature in applying
-    graph theoretic and formal language approaches to multidisciplinary design 
-    problem formulation. We then discuss our graph syntax and representation of 
-    MDO problems and describe how different structures within a graph map to important
-    features of an MDAO problem. Next we present a procedure for determining possible 
-    FPG from a given MCG. Finally, we present the graph based formulation of commercial 
-    aircraft design problem and discuss additional applications enabled by our approach.
+    The paper is organized as follows. First, we describe the differences between a fundamental problem
+    formulation, which is based only on the system-level optimization problem statement that the
+    engineers desire to solve and on the available analysis tools, and a specific problem formulation, which
+    additionally presumes a specific solution to the problem. Next, we survey the literature in applying
+    graph theoretic and formal language approaches to multidisciplinary design problem formulation. 
+    We then discuss our graph syntax and representation of MDO problems and describe the procedures for 
+    determining the MCG and FPG. Finally, we present an example problem based on an MDO analysis of a 
+    commercial aircraft and discuss additional applications enabled by our approach.
 
 
 \section{Specific vs Fundamental Problem Formulation }
-    \label{sec:spg_vs_fpg}
-
+	\label{s:specific vs fundamental}
     The Fundamental Problem Formulation (FPF) for any given problem will be constant regardless 
     of which MDAO framework, optimization algorithm, iterative solver, or solution strategy
     is used to solve the problem. However, it is possible to formulate a problem
@@ -155,7 +147,7 @@
 
 
 \section{Existing Graph-Based Syntax}
-
+	\label{s:existing syntax}
     As shown above, the mathematical language for specifying problem formulations is very general and can be used both for 
     fundamental and specific problem formulations. Tedford and Martins used the above mathematical syntax to specify the 
     FPF for a set of test problems and also to describe specific formulations for solving them with a 
@@ -171,7 +163,7 @@
     edges represent information dependence between those tools. The ordering of elements in a DSM can be used to indicate 
     execution order.  For more complex problems, choosing the proper order to run analysis tools is a non-trival task. 
     Rogers et. al developed DeMAID to manipulate a DSM to find an ordering for analysis tools that 
-    reduces the cost of solving highly coupled systems\cite{rogers1996,rogers1996demaid}. This re-ordering is done through 
+    reduces the cost of solving highly coupled systems\cite{Rogers1996,rogers1996demaid}. This re-ordering is done through 
     row operations on the DSM matrix and yields multiple specific problem 
     formulations which all solve the same FPF. In other words, manipulation of the DSM does not fundamentally alter
     the problem formulation, which makes DSM an excellent foundation for specifying the FPF itself. 
