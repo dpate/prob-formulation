@@ -249,13 +249,7 @@ downstream inputs.
 ((DP:I'm thinking we might also need the upper indegree limit to be zero as well, because setting only the lower indegree limit makes the node a design variable if it didn't have any incoming edges. It's seems possible that in the MCG a node has incoming edges but the user wants it to be a design variable. I can make the change if you agree.))
 For the Sellar problem, there are three design variables, $x_1^*$, $z_1^*$, and $z_2^*$. In Fig. 
 \ref{f:sellar_graph_full}, these are the only three holes (nodes without out 
-incomming edges) in the graph. Based on this example it's tempting to simply 
-call all holes in the graph design variables. However, in the general case this is 
-not completely correct. For any given problem, the set of holes only identifies 
-all the potential design variables. However, some variable holes might not make good design 
-variables. For instance, if your aircraft mission analysis code requires a drag input 
-which ends up being a hole then it's likely that some new analysis tool is needed
-to predict drag before the design process can continue. 
+incomming edges) in the graph. 
 
 \begin{figure}[htb!]
   \begin{center}
@@ -266,13 +260,16 @@ to predict drag before the design process can continue.
 \end{figure}
 
 More formally stated, given a MCG with the $\txt{deg}_l^-(v)=1$ for all nodes, 
-there will be a set of holes. Each hole represents a node that could potentially 
-become a design variable. It is up to the designer to examine that variable and 
-decide if it is appropriate to use it as a design variable. If a variable should 
-be a design variable, then set it's ${deg}_l^-(v)=0$. Otherwise you leave 
-${deg}_l^-(v)=1$ and find some tool to fill the hole in graph. 
+there will likely be a set of holes preventing a valid FPG from being obtained. 
+Each hole represents a node that could potentially become a design variable. 
+It is up to the designer to examine each and decide if it is appropriate to 
+consider it a design variable, in which case the designer shall set the lower 
+indegree limit to be zero. However, some variable holes may not actually be 
+suitable as a design variable. For instance, if an aircraft mission analysis 
+code requires a drag input which ends up being a hole then it's likely best to 
+leave$\txt{deg}_l^-(v)=1$ and find a new analysis code to fill the hole in graph. 
 
-So a design variable is defined as any variable node with ${deg}_l^-(v)=0$. 
+So a design variable is defined as any variable node with $\txt{deg}_l^-(v)=0$. 
 This, by definition, means that design variables are not holes in the graph, since 
 they have not violated their lower in-degree limit. Regardless, 
 when working with a MCG or FPG, only connection edges are allowed, so a design 
@@ -321,12 +318,38 @@ connection edges.
   from more than one analysis block. Likewise, a local node is any node 
   that involves information from only a single analysis block. As stated before, variable 
   nodes with fixed edges directed to model nodes (as part of an analysis block) are inherently local 
-  and similarly model nodes are also local. Expression and driver nodes
-  are not inherently local or global though. For these, their locality is determined 
-  by the incomming and outgoing edges they possess. Consider the graph in Fig. \ref{f:local_global}, 
-  where the expression node $g_1$ represents some kind of constraint for the optimziation problem. 
-  Since $g_1$ only has edges comming from analysis block $B$, it would be considered a local constraint 
-  on block $B$. $g_2$ has incomming edges from both $A$ and $B$ analysis blocks, so it would be a global constraint. 
+  and similarly model nodes are also local. Global variables are a part of many 
+  MDAO problems and must be representable in the graph. Follwoing our simple definition
+  any variable node that had multiple incomming or outgoing edges, would be global. 
+  In Fig. \ref{f:sellar_graph_full} the variable nodes for $x_1^*$, $z_1^*$, and $z_2^*$ 
+  have multiple outgoing edges and would be considered global. 
+
+  Note that the variable $x_1$ from the Sellar problem is usually refered to as 
+  a local variable, which is contradicted by the given graph. This discrepancy 
+  arises from the explicit treatment of objectives and constraints as separate 
+  expression blocks. Normally in the Sellar problem $x_1$ is considered a local 
+  variable because it only directly affects analysis block $D_1$. By forcing
+  the expansion of $F$ into an expression block with its own inputs, then $F$ 
+  gets it's own copy of the $x_1$ variable. This necessitates the creation 
+  of the global $x_1^*$ node in the graph with two outgoing edges to link the 
+  two $x_1$ inputs nodes in the different blocks. Interestingly, using this 
+  definition, where $x_1^*$ is a global variable fits nicely within 
+  the structure of Braun's Colaborative Optimization (CO) archtiecture \cite{braun_thesis}. 
+  The rules of setting up a problem with CO require that each discipline be 
+  given an independent local copy of all global variables, while any local 
+  variables are retained uniquely within their respective disciplines. But 
+  when a local design variable shows up explicitely in the objective function 
+  or global constraint then a global variable is created, and the discipline again 
+  gets an independent local copy of it. Given our definition of global vs local
+  variable nodes, no such exception for local variables is necessary. When you 
+  include a given variable in an expression node, it becomes global by definition 
+  and should be treated as such in CO. 
+
+  Analysis and expression blocks can also have a locality defined for the set of 
+  nodes and edges within the block. Their locality is determined by the 
+  incomming and outgoing edges from the block as a whole. Fig. \ref{f:sellar_graph_full} has expression blocks for each constraint, $G_1$ and $G_2$. Both constraints are 
+  local to their respective analysis blocks. But the expression block for $F$ 
+  has incomming edges from $D_1$ and $D_2$, so it would considered global. 
 
   \begin{figure}
       \begin{center}
@@ -336,21 +359,18 @@ connection edges.
       \end{center}
   \end{figure}
 
-  Although we've already established that variable nodes in an analysis block are local to that 
-  block, global variables are a part of many MDAO problems and must be representable. A global variable 
-  would be any variable node with multiple outgoing connection edges. 
-  For example, in Fig. \ref{f:local_global} the global node $w^*$ has outgoing edges to 
-  the $w$ variable nodes feeding both $A$ and $B$ analysis blocks.
-
-  While this simple definition is valid, it glosses over a more subtle aspect of 
-  some MDAO problems. Fig. \ref{f:local_global}, has three analysis 
-  blocks A, B, and C. Above we identified node $g_2$ as global,  but
-  it has no incomming edges from block $C$. So you could say that $g_2$ is 
-  local to the the set of blocks $A,B$. In this sense, locality 
-  becomes a relative term. A given node can be local to a specific sub-graph of a large
-  problem. This subtle structure can become significant when determining how to 
-  effectively partition an MDAO problem into sub-problems 
-  \cite{krishnamachari1997optimal,allison2009optimal,michelena1997hypergraph}.
+  Simply stating that any node or block with incomming or outgoing edges
+  from more than one other node or block is global works glosses over a more 
+  subtle aspect of some MDAO problems. The locality of any node in a graph is 
+  a relative property. For instance, a single node might have outgoing edges 
+  to two separate analysis blocks, $A$ and $B$, but none to a third, $C$. Then 
+  you could say that this node was global with respect to $A$ and $B$, but local 
+  to the group $A,B$ with respect to $C$. This situation produces a natural 
+  hierarchy in a graph, where you can form increasingly smaller groups as you 
+  segment problem into finer localities. When solving a problem using 
+  a heirarchical decomposition approach, there are various techniques for 
+  partitioning that are effective in different scenarios 
+  \cite{krishnamachari1997optimal,Perez2004,sobieszczanski1997,allison2009optimal,michelena1997hypergraph}. 
 
 \subsection{Coupling Between Analyses}
 
