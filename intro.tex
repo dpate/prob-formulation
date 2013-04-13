@@ -92,58 +92,66 @@
 
     The Fundamental Problem Formulation (FPF) for any given problem will be constant regardless 
     of which MDAO framework, optimization algorithm, iterative solver, or solution strategy
-    is used to solve the problem. For example, consider the following notional problem: 
+    is used to solve the problem. However, it is possible to formulate a problem
+    with an assumed execution ordering that implies a solution strategy. 
+    For example, consider the Sellar test problem \cite{AIAA:sellar}: 
 
     \begin{align}
-        given & \ \ A: {x,y} \rightarrow {m,z} \notag
-        \\      & \ \ B: {x,z} \rightarrow {y^t} \notag
-        \\min. &\ \ f(m) \notag
-        \\w.r.t. & \ \ x,y,z \notag
-        \\s.t. & \ \ g(y^t,y) = 0
+        given & \ \ y_1 = D_1(x_1,y_2,z_1,z_2) \notag
+        \\      & \ \ y_2^t = D_2(y_1,z_1,z_2) \notag
+        \\min. &\ \ F(x_1,y_1,y_2,z_2) \notag
+        \\w.r.t. & \ \ x_1,y_1,y_2,z_1,z_2 \notag
+        \\s.t. & \ \ G(y_2,y_2^t) = 0
         \label{eqn:simple}
     \end{align}
 
-    $A$ and $B$ represent analysis tools, and $f$ and $g$ are the objective and constraint functions respectively. 
-    Equation \ref{eqn:simple} makes an inherent assumption about the solution strategy for the problem. 
-    Analysis $A$ outputs $z$, which is an input to $B$. Hence, $A$ should be run before $B$ with 
-    with $y$ being iterated on to convergence with $y^t$. However, a slightly different formulation is 
-    equally valid and still represents the exact same problem: 
+    $D_1$ and $D_2$ represent analysis tools, and $F$ and $G$ are the objective 
+    and constraint functions respectively. Equation \ref{eqn:simple} makes an 
+    inherent assumption about the solution strategy for the problem. Analysis 
+    $D_1$ outputs $y_1$, which is an input to $D_2$. Hence, $D_1$ should be run 
+    before $D_2$ with with $y_2$ being iterated on to convergence with $y_2^t$. 
+    However, a slightly different formulation is equally valid and still 
+    represents the exact same problem: 
 
     \begin{align}
-        given & \ \ B: {x,z} \rightarrow {y} \notag
-        \\      & \ \ A: {x,y} \rightarrow {m,z^t} \notag
-        \\min. &\ \ f(m) \notag
-        \\w.r.t. & \ \ x,y,z \notag
-        \\s.t. & \ \ g(z^t,z) = 0
-        \label{eqn:simple2}
+        given & \ \ y_2 = D_2(y_1,z_1,z_2) \notag
+        \\      & \ \ y_1^t = D_1(x_1,y_2,z_1,z_2) \notag
+        \\min. &\ \ F(x_1,y_1,y_2,z_2) \notag
+        \\w.r.t. & \ \ x_1,y_1,y_2,z_1,z_2 \notag
+        \\s.t. & \ \ G(y_1,y_1^t) = 0
+        \label{eqn:simple}
     \end{align}
 
     Equation \ref{eqn:simple2} differs only slightly from Eq. \ref{eqn:simple}. 
-    $A$ is now dependent on the output of $B$, and $z$ will be iterated on to 
-    convergence with $z^t$. Now the problem can be solved by running $B$ first 
-    and then $A$.Since the formulations in Eqs. \ref{eqn:simple} and 
+    $D_1$ is now dependent on the output of $D_2$, and $y_1$ will be iterated on to 
+    convergence with $y_1^t$. Now the problem can be solved by running $D_2$ first 
+    and then $D_1$. Since the formulations in Eqs. \ref{eqn:simple} and 
     \ref{eqn:simple2} both describe the same problem then neither can be the
     FPF. They are both specific versions of a more fundamental description of 
     the problem that is common between them. We present the fundamental 
     formulation as follows: 
 
     \begin{align}
-        given & \ \ A: {x,y} \rightarrow {m,z^t} \notag
-        \\      & \ \ B: {x,z} \rightarrow {y^t} \notag
-        \\min. &\ \ f(m) \notag
-        \\w.r.t. & \ \ x,y,z \notag
-        \\s.t. & \ \ g1(z^t,z) = 0 \notag
-        \\     & \ \ g2(y^t,y) = 0
+        given & \ \ D_1.y_1 = D_1(x_1,y_2,z_1,z_2) \notag
+        \\      & \ \ D_2.y_2 = D_2(y_1,z_1,z_2) \notag
+        \\min. &\ \ F(x_1,y_1,y_2,z_2) \notag
+        \\w.r.t. & \ \ x_1,y_1,y_2,z_1,z_2 \notag
+        \\s.t. & \ \ G_1(D_1.y_1,D_2.y_1) = 0 \notag
+        \\     & \ \ G_2(D_1.y_2,D_2.y_2) = 0
         \label{eqn:simple_fpf}
     \end{align}
 
     The formulation in Eq. \ref{eqn:simple_fpf} differs from both Eq. \ref{eqn:simple} 
     and Eq. \ref{eqn:simple2} because it has two constraints which both must be 
     met. The presence of both of these constraints fully decouples the problem so that 
-    either $A$ or $B$ could be run first or both could be run simultaneously. 
+    either $D_1$ or $D_2$ could be run first or both could be run simultaneously. 
     Alexandrov and Lewis, in their work with REMS, assert that fully decoupling 
     the analyses is key to achieving reconfigurability in the problem 
-    formulation\cite{alexandrov2004}.
+    formulation\cite{alexandrov2004}. The key feature they identify to allow this decoupling 
+    is the creation of separate variables for each analysis so that a variable 
+    is identified by its analysis and it's name. For example, in Eqn. \ref{eqn:simple}
+    there is only one $y_1$ variable vs Eqn. \ref{eqn:simple_fpf} where 
+    there are two ($D_1.y_1$ vs $D_2.y_1$). 
 
 
 \section{Existing Graph-Based Syntax}
@@ -163,7 +171,7 @@
     edges represent information dependence between those tools. The ordering of elements in a DSM can be used to indicate 
     execution order.  For more complex problems, choosing the proper order to run analysis tools is a non-trival task. 
     Rogers et. al developed DeMAID to manipulate a DSM to find an ordering for analysis tools that 
-    reduces the cost of solving highly coupled systems\cite{Rogers1996,rogers1996demaid}. This re-ordering is done through 
+    reduces the cost of solving highly coupled systems\cite{rogers1996,rogers1996demaid}. This re-ordering is done through 
     row operations on the DSM matrix and yields multiple specific problem 
     formulations which all solve the same FPF. In other words, manipulation of the DSM does not fundamentally alter
     the problem formulation, which makes DSM an excellent foundation for specifying the FPF itself. 
