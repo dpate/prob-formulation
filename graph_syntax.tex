@@ -293,8 +293,7 @@ for clarity and convience it is useful to distinguish between regular analysis
 blocks and those that arise from the addition of objectives or constraints to 
 the graph. So we define an expression block, as the collection of variable and model 
 nodes related to a given objective or constraint function. Fig. \ref{f:obj-cons}
-shows a notional problem graph augmented with expression blocks and appropriate 
-connection edges. 
+highlights the objective and constraint blocks from the Sellar problem. 
 
 
 \begin{figure}[htb!]
@@ -327,16 +326,16 @@ connection edges.
   of the global $x_1^*$ node in the graph with two outgoing edges to link the 
   two $x_1$ inputs nodes in the different blocks. Interestingly, using this 
   definition, where $x_1^*$ is a global variable fits nicely within 
-  the structure of Braun's Colaborative Optimization (CO) archtiecture \cite{braun_thesis}. 
+  the structure of Braun's Colaborative Optimization (CO) archtiecture \cite{braun1996thesis}. 
   The rules of setting up a problem with CO require that each discipline be 
-  given an independent local copy of all global variables, while any local 
-  variables are retained uniquely within their respective disciplines. But 
-  when a local design variable shows up explicitely in the objective function 
-  or global constraint then a global variable is created, and the discipline again 
+  given an independent local copy of all global variables. All local 
+  variables are retained uniquely within their respective disciplines, except 
+  when a local design variable shows up explicitely in the objective 
+  or global constraint. In that case a global variable is created, and the discipline again 
   gets an independent local copy of it. Given our definition of global vs local
-  variable nodes, no such exception for local variables is necessary. When you 
-  include a given variable in an expression node, it becomes global by definition 
-  and should be treated as such in CO. 
+  variable nodes, no such exception for local variables in global expressions is 
+  necessary. When you include a given variable in an expression block, it becomes 
+  global by definition and should be treated as such in CO. 
 
   Analysis and expression blocks can also have a locality defined for the set of 
   nodes and edges within the block. Their locality is determined by the 
@@ -346,21 +345,13 @@ connection edges.
   blocks. But the expression block for $F$ has incomming edges from $D_1$ and 
   $D_2$, so it would considered global. 
 
-  \begin{figure}
-      \begin{center}
-      %\includegraphics[height=.25\textheight]{XDSM/simple}
-      [[insert graph here]]
-      \caption{A simple graph with local and global nodes \label{f:local_global}}
-      \end{center}
-  \end{figure}
-
   Simply stating that any node or block with incomming or outgoing edges
   from more than one other node or block is global works glosses over a more 
   subtle aspect of some MDAO problems. The locality of any node in a graph is 
   a relative property. For instance, a single node might have outgoing edges 
   to two separate analysis blocks, $A$ and $B$, but none to a third, $C$. Then 
-  you could say that this node was global with respect to $A$ and $B$, but local 
-  to the group $A,B$ with respect to $C$. This situation produces a natural 
+  you could say that this node was global with respect to $A$ and $B$ separately, but local 
+  to the group $A,B$. This situation produces a natural 
   hierarchy in a graph, where you could form increasingly smaller groups as you 
   segment problem into finer localities. 
 
@@ -373,8 +364,7 @@ connection edges.
   this work, where they compose hierarchies from the bottom up, into larger and 
   larger groups. However, $\Psi$ provides a compiler that can produce a standard 
   problem representation of the assembled problem, and a number of example converters
-  from that standard representation to application specific formats. It would be 
-  possible to provide such a converter to build a graph form the $\Psi$ format.
+  from that standard representation to application specific formats. 
 
   [[Could probably build this and include it in appendix]] 
 
