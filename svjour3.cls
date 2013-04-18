@@ -457,8 +457,11 @@ and \string\date\space prior to \string\maketitle}}
 %
 \def\maketitle{\par\let\thanks=\orithanks
 \ch@ckobl{journalname}{Noname}
-\ch@ckobl{date}{the date of receipt and acceptance should be inserted
-later}
+% 22 Dec 2009: Next 2 lines changed from
+% \ch@ckobl{date}{the date of receipt and acceptance should be inserted
+% later}
+% TO (just one line)
+\ch@ckobl{date}{}
 \ch@ckobl{title}{A title should be given}
 \ch@ckobl{author}{Name(s) and initial(s) of author(s) should be given}
 \ch@ckobl{institute}{Address(es) of author(s) should be given}
@@ -533,10 +536,13 @@ later}
 \def\makeheadbox{{%
 \hbox to0pt{\vbox{\baselineskip=10dd\hrule\hbox
 to\hsize{\vrule\kern3pt\vbox{\kern3pt
-\hbox{\bfseries\@journalname\ manuscript No.}
-\hbox{(will be inserted by the editor)}
+% Next line, "\ manuscript No." deleted
+\hbox{\bfseries\@journalname}
+% Next line commented out
+%\hbox{(will be inserted by the editor)}
 \kern3pt}\hfil\kern3pt\vrule}\hrule}%
 \hss}}}
+
 %
 \def\rubric{\setbox0=\hbox{\small\strut}\@tempdima=\ht0\advance
 \@tempdima\dp0\advance\@tempdima2\fboxsep\vrule\@height\@tempdima
@@ -1412,7 +1418,7 @@ to\hsize{\vrule\kern3pt\vbox{\kern3pt
 \widowpenalty=10000
 \def\thisbottomragged{\def\@textbottom{\vskip\z@ plus.0001fil
 \global\let\@textbottom\relax}}
-\pagestyle{headings}
+%\pagestyle{headings}
 \pagenumbering{arabic}
 \if@twocolumn
    \twocolumn
