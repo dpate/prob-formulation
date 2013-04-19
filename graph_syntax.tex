@@ -66,7 +66,7 @@ the FPG is obtained from the MCG by removing nodes and edges,
   A \emph{graph} is a pair $G = (V,E)$ of sets such that $E \subseteq V \times V$, 
   which means that the elements of $E$ are 2--element subsets of $V$. The set $V$ 
   contains the \emph{vertices} or \emph{nodes} and the set $E$ contains the \emph{edges}.
-  For a \emph{directed graph*}((DJP: why the asterisk?)) (or \emph{digraph}) we construct $E$ as a set of ordered pairs instead 
+  For a \emph{directed graph} (or \emph{digraph}) we construct $E$ as a set of ordered pairs instead 
   of a set of sets. Each ordered pair represents an edge starting at the node 
   indicated by the first entry and directed to the node indicated by the second 
   entry. Edge $e$ = $(x,y)$ may be referred to simply as $xy$. For node $v \in V$ 
@@ -153,10 +153,10 @@ the FPG is obtained from the MCG by removing nodes and edges,
   The degree of a given node is a function only of the connection edges 
   attached to it. The number of driven edges is not relevant because any number 
   of drivers could be involved in different parts of an solution process. For 
-  example, in a sequential optimization in which a global optimizer is applied first ((BG: first and second?))
-  and a gradient based optimizer is applied second, design variables would have incomming 
-  driven edges from both optimizers but this would not affect the indegree of those
-  variable nodes. 
+  example in a sequential optimization in which a global optimizer is used first 
+  followed by a gadient based optimizer second to refine global optimizer 
+  result, design variables would have incomming driven edges from both optimizers. 
+  These driven edges would not affect the indegree of those variable nodes. 
 
   Specifially for variable nodes we also define the \emph{upper indegree limit} 
 
