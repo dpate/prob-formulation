@@ -162,7 +162,7 @@
   driven edges from both optimizers but this would not affect the indegree of those
   variable nodes. 
 
-  We also define the \emph{upper indegree limit} 
+  Specifially for variable nodes we also define the \emph{upper indegree limit} 
 
   \begin{equation}
   \txt{deg}_u^-(v):V \to \mathbb{N}
@@ -185,7 +185,9 @@
       \begin{equation} \txt{deg}^-(v) > \txt{deg}_u^-(v) \label{e:collision}\end{equation}
   \end{description} 
 
-  An algorithm for detecting and managing these violations if proposed in Sec.~\ref{s:building graphs}.\ref{ss:obtaining FPG}.
+  The presence of holes and collisions in a graph represent issues that will give
+  rise to an invalid problem formulation. An algorithm for detecting and 
+  managing these violations if proposed in Sec.~\ref{s:building graphs}.\ref{ss:obtaining FPG}.
 
 \section{Graph Representation of MDAO Constructs}
 \label{s:graph representation}
