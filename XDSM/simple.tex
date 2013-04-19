@@ -19,63 +19,63 @@
 	% Use a matrix to line up all the nodes 
     \matrix[MatrixSetup]{
 		% First row
-		& \node [DataIO](input_x){$x^{(0)}$};
+		& \node [DataIO](input_x){$x_1^{(0)},z_1^{(0)},z_2^{(0)}$};
 		&
-		& \node [DataInter](input_y){$y^{(0)}$};
-		& \node [DataInter](input_z){$z^{(0)}$};
+		& \node [DataInter](input_y){$\hat{y_2}^{(0)}$};
+		&
 		& 
 		&
 		\\
 		% second row
-		\node [DataIO] (x_output) {$x^*$};
+		\node [DataIO] (x_output) {$x_1^*,z_1^*,z_2^*$};
 		& \node [Optimization] (opt) {\MultilineComponent{2.3cm}{0,7$\rightarrow$1:}{Optimization}};
 		& 
-		& \node [DataInter](opt-x1){$1:x$};
-		& \node [DataInter](opt-x2){$1:x$};
+		& \node [DataInter](opt-x1){$1:x_1,z_1,z_2$};
+		& \node [DataInter](opt-x2){$1:z_1,z_2$};
 		& 
-		&
+		& \node [DataInter](opt-x3){$1:x_1,z_2$};
 		\\
 		% third row
 		& 
 		& \node [MDA] (mda) {\MultilineComponent{1.5cm}{1, 5$\rightarrow$2:}{MDA}};
+		& \node [DataInter](mda-y2){$2:\hat{y_2}$};
 		& 
-		& 
-		& 
+		& \node [DataInter](mda-y2_2){$2:\hat{y_2}$};
 		& 
 		\\
 		% fourth row
-		\node [DataIO] (y_output) {$y^*$};
+		\node [DataIO] (y_output) {$y_1^*$};
 		& 
 		& 
-		& \node [Analysis] (A) {\MultilineComponent{1.6cm}{2:}{A}};
+		& \node [Analysis] (D_1) {\MultilineComponent{1.6cm}{2:}{$D_1$}};
+		& \node [DataInter](mda-y1){$3:y_1$};
 		& 
-		& \node [DataInter](mda-z){$2:z^t$};
-		& \node [DataInter](mda-m){$6:m$};
+		& \node [DataInter](mdadone-y1){$6:y_1$};
 		\\
 		% fifth row
-		\node [DataIO] (z_output) {$z^*$};
+		\node [DataIO] (y2_output) {$y_2^{*}$};
 		& 
 		& 
 		& 
-		& \node [Analysis] (B) {\MultilineComponent{1.6cm}{3:}{B}};
-		& \node [DataInter](mda-y){$3:y^t$};
-		& 
+		& \node [Analysis] (D_2) {\MultilineComponent{1.6cm}{3:}{$D_2$}};
+		& \node [DataInter](mda-y2){$4:y_2$};
+		& \node [DataInter](mdadone-y2){$6:y_2$};
 		\\
 		% sixth row
 		& 
-		& \node [DataInter](mda-g){$5:g1,g2$};
+		& \node [DataInter](mda-g){$5:h$};
 		& 
 		& 
-		& \node [Function] (constraints) {\MultilineComponent{1.6cm}{4:}{Const.}}; 
+		& \node [Function] (constraints) {\MultilineComponent{1.6cm}{4:}{H}}; 
 		& 
 		\\
 		% seventh row
-		& \node [DataInter](opt-f){$7:f$};
+		& \node [DataInter](opt-f){$7:f,g_1,g_2$};
 		& 
 		& 
 		& 
 		& 
-		& \node [Function] (objective) {\MultilineComponent{1.6cm}{6:}{Objective}}; 
+		& \node [Function_i] (objective) {\MultilineComponent{1.6cm}{6:}{F,$G_1$,$G_2$}}; 
 		\\
 	};
 	
@@ -85,8 +85,8 @@
 		\chainin (input_x);
 		\chainin (opt)		[join=by ProcessTip];
 		\chainin (mda)		[join=by ProcessHV];
-		\chainin (A)		[join=by ProcessHV];
-		\chainin (B)		[join=by ProcessHV];
+		\chainin (D_1)		[join=by ProcessHV];
+		\chainin (D_2)		[join=by ProcessHV];
 		\chainin (constraints)		[join=by ProcessHV];
 		\chainin (mda)		[join=by ProcessHV];
 		\chainin (objective)	[join=by ProcessHV];
@@ -98,21 +98,25 @@
 	\begin{pgfonlayer}{data}
 	% Vertical edges
 	\path (input_x) edge [DataLine] (opt-f)
-	(input_y) edge [DataLine] (A)
-	(input_z) edge [DataLine] (B)
-	(mda-z) edge [DataLine] (constraints)
-	(mda-m) edge [DataLine] (objective)
+	(input_y) edge [DataLine] (D_1)
 	(input_x) edge [DataLine] (opt)
 	(opt) edge [DataLine] (opt-x1)
 	(opt) edge [DataLine] (opt-x2)
-	(A) edge [DataLine] (mda-z)
-	(A) edge [DataLine] (mda-m)
-	(B) edge [DataLine] (mda-y)
+	(opt) edge [DataLine] (opt-x3)
+	(D_1) edge [DataLine] (mda-y1)
+	(D_1) edge [DataLine] (mdadone-y1)
+	(D_2) edge [DataLine] (mda-y2)
+	(D_2) edge [DataLine] (mdadone-y2)
+	(D_2) edge [DataLine] (opt-x2)
 	(constraints) edge [DataLine] (mda-g)
+	(constraints) edge [DataLine] (mda-y2)
+	(constraints) edge [DataLine] (mda-y2_2)
 	(mda-g) edge [DataLine] (mda)
 	(objective) edge [DataLine] (opt-f)
-	(y_output) edge [DataLine] (A)
-	(z_output) edge [DataLine] (B)
+	(objective) edge [DataLine] (opt-x3)
+
+	(y_output) edge [DataLine] (D_1)
+	(y2_output) edge [DataLine] (D_2)
 ;
 	\end{pgfonlayer}
 	

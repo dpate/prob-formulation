@@ -109,18 +109,18 @@
   We now define different types of nodes and edges with specific properties to compose graphs used to represent an MDAO problem. 
   There are three node types:  
   \begin{description}
-  \item[variable: ] represents scalar or array data
-  \item[model:] responsible for mapping inputs to outputs
-  \item[driver:] control logic capable of managing iteration
+    \item[variable:] represents scalar or array data
+    \item[model:] responsible for mapping inputs to outputs
+    \item[driver:] control logic capable of managing iteration
   \end{description}
 
   In addition to the three node types, there are two edge types: 
 
   \begin{description}
   \item[connection edge:] Exchange of information between two nodes. These edges 
-  can either be fixed (can not be removed from graph) or free (can be removed). ((this needs to be modified, as analysis blocks cannot be altered but they can be removed as a group))
-  \item [implicit edge:] Implicit passing of information from a driver node to a 
-    variable node. A single variable node can have many incomming implicit edges. These edges are 
+  can either be fixed (can not be removed from graph) or free (can be removed). 
+  \item [driven edge:] Passing of information from a driver node to a 
+    variable node. A single variable node can have many incomming driven edges. These edges are 
     free and can be added or removed from the graph. 
   \end{description}
 
@@ -129,13 +129,16 @@
   In Alexandrov and Lewis's REMS syntax only two node types were present, variable 
   and function, and only one edge type\cite{alexandrov2004}. We've chosen to rename the ``function'' node 
   type to ``model'' to be more consistent with modern MDAO frameworks. The present work 
-  adds two more node types and one more edge type to the syntax to allow descriptive
-  graphs for all three phases of the design process. 
+  adds one more node types and one more edge type to the syntax to allow descriptive
+  graphs for all three phases of the design process. In addition, we introduce the 
+  concept of fixed vs. free connection edges to represent the
+  static relationship between variable and model nodes from a single analysis, 
+  vs the flexible relationship between variables from different analyses. 
 
 \subsection{Rules for Nodes and Edges}
   \label{ss:rules}
   There are specific rules for the usage of these nodes and edges.
-  The driver node and the implicit edge are only allowed to be present in PSGs. All 
+  The driver node and the driven edge are only allowed to be present in PSGs. All 
   other node and edge types can be present in any of the three graphs, subject to these restrictions: 
   \begin{enumerate}
   \item A model node can only have one edge directed to or from another model node.
@@ -152,13 +155,12 @@
   is denoted as $\txt{deg}^-(v)$, and the \emph{outdegree} 
   is the number of connection edges directed out and it is denoted as $\txt{deg}^+(v)$.
   The degree of a given node is only a function of the connection edges 
-  attached to it. The number of implicit edges is not relevant since any number 
+  attached to it. The number of driven edges is not relevant since any number 
   of drivers could be involved, at different parts of an solution process. For 
   example in a sequential optimization where a global optimizer is first applied
   and a gradient based one is applied second, design variables would have incomming 
-  implicit edges from both optimizers but this would not affect the indegree of those
+  driven edges from both optimizers but this would not affect the indegree of those
   variable nodes. 
-  ((DP:I started to remove any reference to the edge type in these definitions but then saw that you needed it. The reason I did that was because indegree and outdegree are basic graph theory terms. What if the reference to implicit edges is handled with the upper indegree limit, i.e. after the FPG is obtained the upper indegree limit for the design variable nodes is relaxed (increased) so that it isn't a problem what is or isn't counted?))
 
   We also define the \emph{upper indegree limit} 
 
@@ -246,7 +248,6 @@ it is allowed for a single output to have outgoing connection edges to multiple
 downstream inputs. 
 
 \subsection{Design Variables}
-((DP:I'm thinking we might also need the upper indegree limit to be zero as well, because setting only the lower indegree limit makes the node a design variable if it didn't have any incoming edges. It's seems possible that in the MCG a node has incoming edges but the user wants it to be a design variable. I can make the change if you agree.))
 For the Sellar problem, there are three design variables, $x_1^*$, $z_1^*$, and $z_2^*$. In Fig. 
 \ref{f:sellar_graph_full}, these are the only three holes (nodes without out 
 incomming edges) in the graph. 
@@ -275,7 +276,7 @@ they have not violated their lower indegree limit. Regardless,
 when working with a MCG or FPG, only connection edges are allowed, so a design 
 variable in either graph will be a variable with no incomming edges edges. For a valid PSG 
 any design variable node would have at least one, but possibly multiple, incomming 
-implicit edges from one or more driver nodes. 
+driven edges from one or more driver nodes. 
 
 \subsection{Objectives, and Constraints}
 \label{ss:objectives and constraints}
@@ -380,10 +381,10 @@ highlights the objective and constraint blocks from the Sellar problem.
 
   Coupling exists in a design problem when a set of two or more analyses each depend on the
   others outputs. In the Sellar problem from Eqn \ref{eqn:simple_fpf} the two 
-  coupling constraints, $G_1$ and $G_2$ provide a reciprical dependence between 
+  coupling constraints, $H_1$ and $H_2$ provide a reciprical dependence between 
   $D_1$ and $D_2$. In a graph, these constraints show up as connection edges between 
   the outputs of each analysis block. The relevant connection edges are highlighted in 
-  Fig. \ref{f:coupling}, where they form a cycle. Cycles in a graph are the characteristic 
+  Fig. \ref{f:coupling}, where they form a cycle. Cycles of connection edges are the characteristic 
   structure that represents coupling. 
 
   \begin{figure}
