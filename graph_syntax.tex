@@ -109,8 +109,9 @@
 
 \subsection{Node and Edge Types}
   \label{ss:types}
-  We now define different types of nodes and edges with specific properties to compose graphs used to represent an MDAO problem. 
-  There are three node types:  
+  To distinguish between different kinds of nodes, we define the function 
+  $t_{\txt{node}}(v)$ which returns one of three different types of nodes: 
+
   \begin{description}
     \item[variable:] represents scalar or array data
     \begin{equation} 
@@ -130,7 +131,8 @@
   \end{description}
 
 
-  In addition to the three node types, there are two edge types: 
+  In addition we define the function $t_{\txt{edge}}(e)$ which returns one of 
+  two different types of edges: 
 
   \begin{description}
   \item[connection edge:] Exchange of information between two nodes. These edges 
