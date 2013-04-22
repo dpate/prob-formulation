@@ -187,12 +187,13 @@ the FPG is obtained from the MCG by removing nodes and edges,
 
 \section{Graph Representation of MDAO Constructs}
 \label{s:graph representation}
-In this section we will make use of the Sellar problem, described in 
-Eqn. \ref{eqn:simple_fpf}. The graph representation of the Sellar problem, 
-using the new stynax, is presented in Fig. \ref{f:sellar_graph_full}. Throughout
-the rest of this section, different sub-graphs or slight modifications of 
-the full graph will be used to demonstrate the important MDAO constructs within
-this graph syntax.
+In this section we present our graph syntax applied to the description of MDAO 
+Problems. We make use of the Sellar problem, described in 
+Eqn. \ref{eqn:simple_fpf} as an example to illustrate the implementation of the syntax. 
+The graph representation of the Sellar problem, using the new stynax, is 
+presented in Fig. \ref{f:sellar_graph_full}. In this section sub-graphs or 
+slight modifications of the full graph will be used to demonstrate the 
+important MDAO constructs described by this graph syntax.
 
 \begin{figure}[htb!]
     \begin{center}
@@ -205,21 +206,24 @@ this graph syntax.
 
 \subsection{Analysis Blocks and Connections}
 \label{ss:analysis blocks and connections}
-Analysis tools take in a number input variables and then perform some work to calculate 
-the values for their respective outputs. In an MDAO graph, this process is 
-represented by a group of nodes and edges called an \emph{analysis block}, 
-shown in Fig. \ref{f:analysis block}. Within an analysis block each variable 
+Analysis tools take in a number input variables and then calculate 
+the values for their respective outputs. We represent this process
+by a group of nodes and edges called an \emph{analysis block}, 
+shown in Fig. \ref{f:analysis block}. Within an analysis block, each variable 
 node represents a single input or output and is connected 
 to a single model node via a fixed edge. Note that in Fig.~\ref{f:analysis block}, 
-the analysis block contains two model nodes, with a single edge connecting them. 
+the analysis block includes two model nodes, with a single edge connecting them. 
 This edge represents the necessary calculations to map given inputs 
-to proper output values. If constructing a weighted graph, the weight calculation edge 
-provides the opportunity to computational cost. However, it is also allowed to 
-skip this edge and have both incomming and outgoing edges to variables through a 
-single model node for a given analysis block. Although analysis blocks are 
-comprised of multiple nodes and edges, since all the edges within them are 
-fixed, they become fixed sub-graphs within a graph. In this way, they cannot be 
-altered but they can be removed as a group.
+to the outputs of the anlysis. This calculation edge provides the opportunity 
+to encode computational cost or other characteristics of the analysis code as 
+a weight in a weighted graph formulation. If associating a weight is 
+unnecessary, the calculation edge may be omitted and all input and output 
+variables can be connected to a single model node for a given analysis block. 
+Since all the edges within analysis blocks are fixed, the blocks themselves are 
+fixed sub-graphs within the overall MDAO problem graph. The connectivity of 
+nodes and edges in an analysis block cannot be altered for the purposes of MDAO 
+problem formulation; however, analysis block sub-graphs can be added or removed 
+from the MDAO problem graph as needed.
 
 \begin{figure}[htb!]
     \begin{center}
@@ -232,76 +236,87 @@ altered but they can be removed as a group.
 
 Variable nodes in an analysis block can be distinguished as either an input or 
 an output by the manner in which they are connected. As shown in Fig.~\ref{f:analysis block}, 
-inputs are any variable nodes that have an outgoing edge into a model 
-node. Conversely, outputs are any variable nodes that have an incoming edge from a model node. 
+inputs are represented as variable nodes that have an outgoing edge into a model 
+node. Conversely, outputs represented as any variable nodes that have an incoming 
+edge from a model node. 
 
 MDAO problems require that information be passed between sets of analyses. When 
-information from the output of one analysis block is passed, or connected, to the 
-input of another analysis block, a new connection edge is added connecting the two 
-variable nodes involved in the exchange. These connection edges are free, unlike the edges 
-within an analysis block, can be added or removed depending on the needs
+information from one output of an analysis block is passed, or connected, to an 
+input of another analysis block, a new connection edge is added between the two 
+variable nodes involved in the exchange. These connection edges are free, and unlike the edges 
+within an analysis block, the edges can be added or removed depending on the needs
 of a given design problem. In other words, free connection edges are created by 
-engineers linking the output of one tool to the input of another one. Note that 
-it is allowed for a single output to have outgoing connection edges to multiple 
+engineers linking an output of one tool to an input of another one. It is 
+allowable for a single output to have outgoing connection edges to multiple 
 downstream inputs. 
 
 \subsection{Design Variables}
-For the Sellar problem, there are three design variables, $x_1^*$, $z_1^*$, and $z_2^*$. In Fig. 
-\ref{f:sellar_graph_full}, these are the only three holes (nodes without out 
-incomming edges) in the graph. 
+Design variables are the input variables that are free to be 
+changed by the designer or by an optimizer in an MDAO study. In a graph design
+variables will be a set of variable nodes, $V_{dv}$, identified as follows: 
+
+\begin{equation}
+  V_{dv} = \{V \st \txt{deg}_l^-(v)=0\}
+\end{equation}
+
+For the Sellar problem, there are three design variables: $x_1^*$, $z_1^*$, and 
+$z_2^*$. In Fig. \ref{f:designvars} all variable from the Sellar problem are 
+annotated with their lower indegree limit and the three design variables are identified 
+in bold. 
 
 \begin{figure}[htb!]
   \begin{center}
-  [NOTE: Re-work this one to match $D_2$ from Sellar]
+    [Graph Here....]
     \includegraphics[width=.6\textwidth]{images/design_vars_graph}
   \end{center}
-  \caption{Notional graph with two potential design variables \label{f:designvars}}
+  \caption{Sellar problem graph with lower indegree limits for all variables \label{f:designvars}}
 \end{figure}
 
-More formally stated, given a MCG with the $\txt{deg}_l^-(v)=1$ for all nodes, 
-there will likely be a set of holes preventing a valid FPG from being obtained. 
-Each hole represents a node that could potentially become a design variable. 
-It is up to the designer to examine each and decide if it is appropriate to 
-consider it a design variable, in which case the designer shall set the lower 
-indegree limit to be zero. However, some variable holes may not actually be 
-suitable as a design variable. For instance, if an aircraft mission analysis 
-code requires a drag input which ends up being a hole then it's likely best to 
-leave$\txt{deg}_l^-(v)=1$ and find a new analysis code to fill the hole in graph. 
+In Fig. \ref{f:designvars}, none of the design variable nodes have any incomming 
+edges. In general, in a MCG or a FPG, design variables will 
+show up as nodes without any incomming edges. For a valid PSG, design variables 
+could have one or more incomming driven edges representing a value determined by 
+a optimizer. 
 
-So a design variable is defined as any variable node with $\txt{deg}_l^-(v)=0$. 
-This, by definition, means that design variables are not holes in the graph, since 
-they have not violated their lower indegree limit. Regardless, 
-when working with a MCG or FPG, only connection edges are allowed, so a design 
-variable in either graph will be a variable with no incomming edges edges. For a valid PSG 
-any design variable node would have at least one, but possibly multiple, incomming 
-driven edges from one or more driver nodes. 
+Note the although there are no incomming edges, design variables are not holes 
+in the graph as defined by Eq. \ref{e:hole}. Since they have $\txt{deg}_l^-(v)=0$ 
+having no incomming connection edges does not violate their lower indegree limit. 
+However, the concept of holes can be useful for identifying potential design variables
+given an arbitrary MCG. If you first set $\txt{deg}_l^-(v)=1$ for all variable nodes, 
+and then find the resulint holes, you will have a list of variable nodes that 
+could potentially be design variables. Some variables will be true design variables, 
+while others might represent missing information in the problem formulation. For 
+instance, if there is a hole for a drag input of an aircraft mission analysis code 
+then this is not likely a good choice for a design variable. So it is up to the designer to 
+examine each hole and decide if it's an appropriate design variable. If 
+the variable should become a design variable then set $\txt{deg}_l^-(v)=0$. 
+If a variable should not be a design variable, then leave it as a hole which 
+needs to be addressed in a manner discussed in section \ref{ss:obtaining FPG}.
+ 
 
-\subsection{Objectives, and Constraints}
+\subsection{Objectives and Constraints}
 \label{ss:objectives and constraints}
-Like design variables, objectives and constraints are also constructs that need 
-to be identified when setting up a given design problem. In the case of 
-objective functions single output values could be selected, but commonly multiple 
-values are assembeled together via simple algebraic expressions to form a composite 
-objective function. (e.g. The objective function from Eqn. \ref{eqn:simple_fpf} is
-$x_1^2+z_2+y_1+e^{-y_2}$). Constraints are always given in the 
-form of either an inequality or an equality. (e.g. a constraint from Eqn. 
-\ref{eqn:simple_fpf} is $\frac{y_1}{3.16}-1\geq0$.) By convention, 
-constraints are usually given such that some expression will be less than or equal 
-to zero, so any positive value would violate the constraint. For both objective 
-and constraints, these simple expressions take some inputs and map them to an
-output value of significance to the overall design problem. 
+Objectives and constraints are constructs that need to be identified when 
+describing and MDAO problem. In the case of objective functions a single output 
+value generated by an analysis block could be selected, but commonly multiple 
+values are assembeled together to form a composite objective function. 
+Generally both objective and constraint functions accept a set of inputs and map 
+them to an output value of significance to the overall design problem. 
 
-These operations, though very simple, are effectively the same kind of task 
-performed by an analysis block. A constraint or objective function can therfore 
-be represented as another analysis block on the graph, with it's own input and 
+The operations of implementing composite objective and constraint functions, 
+although typically simple, are effectively the identical to the task performed by an 
+analysis block. A composit constraint or objective function can therfore 
+be represented as an additional analysis block within the graph, with its own input and 
 output variable nodes. Although fundamentally no different than an analysis block, 
-for clarity and convience it is useful to distinguish between regular analysis 
-blocks and those that arise from the addition of objectives or constraints to 
-the graph. Therefore, we define an \emph{expression block}, as the collection of variable and model 
-nodes related to a given objective or constraint function. Fig. \ref{f:obj-cons}
-highlights the objective and constraint blocks from the Sellar problem. 
-
-
+for clarity and convience, it is useful to distinguish between analysis 
+blocks corresponding to analysis codes and those that arise from the addition of 
+objectives or constraints to the graph. Therefore, we define an 
+\emph{expression block}, as the collection of variable and model nodes related 
+to a given objective or constraint function. Fig. \ref{f:obj-cons} highlights 
+the objective and constraint blocks from the Sellar problem. If the relevant 
+objective and constraint values are direct results from other analysis blocks 
+and composite functions are not needed, then expression blocks may be omitted 
+from the MDAO problem graph.
 
 \begin{figure}[htb!]
   \begin{center}
@@ -310,43 +325,71 @@ highlights the objective and constraint blocks from the Sellar problem.
   \caption{Notional graph with and objective and constraint nodes \label{f:obj-cons}}
 \end{figure}
 
-
 \subsection{Local vs Global Nodes}
 
-  A simple definition of a global node is any node that involves information 
-  from more than one analysis block. Likewise, a local node is any node 
-  that involves information from only a single analysis block. As stated before, variable 
-  nodes with fixed edges directed to model nodes (as part of an analysis block) are inherently local 
-  and similarly model nodes are also local. Global variables are a part of many 
-  MDAO problems and must be representable in the graph. Follwoing our simple definition
-  any variable node that had multiple incomming or outgoing edges, would be global. 
-  In Fig. \ref{f:sellar_graph_full} the variable nodes for $x_1^*$, $z_1^*$, and $z_2^*$ 
-  have multiple outgoing edges and would be considered global. 
+  The set of local nodes, $V_l$, is the collection of 
+  nodes with exactly one outgoing connection edge. 
+
+  \begin{equation}
+    V_{l} = \{V \st \txt{deg}^+(v)=1\}
+    \label{e:local_definition}
+  \end{equation}
+
+  In section \ref{s:specific vs fundamental} variable nodes that are part of 
+  an analysis block are inherently local and similarly model nodes 
+  are also local. Following the definition in Eq. \ref{e:local_definition}
+  we can now see why. Variable nodes connected to model nodes are only allowed to 
+  have one outgoing edge, and hence will always by definition be local variables. 
+
+  The set of global nodes, $V_g$, is the collection of all nodes with more than 
+  one outgoing connection edge. 
+
+  \begin{equation}
+    V_{g} = \{V \st \txt{deg}^+(v)>1\}
+    \label{e:global_definition}
+  \end{equation}
+
+  Follwoing our definition any variable node that had multiple 
+  outgoing edges, is global. In Fig. \ref{f:sellar_graph_full} 
+  the variable nodes for $x_1^*$, $z_1^*$, and $z_2^*$ have multiple outgoing 
+  edges and would be considered global. 
 
   Note that the variable $x_1$ from the Sellar problem is usually refered to as 
   a local variable, which is contradicted by the given graph. This discrepancy 
   arises from the explicit treatment of objectives and constraints as separate 
-  expression blocks. Normally in the Sellar problem $x_1$ is considered a local 
-  variable because it only directly affects analysis block $D_1$. By forcing
-  the expansion of $F$ into an expression block with its own inputs, then $F$ 
-  gets it's own copy of the $x_1$ variable. This necessitates the creation 
-  of the global $x_1^*$ node in the graph with two outgoing edges to link the 
-  two $x_1$ inputs nodes in the different blocks. Interestingly, using this 
-  definition, where $x_1^*$ is a global variable fits nicely within 
-  the structure of Braun's Colaborative Optimization (CO) archtiecture \cite{braun1996thesis}. 
-  The rules of setting up a problem with CO require that each discipline be 
-  given an independent local copy of all global variables. All local 
-  variables are retained uniquely within their respective disciplines, except 
-  when a local design variable shows up explicitely in the objective 
-  or global constraint. In that case a global variable is created, and the discipline again 
-  gets an independent local copy of it. Given our definition of global vs local
-  variable nodes, no such exception for local variables in global expressions is 
-  necessary. When you include a given variable in an expression block, it becomes 
-  global by definition and should be treated as such in CO. 
+  expression blocks. Normally in the Sellar problem, $x_1$ is considered a local 
+  variable because it directly affects only analysis block $D_1$. By expanding
+  $F$ into an expression block with its own inputs, then $F$ is assigned its own local 
+  copy of the $x_1$ variable. This formulation necessitates the creation of the global $x_1^*$ 
+  node in the graph with two outgoing edges to link the two $x_1$ inputs nodes 
+  in the different blocks. Interestingly, the classification of $x_1^*$ 
+  as a global variable fits nicely within the structure of the Colaborative 
+  Optimization (CO) archtiecture \cite{braun1996thesis}. The rules for setting up 
+  a problem with CO require that each discipline be given an independent local 
+  copy of all global variables. All local variables are retained uniquely 
+  within their respective disciplines, except when a local design variable appears 
+  explicitely in the objective or global constraint. In that case a global 
+  variable is created, and the analysis block again is again assigned an 
+  independent local copy of it. Given our definition of global vs local variable 
+  nodes, no such exception for local variables in global expressions is 
+  necessary. Whenever a given variable is included in an expression block, 
+  it forces the creation of a global variable node in the graph which will 
+  result in the correct structure for CO automatically. 
 
-  Analysis and expression blocks can also have a locality defined for the set of 
-  nodes and edges within the block. Their locality is determined by the 
-  incomming and outgoing edges from the block as a whole. Fig. 
+  Analysis and expression blocks can themselves be local or global, but the 
+  criteria for determining this is slightly different than for variable nodes. 
+  In this case, you consider the set of connection edges for the block
+  (e.g. from all the variable nodes within the block) as a set. Additionally, 
+  you must consider both incoming and outgoing edges, where for variables 
+  only outgoing connection edges were relevant. 
+
+  A local analysis block is defined as a block with incomming edges from 
+  exactly one other analysis block and outgoing edges from exactly one other analysis 
+  block. 
+
+  A global analysis block is defined as 
+
+  Fig. 
   \ref{f:sellar_graph_full} has expression blocks for each constraint, 
   $G_1$ and $G_2$. Both constraints are local to their respective analysis 
   blocks. But the expression block for $F$ has incomming edges from $D_1$ and 
