@@ -189,7 +189,7 @@ the FPG is obtained from the MCG by removing nodes and edges,
 \label{s:graph representation}
 In this section we present our graph syntax applied to the description of MDAO 
 Problems. We make use of the Sellar problem, described in 
-Eqn. \ref{eqn:simple_fpf} as an example to illustrate the implementation of the syntax. 
+Eq. \ref{eqn:simple_fpf} as an example to illustrate the implementation of the syntax. 
 The graph representation of the Sellar problem, using the new stynax, is 
 presented in Fig. \ref{f:sellar_graph_full}. In this section sub-graphs or 
 slight modifications of the full graph will be used to demonstrate the 
@@ -354,7 +354,7 @@ from the MDAO problem graph.
   the variable nodes for $x_1^*$, $z_1^*$, and $z_2^*$ have multiple outgoing 
   edges and would be considered global. 
 
-  Note that the variable $x_1$ from the Sellar problem is usually refered to as 
+  The variable $x_1$ from the Sellar problem is usually refered to as 
   a local variable, which is contradicted by the given graph. This discrepancy 
   arises from the explicit treatment of objectives and constraints as separate 
   expression blocks. Normally in the Sellar problem, $x_1$ is considered a local 
@@ -383,50 +383,51 @@ from the MDAO problem graph.
   you must consider both incoming and outgoing edges, where for variables 
   only outgoing connection edges were relevant. 
 
-  A local analysis block is defined as a block with incomming edges from 
-  exactly one other analysis block and outgoing edges from exactly one other analysis 
-  block. 
+  A local analysis block is 
+  defined as a block with incomming edges from exactly one other analysis 
+  block and outgoing edges from exactly one other analysis block. A global 
+  analysis block is defined as a block with incomming edges or outgoing edges 
+  to more than one analysis block. 
 
-  A global analysis block is defined as 
+  [[MATH HERE]]
 
-  Fig. 
-  \ref{f:sellar_graph_full} has expression blocks for each constraint, 
+  Looking at the Sellar problem in 
+  Fig. \ref{f:sellar_graph_full} we see the expression blocks for each constraint, 
   $G_1$ and $G_2$. Both constraints are local to their respective analysis 
   blocks. But the expression block for $F$ has incomming edges from $D_1$ and 
   $D_2$, so it would considered global. 
 
-  Simply stating that any node or block with incomming or outgoing edges
-  from more than one other node or block is global works glosses over a more 
-  subtle aspect of some MDAO problems. The locality of any node in a graph is 
+  Catagorizing any node or analysis block block with incomming or outgoing edges
+  from more than one source as global neglects a more 
+  subtle aspect of some MDAO problems. Namley the locality of any node in a graph is 
   a relative property. For instance, a single node might have outgoing edges 
-  to two separate analysis blocks, $A$ and $B$, but none to a third, $C$. Then 
-  you could say that this node was global with respect to $A$ and $B$ separately, but local 
-  to the group $A,B$. This situation produces a natural 
-  hierarchy in a graph, where you could form increasingly smaller groups as you 
-  segment problem into finer localities. 
+  to two separate analysis blocks, $A$ and $B$, but none to a third, $C$. This 
+  node was global with respect to $A$ and $B$ separately, but local 
+  to the group $A,B$. This situation produces a natural hierarchy in a graph, 
+  from which one could form ever smaller groups as the problem is segmented into 
+  finer localities. 
 
-  When solving a problem using a heirarchical decomposition approach, 
-  there are various techniques for partitioning that are effective in different 
-  scenarios \cite{krishnamachari1997optimal,michelena1997hypergraph,sobieszczanski1997,Perez2004,allison2009optimal}. 
-  Tosserams et al proposed a language based syntax for describing the partitioning of problems, named $\Psi$
-  \cite{tosserams2010specification}. $\Psi$ provides an opposing perspective to 
-  this work, where they compose hierarchies from the bottom up, into larger and 
-  larger groups. However, $\Psi$ provides a compiler that can produce a standard 
-  problem representation of the assembled problem, and a number of example converters
-  from that standard representation to application specific formats. 
-
-  [[Could probably build this and include it in appendix]] 
-
+  When solving a problem using a hierarchical decomposition approach, 
+  there are various techniques for partitioning a problem into hierarchical 
+  localities that are effective in different scenarios \cite{krishnamachari1997optimal,michelena1997hypergraph,sobieszczanski1997,Perez2004,allison2009optimal}. 
+  Tosserams \textit{et al.} proposed a language based-syntax for describing the 
+  partitioning of problems, named $\Psi$\cite{tosserams2010specification}. 
+  $\Psi$ provides an opposing perspective to this work, where they compose 
+  hierarchies from the bottom up, into larger and larger groups. However, 
+  $\Psi$ provides a compiler that can produce a standard problem representation 
+  of the assembled problem and a number of example converters from that 
+  standard representation to application specific formats. 
 
 \subsection{Coupling Between Analyses}
 
   Coupling exists in a design problem when a set of two or more analyses each depend on the
-  others outputs. In the Sellar problem from Eqn \ref{eqn:simple_fpf} the two 
-  coupling constraints, $H_1$ and $H_2$ provide a reciprical dependence between 
-  $D_1$ and $D_2$. In a graph, these constraints show up as connection edges between 
+  other's outputs. In the Sellar problem from Eqn \ref{eqn:simple_fpf} the two 
+  coupling constraints, $H_1$ and $H_2$, provide a reciprical dependence between 
+  $D_1$ and $D_2$. In a graph, these constraints appear as connection edges between 
   the outputs of each analysis block. The relevant connection edges are highlighted in 
-  Fig. \ref{f:coupling}, where they form a cycle. Cycles of connection edges are the characteristic 
-  structure that represents coupling. 
+  Fig. \ref{f:coupling}, where they form a closed path between two analysis blocks,
+  called a cycle. Cycles of connection edges are the characteristic structure that 
+  represents coupling. 
 
   \begin{figure}
       \begin{center}
@@ -436,82 +437,75 @@ from the MDAO problem graph.
       \end{center}
   \end{figure}
 
-  It is important to note that the coupling cycles do not contain 
-  any driver nodes. Solver, optimizer, or other iterative process is 
-  invovled in the coupling definition--though one will be necessary for a valid 
-  PSG. Additionally, a coupling cycle has no inherant start or end. It would be
-  valid to pick any node in the cycle as a starting point, and proceed around the
-  loop untill you get back to your starting point. For the Sellar Problem, picking 
-  $D_1$ as the starting point would yeild a problem as given in 
-  Eqn.~\ref{eqn:simple}, while picking $D_2$ would yield the problem as given in 
-  Eqn.~\ref{eqn:simple2}.
+  Coupling cycles do not contain driver nodes in the MCG of FPG representation. 
+  Solvers, optimizers, and other iterative processes are not invovled in the coupling 
+  definition--though one will be necessary to build a valid PSG from a given FPG. 
+  Additionally, a coupling cycle has no inherent start or end. It would be acceptable to select
+  node in the cycle as a starting point and proceed around the
+  loop until you get back to the starting point. For the Sellar Problem, selecting 
+  $D_1$ as the starting point would yield a problem as given in 
+  Eq.~\ref{eqn:simple}, whereas selecting $D_2$ would yield the problem as given in 
+  Eq.~\ref{eqn:simple2}.
 
   Larger problems can contain more complex cycles in their FPG, indicating more 
-  complex coupling between analyses. A cycle can contain more than 
-  just two analysis blocks. Multiple independent cycles can exist, indicating 
-  independent coupling relationships. Cycles can also overlap, where the same analysis 
+  complex coupling between analyses. For example A cycle can involve more than 
+  just two analysis blocks. Multiple independent cycles could also exist, indicating 
+  independent coupling relationships. Cycles can also overlap, meaning that the same analysis 
   blocks are involved in multiple different coupling cycles. All of these situations
   arise naturally as the size of problems grows, and managing this coupling may
   become difficult. In the present work, Sec.~\ref{s:example problem}.\ref{ss:obtaining an FPG} 
-  will demonstrate how building an FPG from an MCG provides an opportunity to 
+  demonstrates how building an FPG from an MCG provides an opportunity to 
   identify and potentailly reduce the number of cycles in a graph. 
 
-  If large amounts of coupling are present it can help convergence 
-  rates to look for an effective ordering for the execution of analyses.
+  If many couplings are present, convergence rates can be improved by 
+  searching for an effective ordering for the execution of analyses.
   Rogers' DEMAID tool uses a genetic algorithm to find an ordering that minimizes 
   the overall coupling of the system by separating independent cycles in the 
-  graph \cite{rogers1996,rogers1996demaid}. Rodgers work focused on the matrix 
-  form of the DSM for ordering optimization. Lu and Martins more recent work 
-  worked with a weighted form of the DSM and used an iterative clustering approach 
-  to perform a similar task to DEMAID \cite{Lu2012}. 
-
-  However, when using a graph representation, the ordering problem can be greatly 
-  simplified. For any given coupling cycle, a Gauss-Seidel iteration pattern 
-  is automatically given simply folowing the cycle around the graph. If only 
-  once cycle is present, then the task reduces down to selecting a starting point
-  in the cycle. When sub-cycles are present each sub-cycle ordering is also 
-  given automatically by following the graph, but now a there is freedom at which 
-  level to manage the iteration over the cycles. Ordering of many cycles and 
-  sub-cycles is still a challenge, but the total search space is reduced by 
-  always following the ordering from the graph from a selected starting node. 
+  graph \cite{rogers1996,rogers1996demaid}. Rogers work focused on the matrix 
+  form of the DSM for ordering optimization. Lu and Martins more recently leveraged 
+  a weighted form of the DSM and used an iterative clustering approach to perform a 
+  similar task to DEMAID \cite{Lu2012}. 
 
 \subsection{Multi--fidelity Problems}
   \label{ss:multi-fideliy problems}
   A multi--fidelity problem can be characterized by two or more different analyses 
-  each calculating the same data. Mapping this type of multi--fidelity situation 
-  onto a graph will yield two analysis blocks, each with their own output 
-  variable nodes, having outgoing edges to a single variable in a third analysis 
-  block that needs the data as input. Figure \ref{f:collision_example} shows 
-  a modified version of the Sellar problem with a new analysis, $D_0$, representing a 
-  low fidelity version of $D_1$. 
+  each calculating the same data. Representing this type of multi--fidelity 
+  construct in a graph will yield two analysis blocks, each with its own output 
+  variable nodes, having outgoing edges that connect to a single variable in a 
+  third analysis block that needs the data as input. So the set of all multi-fidelity
+  variables, $V_{mf}$, is given as: 
+
+  \begin{equation}
+    V_{mf} = \{ V \st \txt{deg}^-(v)>1 \} \cup \{ V \st \txt{deg}^-_u(v)>=\txt{deg}^-(v) \}
+  \end{equation}
+
+  In a multi-fidelity problem, a given variable node may have multiple incomming 
+  edges without causing a collision as defined by by Eq.~\ref{e:collision}. 
+  Fig.~\ref{f:collision_example} shows a modified version of the Sellar problem 
+  with a new analysis, $D_0$, representing a low fidelity version of $D_1$. 
+  In this modified graph, the annotations indicate the upper indegree limit. For 
+  $D_2$, $\txt{deg}^-_u(D_2.y_1) = 2$ which avoids a collsion. A  
+  $\txt{deg}^-_u(v) > 1$ for any variable in a graph represents a decision to 
+  allow multiple fidelities to interact at that part of the graph in order to alieviate
+  a conflict. In section \ref{ss:obtaining FPG} we present an algorithm for finding 
+  conflicts within a given MCG so that a designer can make the necessary decisisons about each 
+  one in turn. 
 
   \begin{figure}
     \begin{center}
       %\includegraphics[height=.25\textheight]{}
     [INSERT GRAPH HERE]
-    \caption{Graph of a notional multi-fidelity problem \label{f:collision_example}}
+    \caption{Graph of the modified Sellar, multi--fidelity problem with $\txt{deg}^-_u(v)$ annotations on variable nodes\label{f:collision_example}}
   \end{center}
   \end{figure}
 
-  When an input variable node has more than one incoming edge, designers must make
-  some kind of decision about how to manage the flow of information in their problem. 
-  In Eqn.~\ref{e:collision} we defined a collision as the situation where
-  there are more incoming connection edges than the upper indegree limit. So desginers can
-  indicate how to handle conflicting edges in a problem graph by setting the upper indegree limit
-  for a given node. In more concrete terms, setting this limit equates to defining 
-  the part of the graph in question as single or multi--fidelity. 
-
-  When $\txt{deg}_u^-(y)=1$, then any conflicting edges in the graph will cause a collision
-  and a choice between the colliding analysis blocks must be made. This results in a 
-  single fidelity design problem. On the other hand if $\txt{deg}_u^-(y)=2$, then two 
-  different analysis blocks can co-exist with a given graph without causing a 
-  collision. The design problem is then a multi-fidelity problem.
-
-  Multi-fidelity problems are always charaterized by graphs with variable 
-  nodes that have an upper-degree-limit greater than one. These problems require 
+  Multi--fidelity problems are always charaterized by graphs with variable 
+  nodes that have an $\txt{deg}^-_u(v) > 1$. These problems require 
   special techniques for resolving the confliciting edges by introducing some mechanism
   to manage when each of the different fidelity analyses are 
   run\cite{march2012provably,alexandrov2001approximation,Huang_Allen_Notz_Miller_2006}.
-
+  The specifics of this mechanism are not given in any form withing an MCG or 
+  FPG. Instead the multi-fidelity mechanism specifics would be represented as a 
+  driver in a PSG derived from any given multi-fidelity FPG. 
 
 
