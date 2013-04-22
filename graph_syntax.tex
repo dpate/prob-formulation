@@ -14,13 +14,16 @@
     \item Multi-fidelity analyses
   \end{itemize}
 
-The new syntax is intended to represent three phases of the design problem formulation process. 
-In the initial problem definition
-  phase, the specific analysis tools and design goals are identified. Next, 
-  a single formal problem formulation is identified that specifies design variables, constraints, objectives, 
-  analysis tools, and all other elements required to represent the overall MDAO problem. 
-Lastly, a specific procedure for solving the problem is selected, e.g. selecting an MDAO optimization architecture. Using the proposed graph syntax, these phases 
-  can be represented with the following three graphs:
+  The new syntax is intended to represent three phases of the design problem 
+  formulation process. In the initial problem definition phase, the specific 
+  analysis tools and design goals are identified. Next, a single formal problem 
+  formulation is identified that specifies design variables, constraints, 
+  objectives, analysis tools, and all other elements required to represent 
+  the overall MDAO problem. Lastly, a specific procedure for solving the problem 
+  is selected, e.g. selecting an MDAO optimization architecture. Using 
+  the proposed graph syntax, these phases can be represented with the following 
+  three graphs:
+
   \begin{itemize}
     \item Maximal Connectivity Graph (MCG)
     \item Fundamental Problem Graph (FPG)
@@ -42,7 +45,7 @@ Lastly, a specific procedure for solving the problem is selected, e.g. selecting
   until only one is remaining. Then, from a single FPG, different PSGs may be obtained by implementing 
   different solution strategies. If you consider the size of a graph to be the sum of all of its
   edges and nodes then the hourglass shape in Fig. \ref{f:hourglass} illustrates how
-the FPG is obtained from the MCG by removing nodes and edges, 
+  the FPG is obtained from the MCG by removing nodes and edges, 
   and the PSG is obtained from the FPG by adding nodes and edges.
 
   \begin{figure}[htb!]
@@ -87,8 +90,10 @@ the FPG is obtained from the MCG by removing nodes and edges,
   E & = & \big\{(2,1),(3,2),(1,3),(3,4)\big\}.
   \end{IEEEeqnarray*}
 
-  A \emph{path} $P=(V,E)$ from $x_0$ to $x_k$ in graph $G$ is a subgraph of $G$ with $V = \{x_0,x_1,\ldots,x_k\}$ and $E = \{(x_0,x_1),(x_1,x_2),\ldots,(x_{k-1},x_k)\}$.
-  A \emph{reverse path} $P_R$ in graph $G$ is a path on $R$, where $R$ is the reverse graph of $G$ obtained by switching the orientation of every edge.
+  A \emph{path} $P=(V,E)$ from $x_0$ to $x_k$ in graph $G$ is a subgraph of $G$ 
+  with $V = \{x_0,x_1,\ldots,x_k\}$ and $E = \{(x_0,x_1),(x_1,x_2),\ldots,(x_{k-1},x_k)\}$.
+  A \emph{reverse path} $P_R$ in graph $G$ is a path on $R$, where $R$ is the 
+  reverse graph of $G$ obtained by switching the orientation of every edge.
 
 
   %does this belong in the analysis block section???? 
@@ -108,25 +113,46 @@ the FPG is obtained from the MCG by removing nodes and edges,
   There are three node types:  
   \begin{description}
     \item[variable:] represents scalar or array data
+    \begin{equation} 
+      V_{\txt{var}} = \{v \st t_{\txt{node}}(v) = \txt{`variable'}\}
+    \end{equation}
+
     \item[model:] responsible for mapping inputs to outputs
+    \begin{equation} 
+      V_{\txt{model}} = \{v \st t_{\txt{node}}(v) = \txt{`model'}\}
+    \end{equation}
+
     \item[driver:] control logic capable of managing iteration
+    \begin{equation} 
+      V_{\txt{driver}} = \{v \st t_{\txt{node}}(v) = \txt{`driver'}\}
+    \end{equation}
+
   \end{description}
+
 
   In addition to the three node types, there are two edge types: 
 
   \begin{description}
   \item[connection edge:] Exchange of information between two nodes. These edges 
   can either be fixed (cannot be removed from graph) or free (can be removed). 
+    \begin{equation} 
+      E_{\txt{conn}} = \{e \st t_{\txt{edge}}(e) = \txt{`connection'}\}
+    \end{equation}
   \item [driven edge:] Passing of information from a driver node to a 
     variable node. A single variable node can have many incomming driven edges. These edges are 
-    free and can be added or removed from the graph. 
+    free and can be added or removed from the graph.
+     \begin{equation} 
+       E_{\txt{driven}} = \{e \st t_{\txt{edge}}(e) = \txt{`driven'}\}
+     \end{equation} 
   \end{description}
 
   [[Insert legend for node and edge types]]
 
-  In Alexandrov and Lewis's REMS syntax only two node types (variable and function) and one edge type are included \cite{alexandrov2004}. 
- We have chosen to adopt the terminology ``model'' node instead of ``function'' node to be consistent with modern MDAO framework terminonlogy. The present work 
-  adds one additional node types and one additional edge type to the syntax to allow descriptive
+  In Alexandrov and Lewis's REMS syntax only two node types (variable and function) 
+  and one edge type are included \cite{alexandrov2004}. We have chosen to adopt 
+  the terminology ``model'' node instead of ``function'' node to be consistent 
+  with modern MDAO framework terminonlogy. The present work adds one additional 
+  node types and one additional edge type to the syntax to allow descriptive
   graphs for all three phases of the design problem formulation process. In addition, we introduce the 
   concept of fixed vs. free connection edges to represent the
   static relationship between variable and model nodes from a single analysis, 
@@ -136,7 +162,8 @@ the FPG is obtained from the MCG by removing nodes and edges,
   \label{ss:rules}
   A rule set is provided for the usage of these nodes and edges.
   The driver node and the driven edge are allowed to be present only in PSGs.
-  Other node and edge types can be present in any of the three graph types, subject to the following restrictions: 
+  Other node and edge types can be present in any of the three graph types, 
+  subject to the following restrictions: 
   \begin{enumerate}
   \item A model node may have only one edge directed to or from another model node.
   \item A model node may have only fixed connection edges directed in or out.
@@ -209,15 +236,25 @@ important MDAO constructs described by this graph syntax.
 Analysis tools take in a number input variables and then calculate 
 the values for their respective outputs. We represent this process
 by a group of nodes and edges called an \emph{analysis block}, 
-shown in Fig. \ref{f:analysis block}. Within an analysis block, each variable 
-node represents a single input or output and is connected 
-to a single model node via a fixed edge. Note that in Fig.~\ref{f:analysis block}, 
-the analysis block includes two model nodes, with a single edge connecting them. 
-This edge represents the necessary calculations to map given inputs 
-to the outputs of the anlysis. This calculation edge provides the opportunity 
+shown in Fig. \ref{f:analysis block}. Each analysis block is 
+denoted by: 
+
+\begin{equation}
+  A_i=(V_{A_i},E_{A_i}),\ for\ i\in I, 
+\end{equation}
+
+Where $m$ is the number of analysis tools represented in the graph 
+and $I=\{1,2,\ldots,m\}$.
+
+
+Within a given analysis block, variable node represents a single input or 
+output and is connected to a single model node via a fixed connection edge. Note that 
+in Fig.~\ref{f:analysis block}, the analysis block includes two model nodes, 
+with a single edge connecting them. This edge represents the necessary 
+calculations to map given inputs to the outputs of the anlysis. This calculation edge provides the opportunity 
 to encode computational cost or other characteristics of the analysis code as 
 a weight in a weighted graph formulation. If associating a weight is 
-unnecessary, the calculation edge may be omitted and all input and output 
+unnecessary, the calculation edge and second model node may be omitted and all input and output 
 variables can be connected to a single model node for a given analysis block. 
 Since all the edges within analysis blocks are fixed, the blocks themselves are 
 fixed sub-graphs within the overall MDAO problem graph. The connectivity of 
@@ -256,7 +293,7 @@ changed by the designer or by an optimizer in an MDAO study. In a graph design
 variables will be a set of variable nodes, $V_{dv}$, identified as follows: 
 
 \begin{equation}
-  V_{dv} = \{V \st \txt{deg}_l^-(v)=0\}
+  V_{\txt{dv}} = \{V_{\txt{var}} \st \txt{deg}_l^-(v)=0\}
 \end{equation}
 
 For the Sellar problem, there are three design variables: $x_1^*$, $z_1^*$, and 
@@ -310,13 +347,20 @@ be represented as an additional analysis block within the graph, with its own in
 output variable nodes. Although fundamentally no different than an analysis block, 
 for clarity and convience, it is useful to distinguish between analysis 
 blocks corresponding to analysis codes and those that arise from the addition of 
-objectives or constraints to the graph. Therefore, we define an 
-\emph{expression block}, as the collection of variable and model nodes related 
-to a given objective or constraint function. Fig. \ref{f:obj-cons} highlights 
-the objective and constraint blocks from the Sellar problem. If the relevant 
+objectives or constraints to the graph. Therefore, we denote an \emph{expression block}, as: 
+
+\begin{equation}
+  F_j=(V_{F_j},E_{F_j}),\ for\ j\in J, 
+\end{equation}
+
+Where $m$ is the number of expressions in the graph
+and $J=\{1,2,\ldots,m\}$. For the sake of consistency of naming conventions
+$F_j$, $G_j$, and $H_j$ are used to deonte expression blocks for objectives, inequality
+constraints, and equality constraints. If the relevant 
 objective and constraint values are direct results from other analysis blocks 
 and composite functions are not needed, then expression blocks may be omitted 
-from the MDAO problem graph.
+from the MDAO problem graph. Fig. \ref{f:obj-cons} highlights the 
+objective and constraint blocks from the Sellar problem. 
 
 \begin{figure}[htb!]
   \begin{center}
@@ -327,11 +371,11 @@ from the MDAO problem graph.
 
 \subsection{Local vs Global Nodes}
 
-  The set of local nodes, $V_l$, is the collection of 
+  The set of local nodes, $V_\txt{l}$, is the collection of 
   nodes with exactly one outgoing connection edge. 
 
   \begin{equation}
-    V_{l} = \{V \st \txt{deg}^+(v)=1\}
+    V_{\txt{l}} = \{V_{\txt{var}} \st \txt{deg}^+(v)=1\}
     \label{e:local_definition}
   \end{equation}
 
@@ -341,11 +385,11 @@ from the MDAO problem graph.
   we can now see why. Variable nodes connected to model nodes are only allowed to 
   have one outgoing edge, and hence will always by definition be local variables. 
 
-  The set of global nodes, $V_g$, is the collection of all nodes with more than 
+  The set of global nodes, $V_\txt{g}$, is the collection of all nodes with more than 
   one outgoing connection edge. 
 
   \begin{equation}
-    V_{g} = \{V \st \txt{deg}^+(v)>1\}
+    V_{\txt{g}} = \{V_{\txt{var}} \st \txt{deg}^+(v)>1\}
     \label{e:global_definition}
   \end{equation}
 
@@ -358,7 +402,7 @@ from the MDAO problem graph.
   a local variable, which is contradicted by the given graph. This discrepancy 
   arises from the explicit treatment of objectives and constraints as separate 
   expression blocks. Normally in the Sellar problem, $x_1$ is considered a local 
-  variable because it directly affects only analysis block $D_1$. By expanding
+  variable because it directly affects only analysis block $A_1$. By expanding
   $F$ into an expression block with its own inputs, then $F$ is assigned its own local 
   copy of the $x_1$ variable. This formulation necessitates the creation of the global $x_1^*$ 
   node in the graph with two outgoing edges to link the two $x_1$ inputs nodes 
@@ -394,8 +438,8 @@ from the MDAO problem graph.
   Looking at the Sellar problem in 
   Fig. \ref{f:sellar_graph_full} we see the expression blocks for each constraint, 
   $G_1$ and $G_2$. Both constraints are local to their respective analysis 
-  blocks. But the expression block for $F$ has incomming edges from $D_1$ and 
-  $D_2$, so it would considered global. 
+  blocks. But the expression block for $F$ has incomming edges from $A_1$ and 
+  $A_2$, so it would considered global. 
 
   Catagorizing any node or analysis block block with incomming or outgoing edges
   from more than one source as global neglects a more 
@@ -409,7 +453,8 @@ from the MDAO problem graph.
 
   When solving a problem using a hierarchical decomposition approach, 
   there are various techniques for partitioning a problem into hierarchical 
-  localities that are effective in different scenarios \cite{krishnamachari1997optimal,michelena1997hypergraph,sobieszczanski1997,Perez2004,allison2009optimal}. 
+  localities that are effective in different scenarios 
+  \cite{krishnamachari1997optimal,michelena1997hypergraph,sobieszczanski1997,Perez2004,allison2009optimal}. 
   Tosserams \textit{et al.} proposed a language based-syntax for describing the 
   partitioning of problems, named $\Psi$\cite{tosserams2010specification}. 
   $\Psi$ provides an opposing perspective to this work, where they compose 
@@ -419,15 +464,16 @@ from the MDAO problem graph.
   standard representation to application specific formats. 
 
 \subsection{Coupling Between Analyses}
-
-  Coupling exists in a design problem when a set of two or more analyses each depend on the
+  Coupling is described by the presence of a a closed path between two or more
+  analysis blocks, called a cycle. A path, given by $P=(V_{path},E_{path})$, 
+  contains a cycle if at least two edges in the path refrence the same node, 
+  $E = \{(x_0,x_1),(x_1,x_2),\ldots,(x_{k-1},x_k),(x_k,x_0)\}$. These cycles 
+  decribe the reciprical dependence of a set of two or more analyses on each 
   other's outputs. In the Sellar problem from Eqn \ref{eqn:simple_fpf} the two 
   coupling constraints, $H_1$ and $H_2$, provide a reciprical dependence between 
-  $D_1$ and $D_2$. In a graph, these constraints appear as connection edges between 
+  $A_1$ and $A_2$. In a graph, these constraints appear as connection edges between 
   the outputs of each analysis block. The relevant connection edges are highlighted in 
-  Fig. \ref{f:coupling}, where they form a closed path between two analysis blocks,
-  called a cycle. Cycles of connection edges are the characteristic structure that 
-  represents coupling. 
+  Fig. \ref{f:coupling}, where they form 
 
   \begin{figure}
       \begin{center}
@@ -443,8 +489,8 @@ from the MDAO problem graph.
   Additionally, a coupling cycle has no inherent start or end. It would be acceptable to select
   node in the cycle as a starting point and proceed around the
   loop until you get back to the starting point. For the Sellar Problem, selecting 
-  $D_1$ as the starting point would yield a problem as given in 
-  Eq.~\ref{eqn:simple}, whereas selecting $D_2$ would yield the problem as given in 
+  $A_1$ as the starting point would yield a problem as given in 
+  Eq.~\ref{eqn:simple}, whereas selecting $A_2$ would yield the problem as given in 
   Eq.~\ref{eqn:simple2}.
 
   Larger problems can contain more complex cycles in their FPG, indicating more 
@@ -476,15 +522,15 @@ from the MDAO problem graph.
   variables, $V_{mf}$, is given as: 
 
   \begin{equation}
-    V_{mf} = \{ V \st \txt{deg}^-(v)>1 \} \cup \{ V \st \txt{deg}^-_u(v)>=\txt{deg}^-(v) \}
+    V_{\txt{mf}} = \{ V_{\txt{var}} \st 1 < \txt{deg}^-(v) \leq \txt{deg}^-_u(v) \}
   \end{equation}
 
   In a multi-fidelity problem, a given variable node may have multiple incomming 
   edges without causing a collision as defined by by Eq.~\ref{e:collision}. 
   Fig.~\ref{f:collision_example} shows a modified version of the Sellar problem 
-  with a new analysis, $D_0$, representing a low fidelity version of $D_1$. 
+  with a new analysis, $D_0$, representing a low fidelity version of $A_1$. 
   In this modified graph, the annotations indicate the upper indegree limit. For 
-  $D_2$, $\txt{deg}^-_u(D_2.y_1) = 2$ which avoids a collsion. A  
+  $A_2$, $\txt{deg}^-_u(A_2.y_1) = 2$ which avoids a collsion. A  
   $\txt{deg}^-_u(v) > 1$ for any variable in a graph represents a decision to 
   allow multiple fidelities to interact at that part of the graph in order to alieviate
   a conflict. In section \ref{ss:obtaining FPG} we present an algorithm for finding 
