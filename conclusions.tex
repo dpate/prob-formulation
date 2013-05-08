@@ -1,0 +1,33 @@
+\section*{Conclusions}
+In this paper, we have presented an approach for describing MDAO problems with constructs and syntax from graph theory.  
+Our graph description shares similarities to other approaches such as REMS, $\Psi$, FDT, DSM, and XDSM, but it provides new constructs tailored to applications in early phases of MDAO problem formulation before specific problem solution approaches are envisioned.  
+In particular, we introduce the concepts of the Maximally Connected Graph (MCG) and the Fundamental Problem Graph (FPG).  
+
+The MCG addresses the question, ``Given a set of analysis tools, what are all of the variable interconnections between them that could be established?''  
+The MCG provides a structured formalism to identify \textit{holes} and \textit{conflicts} in interconnections between input and output variables implied by the set of analysis tools.  
+A hole corresponds to a variable that is not calculated in the MCG data flow but is needed by other tools.   
+To create a valid problem formulation, all holes must be ``filled'' either by assigning the corresponding variable as a design variable to be set by the user or an optimizer, or by introducing additional tools to compute the variable.  
+
+A conflict corresponds to a situation in which two or more analysis tools compute separate instances of the same variable.  
+To create a valid problem formulation, all conflicts must be resolved either by removing redundant analysis tools or by introducing logic or solvers into the data flow to choose between or aggregate multiple instances during execution.  
+The identification of conflicts in an MCG is especially important for problem formulations involving multiples analysis tools of different fidelities; in this context, a conflict represents an opportunity to formulate a multi-fidelity problem that can take best advantage of the efficiency/accuracy tradeoff between different analysis tools.  
+Resolving conflicts and filling holes in an MCG requires choices by the user to specify the overall MDAO problem that he/she desires to solve, i.e. to produce the required set of system-level outputs given a specified set of design variables. 
+
+The FPG is a graph that describes a data connection structure corresponding to an MDAO problem formulation free of conflicts and holes.  
+An FPG is the result of user choices to fill holes and resolve conflicts in the initial MCG.  
+One benefit of using graph theory is the standard algorithms, such as cycle detection, which can be used to inform the user's decisions.
+Typically, many different FPGs could be attained from a given MCG, depending on the user choices.  
+The number of possible FPGs that can be attained by selecting different design variables or introducing additional analysis tools to fill holes and/or resolve conflicts can be viewed as a measure of the freedom available to the user in implementing the available analysis tools to formulate valid MDAO problems.  
+In Section 5, we present an algorithm for identifying holes and conflicts in an MCG that can be applied by the user in a process to arrive at valid FPGs.  
+In Section 6, we provide an example application of formulating an FPG from an MCG for a commercial aircraft design problem.
+
+Once a desired FPG is identified, the graph syntax described in the paper can be leveraged to formulate a Problem Solution Graph (PSG) describes particular MDAO solution architectures, e.g. MDF, IDF, BLISS, ATC, that can be used to solve the problem defined by the FPG.  
+Many possible PSGs could be formulated to solve a problem corresponding to a specified FPG.   
+The application of the syntax to PSGs has not been illustrated in the paper.
+
+For simple problems with few analysis tools and variables, the formulation of a valid problem description is straightforward.  
+However, MDAO problems continue to grow in scale and complexity.  
+As the numbers of analysis tools and variables have increased, it has become increasingly challenging and time consuming for engineering teams to determine how the multiple analysis tools can be interconnected to produce valid problem formulations, to know when other tools must be introduced, and to determine the number of free variables in the problem that can or should be varied by the designer or an optimizer.  
+The graph formalism presented in this paper is intended to offer value in this context of increasing problem complexity by providing a formal approach to identify and resolve missing and redundant data in order to create valid MDAO problem formulations.  
+
+
