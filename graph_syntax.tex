@@ -275,7 +275,7 @@ If the indegree limits are violated by the number of incoming connection edges (
   node $x_1^*$ in the graph with two outgoing edges to link the two $x_1$ inputs nodes 
   in the respective blocks. 
 
-  This classification of $x_1^*$ in the Sellar problem
+This classification of $x_1^*$ in the Sellar problem
   as a global variable works well within the structure of the Collaborative 
   Optimization (CO) archtiecture \cite{braun1996thesis}. The rules for constructing 
   a problem with CO require that each discipline be given an independent local 
@@ -287,7 +287,7 @@ If the indegree limits are violated by the number of incoming connection edges (
   nodes, no such exception for local variables in global expressions is 
   necessary. Whenever a variable is included in an expression block, 
   it forces the creation of a global variable node in the graph which will 
-  automatically result in the correct CO structure.
+automatically result in the correct CO structure.
 
   
 
@@ -299,14 +299,14 @@ If the indegree limits are violated by the number of incoming connection edges (
   The edges belonging to a cycle in the Sellar problem are highlighted in 
   Fig. \ref{f:sellar cycles} where they form a closed path between analysis blocks $D_1$ and $D_2$.
 
-  \begin{figure}[htb!]
-    \begin{center}
-      \includegraphics[width=4.0in]{images/sellar_cycles}
-    \end{center}
+ \begin{figure}[htb!]
+  \begin{center}
+    \includegraphics[width=4.0in]{images/sellar_cycles}
+  \end{center}
     \caption{Sellar problem graph with dashed edges indicating participation in a cycle.
-    \label{f:sellar cycles}
+\label{f:sellar cycles}
     }
-  \end{figure} 
+\end{figure} 
 
   Coupling cycles do not contain driver nodes in the MCG or FPG representation. 
   Solvers, optimizers, and other iterative processes are not invovled in the coupling 
@@ -358,8 +358,7 @@ If the indegree limits are violated by the number of incoming connection edges (
   one in turn. 
   \begin{figure}
     \begin{center}
-      %\includegraphics[height=.25\textheight]{}
-    [INSERT GRAPH HERE]
+      \includegraphics[width=4in]{images/sellar_mulfi}
     \caption{Graph of the modified Sellar, multi-fidelity problem with $\txt{deg}^-_u(v)$ annotations on variable nodes\label{f:collision_example}}
   \end{center}
   \end{figure}
