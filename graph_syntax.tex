@@ -70,11 +70,6 @@ Figure \ref{f:sellar types} demonstrates the usage of these node and edge types 
 \label{f:sellar types}
 \end{figure} 
 
-% ((JG: A single variable node can have many incomming driven edges. These edges are 
-%    free and can be added or removed from the graph.))
-%
-%  [[Insert legend for node and edge types]] ((DP: I'm not sure what the legend is supposed to be))
-
   A rule set is provided for the usage of these node and edge types to provide a structure to the graph-based representation.
   The driver node and the driven edge are allowed to be present only in PSGs, whereas the other node and edge types can be present in any of the three graph types, 
   subject to the following restrictions: 
@@ -274,7 +269,7 @@ If the indegree limits are violated by the number of incoming connection edges (
   contradicted by the given graph \cite{Sellar1996}. This discrepancy 
   arises from the explicit treatment of objectives and constraints as separate 
   expression blocks. This variable is could be considered a local 
-  variable because it directly affects only analysis block $A_1$. However, by expanding
+  variable because it directly affects only analysis block $D_1$. However, by expanding
   $F$ into an expression block with its own inputs, $F$ maintains its own local 
   copy of the $x_1$ variable. This formulation necessitates the creation of the global 
   node $x_1^*$ in the graph with two outgoing edges to link the two $x_1$ inputs nodes 
@@ -353,9 +348,9 @@ If the indegree limits are violated by the number of incoming connection edges (
   In a multi-fidelity problem, a given variable node may have multiple incoming 
   edges without implying a collision as defined by by Eq.~\ref{e:collision}. 
   Fig.~\ref{f:collision_example} shows a modified version of the Sellar problem 
-  with a new analysis, $D_0$, representing a low fidelity version of $A_1$. 
+  with a new analysis, $D_0$, representing a low fidelity version of $D_1$. 
   In this modified graph, the annotations indicate the upper indegree limit. For 
-  $A_2$, $\txt{deg}^-_u(A_2.y_1) = 2$ which avoids a collsion. A  
+  $D_2$, $\txt{deg}^-_u(D_2.y_1) = 2$ which avoids a collsion. A  
   $\txt{deg}^-_u(v) > 1$ for any variable in a graph represents a decision to 
   allow multiple fidelities to interact at that part of the graph in order to allieviate
   a conflict. In section \ref{ss:obtaining FPG} we present an algorithm for finding 
