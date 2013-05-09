@@ -55,15 +55,9 @@
     \end{quote}
 
     Our goal is to develop formalism for expressing analysis interconnectivity and for determining feasible
-    data flows to assist an engineering team conducting this task. Because the problem deals with
-    interconnectivity, we base our approach on the representations and techniques of graph theory. The 
-    proposed graph syntax is closely related to the REMS system proposed by 
-    Alexandrov and Lewis\cite{alexandrov2004}. The approach taken here should be viewed as an extention 
-    of the concepts proposed in REMS with the goal of allowing the graphs to more closely interact with 
-    existing design processes and MDAO frameworks. 
-
-The approach begins by 
-    constructing the \emph{maximal connectivity graph (MCG)} describing all possible
+    analysis tool sets to assist an engineering team conducting this task. Because the problem deals with
+    interconnectivity, we base our approach on the representations and techniques of graph theory.
+    The approach begins by constructing the \emph{maximal connectivity graph (MCG)} describing all possible
     interconnections between the analysis tools proposed by the engineers. Graph operations are then
     conducted to reduce the MCG down to a \emph{fundamental problem graph (FPG)} that describes the set of analysis
     tools needed to solve the specified system-level design problem.
@@ -85,11 +79,15 @@ The approach begins by
 \subsection{Specific vs Fundamental Problem Formulation }
 	\label{s:specific vs fundamental}
     The Fundamental Problem Formulation (FPF) is our terminology for a 
-    statement of the overall system-level optimization problem that does not 
-    depend on the choice of solution-specifc elements such as the MDAO 
-    framework, optimization algorithm, iterative solver, or execution sequence
-    used to solve the problem. The FPF contrasts with problem statements that are written without 
-    reference to a specific solution strategy, but that still imply a specific execution sequence.
+    statement of the overall system-level optimization problem that contains only 
+    information about analysis tools, design variables, objectives, and constraints without any 
+    information about how to solve the problem. It does not depend on the choice 
+    of solution-specific elements such as the MDAO framework, optimization 
+    algorithm, iterative solver, or execution sequence. This description represents 
+    the problem from the point of view of a engineer specifying the details of a design problem 
+    without constrainig how it should be solved. The lack of solution information 
+    in the FPF contrasts with problem statements that are written with reference 
+    to a specific solution strategy or with implication of a specific execution sequence.
     For example, consider the Sellar test problem \cite{AIAA:sellar}, with an FPF given as follows:
 
     \begin{align}
@@ -103,19 +101,28 @@ The approach begins by
     \end{align}
 
     
-    In Eq. \ref{eqn:simple_fpf}, $y_1$ is an output of $D_1$ as well as an input 
+    In Eq.~\ref{eqn:simple_fpf}, $y_1$ is an output of $D_1$ as well as an input 
     to $D_2$. Similarly, $y_2$ is an output of $D_2$ as well as an input 
     to $D_1$. This implies that $D_1$ and $D_2$ are coupled together by means 
     of their reciprical dependence. However no information is given as to weather
     $D_1$ or $D_2$ should be run before the other. Given Eq \ref{eqn:simple_fpf}, 
     it would be equally valid to run $D_1$ first, $D_2$ first, or both simultaneously. 
-
-    Eq. \ref{eqn:simple} gives a modified problem formulation where $D_1$ is run 
+    
+    The Sellar problem is very simple. There is only a single coupling interaction 
+    between the two disciplines and there are a very limited set of variables. 
+    That makes it relatively easy to describe the problem given in 
+    Eq.~\ref{eqn:simple_fpf}. However, for larger more complex problems, 
+    it is much harder to identify the fundamental problem formulation. Interdisciplinary 
+    couplings are not always obvious and the set of analsyis tools and variables are 
+    much larger. To further compount the problem engineers may already have some 
+    solution strategy or execution order they are used to applying to problems. 
+    Hence, it is common to see problem formulations given in a less general form 
+    as in Eq. \ref{eqn:simple}. Here $D_1$ must be run 
     first. A new variable is introduced, $\hat{y_2}$, to break the dependence of
-    $D_1$ on $D_2$. Also a new coupling constraint, $H$, to enforce the consistency
-    that would otherwise be lost due to $\hat{y_2}$. Equation \ref{eqn:simple} is 
-    a specific alternative expression of the more fundamental problem description 
-    given in Eq. \ref{eqn:simple_fpf}.
+    $D_1$ on $D_2$. Also a new coupling constraint, $H$, is added to enforce the 
+    consistency that would otherwise be lost due to $\hat{y_2}$. Equation \ref{eqn:simple} is 
+    a more specific, but equally valid, expression of the Sellar problem that could easily be 
+    generated through an incremental approach to constructing the problem. 
 
     \begin{align}
         \txt{given} & \ \ y_1 = D_1(x_1,\hat{y_2},z_1,z_2) \notag
@@ -160,7 +167,9 @@ The approach begins by
     however, the FDT graph is undirected and nodes can represent analysis tools, objectives, 
     or constraints. Edges between nodes represent a dependence on the same 
     variable. Michelena and Papalambros made use of the FDT to solve a graph partitioning problem that yielded 
-    more efficient optimization problem decompositions\cite{Michelena1997}. While FDT succeeds at capturing the 
+    more efficient optimization problem decompositions\cite{Michelena1997}. Allison 
+    extended this work to couple adjacency matrix information with the FDT to 
+    account for system coupling in an automated partitioning scheme\cite{Allison2008} While FDT succeeds at capturing the 
     information about objectives and constraints, its lack of directed edges 
     implies that it cannot capture the coupled data dependency that a DSM captures. 
     The FDT in Fig. \ref{fig:FDT_simple} shows that $D_1$ is dependent on $y_2$ and 
@@ -168,6 +177,7 @@ The approach begins by
     that information alone. This missing information implies 
     that, while FDT is very useful for partitioning problems, it is also not 
     sufficient to completely describe a problem formulation. 
+
     \begin{figure}[htb!]
         \begin{center}
         \begin{tabular}{|c|c|c|c|c|c|c|}
@@ -194,7 +204,10 @@ The approach begins by
     transition between multiple solution strategies while keeping a constant 
     graph representation of the fundamental problem formulation. REMS provides
     syntax for variables and functions but does not facilitate inclusion 
-    of solvers or optimizers in the graph. 
+    of solvers or optimizers in the graph.  The 
+    proposed graph syntax is closely related to REMS. The syntax proposed here should 
+    be viewed as an extention to REMS with the goal of allowing the graphs to more 
+    closely interact with existing design processes and MDAO frameworks. 
 
     Lamb and Martins also included objectives and constraint functions as nodes 
     in an Extended DSM (XDSM) in order to capture a more complete description 
@@ -219,8 +232,8 @@ The approach begins by
     requires the use of solver and optimizer blocks to represent 
     the relationship between design variables and objectives/constraints. 
     By introducing solver or optimizer blocks, XDSM automatically implies a strategy. 
-The XDSM for Eq. \ref{eqn:simple} is 
-    given in Figure \ref{fig:XDSM_simple}. This diagram is shown with an 
+    The XDSM for Eq. \ref{eqn:simple} is given in Figure \ref{fig:XDSM_simple}. 
+    This diagram is shown with an 
     assumed Gauss-Seidel iteration scheme and an MDF solution architecture. 
 
     Of these methods, REMS can describe most aspects of a fundamental 
@@ -233,14 +246,14 @@ The XDSM for Eq. \ref{eqn:simple} is
 
 \subsection{Requirements for a New Graph Syntax}
   \label{s:requirements}
-  The goal of the new graph-based syntax presented here is to enable the general structure of an MDAO problem to be described independently of any solution information, 
+  The goal of the new graph-based syntax presented here is to enable the general 
+  structure of an MDAO problem to be described independently of any solution information, 
   while still being able to accomodate the more specific case when a solution 
   strategy is applied. In order to achieve this goal, 
   the graph syntax needs to accomodate a number of MDAO problem constructs: 
   \begin{itemize}
     \item Analysis tools and their interconnections
     \item Design variables, objectives, and constraints
-    \item Local and global information
     \item Coupling between analyses
     \item Multi-fidelity analyses
   \end{itemize}
@@ -260,11 +273,13 @@ The XDSM for Eq. \ref{eqn:simple} is
     \item Problem Solution Graph (PSG)
   \end{itemize}
 
-  The \emph{maximal connectivity graph} represents the first phase of the problem formulation with all 
-  analysis tools being considered and all possible connections between them also present. The second graph 
-  is the \emph{fundamental problem graph}, which is comprises only the analyses participating to solve the problem. Finally, a \emph{problem solution graph} 
-  may be represented by including additional edges and nodes to represent the 
-  solution strategy being employed to solve the problem. This paper focuses on the MCG and FPG and does not describe the PSG in detail.
+  The \emph{maximal connectivity graph} represents the first phase of the problem 
+  formulation with all analysis tools being considered and all possible connections 
+  between them also present. The second graph is the \emph{fundamental problem graph}, 
+  which is comprises only the analyses participating to solve the problem. 
+  Finally, a \emph{problem solution graph} may be represented by including additional 
+  edges and nodes to represent the solution strategy being employed to solve the 
+  problem. This paper focuses on the MCG and FPG and does not describe the PSG in detail.
 
   The relationship between these three graphs is depicted in Figs.~\ref{f:tree} and \ref{f:hourglass}. 
   The tree diagram demonstrates the fact that it is generally possible to obtain 

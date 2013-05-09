@@ -1,10 +1,7 @@
 \section{Example Problem}
 	\label{s:example problem}
 	This section presents an example problem to demonstrate the process of obtaining the FPG and the advantages of doing so. 
-	For this example, the algorithm from Sec.~\ref{ss:obtaining FPG} was implemented in the NetworkX package of the Python programming language. 
-	While any language with the ability to manipulate graphs is applicable, NetworkX was chosen due to its built-in features, such as cycle detection and shortest path algorithms.
-
-	The example task is to create an FPG for the conceptual sizing of a single-aisle subsonic transport using a set of analysis tools with objectives including performance and gross weight for a required mission. 
+The example task is to create an FPG for the conceptual sizing of a single-aisle subsonic transport using a set of analysis tools with objectives including performance and gross weight for a required mission. 
 	The full set of analysis codes available for use is provided in Table \ref{t:analysis codes}.
 	\begin{table}[htbp]
 	  \centering
@@ -36,7 +33,7 @@ The enumeration of these analysis tools and objectives concludes step (A) in Sec
 Step (B) is the production of the MCG.
 	In this example, the MCG is formed using a consistant variable naming convention and then connecting all variables with the same name with connection edges. 
 	Table \ref{t:ins and outs} presents the full list of variables in the leftmost column and indicates whether the variable is an input or an output of each analysis code. 
-	Some variables, such as geometry and performance, represent groups of variables that are passed as vectors or other structures due to their similarity. 
+	Some variables, such as geometry and performance, represent groups of variables that are passed as arrays or other data structures due to their similarity. 
 	This bundling of variables is not fundamental and does not limit the generality of this example; rather, it simplifies the presentation.
 	\begin{table}[htb!]
 	  \centering
@@ -66,7 +63,7 @@ Step (B) is the production of the MCG.
 	In this example, the MCG $M$ is formed in four steps:
 	\begin{enumerate}
 	\item An analysis block is created for each analysis code using the information in each column of Table \ref{t:ins and outs}. 
-	Each analysis block is formed by first creating variable nodes for each input and adding directed edges into a single model node. An edge is directed from this model node into a second model node, which is then directed into variable nodes corresponding to each output. 
+	Each analysis block is formed by first creating variable nodes for each input and adding directed edges into a single function node. An edge is directed from this function node into a second function node, which is then directed into variable nodes corresponding to each output. 
 	A sample analysis block is shown for analysis code FLOPSa in Fig.~\ref{f:FLOPSb analysis block}.
 	\begin{figure}[htb!]
 	  \begin{center}
@@ -78,10 +75,10 @@ Step (B) is the production of the MCG.
 
 	\item Expression blocks are created to represent the objectives for performance and total weight.
 
-	\item A variable nodes is created to represent the geometry variable as a global input. Any global inputs incorrectly omitted will be identified in step (D).
+	\item A variable nodes is created to represent the geometry variable as a input. Any inputs incorrectly omitted will be identified in step (D).
 
 	\item Connection edges are created that connect each variable node to every other variable node representing variables with the same name. 
-	The direction is determined by whether the variable node has an edge directed into or out of a model node, i.e. whether it is a local input or a local output.
+	The direction is determined by whether the variable node has an edge directed into or out of a function node, i.e. whether it is a local input or a local output.
 	\end{enumerate}
 	The resulting MCG is shown in Fig.~\ref{f:MCG holes}. 
 	Cycles are shown as dashed lines. FPGs formed from this MCG may or may not retain these cycles.
@@ -105,13 +102,13 @@ To implement step (C) in Sec.~\ref{ss:process}, the indegree of every variable n
 
 Step (D) now procededs by executing the FPG algorithm. An FPG cannot be obtained because the variable nodes representing the number of engines are holes for NPSS, FLOPSa, and FLOPSb, and the variable nodes representing the mission definition are holes for FLOPSa and FLOPSb. These holes propagated upstream and created holes in the objectives, thereby preventing a valid FPG.
 
-Step (D)(a) begins to resolve this conflict by creating a global input for the number of engines. In this example, the number of engines was not originally included as a global input to demonstrate how the process responds to this error.
+Step (D)(a) begins to resolve this conflict by creating a input for the number of engines. In this example, the number of engines was not originally included as a input to demonstrate how the process responds to this error.
 Step (D)(b) then reduces the lower and upper indegree limits for the variable node representing the mission definition to zero, implying that these nodes must be specified as design variables (see Table \ref{t:variable node classification}). The new MCG is shown in Fig.~\ref{f:MCG}.
 	\begin{figure}[htb!]
 	  \begin{center}
 		\includegraphics[width=6in]{images/MCG_edit}
 	  \end{center}
-	  \caption{The updated MCG with a new global input.}
+	  \caption{The updated MCG with a new input.}
 	\label{f:MCG}
 	\end{figure}
 
@@ -121,11 +118,8 @@ Step (D)(b) then reduces the lower and upper indegree limits for the variable no
 In this example, the FPG with the fewest number cycles is shown in Fig.~\ref{f:FPG fewest cycles}, in which the edges belonging to a cycle are inticated by dashed lines. 
 For this example problem, the cycles were detected using the implementation of Johnson's algorithm \cite{Johnson1975} in the Python package NetworkX. 
 There are two cycles which arise from each local output from PDCYL being directed into FLOPSa and then back into PDCYL. 
-%((DP:discuss cycle equivalency))
-%((mention edge weight for center edge))
 
-	Similar alternatives would be to minimize the number of analysis blocks involved in cycles, counting multiplicity, or to minimize the length of the longest cycle (called the \emph{circumference} of the graph). Since these graphs will always be relatively small (on the order of hundreds of nodes) the 
-	computational expense for examining all possible FPGs is negligble compared to the expected expense of using the problem formulation to obtain a solution.
+	Similar alternatives would be to minimize the number of analysis blocks involved in cycles, counting multiplicity, or to minimize the length of the longest cycle (called the \emph{circumference} of the graph). It is beyond the scope of this work to explore efficient methods for finding the FPGs meeting these criteria. However, as discussed by Gabow\cite{Gabow1985}, graph algorithms typically scale well with the size of the graph. This suggests that the computation cost of finding an FPG should be small.
 	\begin{figure}[htb!]
 	  \begin{center}
 		\includegraphics[width=4.5in]{images/FPG_edit_fewest_cycles}

@@ -8,56 +8,63 @@ In particular, we introduce the concepts of the Maximal Connectivity Graph (MCG)
 and the Fundamental Problem Graph (FPG).  
 
 The MCG addresses the question, ``Given a set of analysis tools and design objectives, what are all 
-of the potential problem formulations that exist to solve a design problem?''  
-The MCG provides a structured formalism to reduce the (potentially very large) 
+of the potential problem formulations that could exist to solve a design problem?''  
+The MCG provides a structured formalism to reduce the, potentially very large, 
 set of valid combinations of analysis tools to a single subset and to identify
 conflicts that could prevent a valid problem formulation.
 Conflicts can originate from two sources: holes and collisisons. A hole 
 corresponds to a variable that is not calculated by any analysis block in the 
 MCG but is needed by other blocks. To create a valid problem formulation, all 
-holes must be ``filled'' either by assigning the corresponding variable as a 
-design variable to be set by the user or an optimizer, or by introducing 
-additional tools to compute the variable.  A conflict corresponds to a 
-situation in which two or more analysis tools compute values for the same variable.  
-To create a valid problem formulation, all conflicts must be resolved either by 
-removing redundant analysis tools or by allowing the redundencies to remain 
+holes must be ``filled'' either by selecting the corresponding variable as a 
+design variable, or by introducing additional analysis tools to compute the variable.  
+A collision happens when two or more analysis tools compute values for the same variable.  
+To create a valid problem formulation, all collisions must be resolved either by 
+removing redundant analysis tools or by explicitly allowing the redundencies to remain 
 in the form of a multifidelity problem. For the latter case, a special solution 
 method will need to be employed to manage the multifidelity situation and decide 
 when to execute the different analysis tools. Resolving collisions and filling 
 holes in an MCG both require choices by the designer to shape the overall
-MDAO problem that he/she desires to solve. 
+MDAO problem to meet the needs of the problem he/she is trying to solve. 
 
 The FPG represents the problem as an engineer would describe it: ``Given a specific set of tools, 
-with a set of free design vairables, find design that best meets a given objective
+with a set of design vairables, find design that best meets a given objective
 within the given constraints.'' Although an FPG uniquely defines a single MDAO problem, 
-any given MCG can potentially contain a number of different FPG's. In Section 
+there is not necessarily a unique FPG for any given MCG. In Section 
 \ref{s:building graphs} we provide an algorithm 
 that reduces an MCG, via the resolution of conflicts in the graph, down to an FPG. 
 How one goes about resolving the conflicts will determine which particular FPG is reached. 
-One benefit of using graph theory is the standard tools, such as cycle 
+One benefit of using graph theory is the standard techniques, such as cycle 
 detection, which can be used to inform the user's decisions and make the process of conflict 
 resolution much easier. 
 
-In Section \ref{s:example problem}, we provide an example application of formulating different FPGs from an MCG 
-for a commercial aircraft design problem. This problem includes 8 
+In Section \ref{s:example problem}, we provide an example of 
+formulating different FPGs from an MCG for a commercial aircraft design problem. This problem includes 8 
 analysis tools and approximately 20 variables. Despite this relatively modest size, 
 the MCG is rich enough to provide for a number of different valid FPGs. This demonstrates
 the inherant value of the MCG to the design process by providing a mechanism for selecting 
 an FPG based on important factors such as available design cycle time, consideration of 
 coupling effects, or desired fidelity. Even after downselecting to a single FPG, the 
-MCG itself still remains a usefull tool. No real design problem is static, and will always
+MCG itself still remains a useful tool. No real design problem is static, and will always
 evolve throughout the design process. New tools may be introduced to account for previously 
 unexpected effects and new constraints or objectives can be introduced. When this occurs, 
 the MCG provides the opportunity to account for these changes by starting over with the 
 algorithm from Section \ref{s:building graphs} to downselect to the most effective new FPG. 
-By repeating this process you allow for any new interdisciplinary couplings and  
+While it is possible that this new FPG will be very similar to the previous one, 
+it is also very possible that it will be different in significant ways. 
+By repeating downselection algorithm from the MCG you allow for any new interdisciplinary couplings and  
 information conflicts to play a role in selecting the most appropriate FPG. 
 
-
-
-Once a desired FPG is identified, the graph syntax described in the paper can be leveraged to formulate a Problem Solution Graph (PSG) describes particular MDAO solution architectures, e.g. MDF, IDF, BLISS, ATC, that can be used to solve the problem defined by the FPG.  
-Many possible PSGs could be formulated to solve a problem corresponding to a specified FPG.   
-The application of the syntax to PSGs has not been illustrated in the paper.
+Once a desired FPG is identified, the graph syntax described in the paper can be 
+leveraged to formulate a Problem Solution Graph (PSG). This graph includes all of the 
+same information from the FPG while additionally describing the particular MDAO 
+solution architecture, e.g. MDF, IDF, BLISS, ATC, that will be used to solve the problem.  
+Many possible PSGs could be formulated to solve a problem corresponding to a 
+specified FPG. The application of the syntax to PSGs has not been illustrated in the paper, 
+but the basic concept of applying multiple solution strategies to a given problem 
+formulation has been well established by a number of MDAO architecture 
+benchmarking efforts\cite{Tedford2009,gray2013}. Furthermore the validity of applying 
+graph syntax to the description of specific problem solutions has been demonstrated 
+by XDSM. 
 
 For simple problems with few analysis tools and variables, the formulation of a valid problem description is straightforward.  
 However, MDAO problems continue to grow in scale and complexity.  
