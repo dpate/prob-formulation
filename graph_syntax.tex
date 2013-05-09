@@ -266,47 +266,27 @@ If the indegree limits are violated by the number of incoming connection edges (
 %If a variable should not be a design variable, then leave it as a hole which 
 %needs to be addressed in a manner discussed in section \ref{ss:obtaining FPG}.
 
-\subsection{Local vs Global Nodes ((recommend omission))}
+\subsection{Local vs Global Nodes }
 
-  In this graph-based syntax, a variable node is considered \emph{local} if it has exactly one outgoing connection edge or \emph{global} if it has more than one outgoing connection edge. Therefore, a variable node may be used to represent a global input if it has at least two outgoing connection edges. Otherwise, the input is formulated as a design variable that is local to a specific analysis block.
-%  The set of local nodes, $V_\txt{l}$, is the collection of 
-%  nodes with exactly one outgoing connection edge. 
-%
-%  \begin{equation}
-%    V_{\txt{l}} = \{V_{\txt{var}} \st \txt{deg}^+(v)=1\}
-%    \label{e:local_definition}
-%  \end{equation}
-%  In section \ref{s:specific vs fundamental} variable nodes that are part of 
-%  an analysis block are inherently local and similarly model nodes 
-%  are also local. Following the definition in Eq. \ref{e:local_definition}
-%  we can now see why. Variable nodes connected to model nodes are only allowed to 
-%  have one outgoing edge, and hence will always by definition be local variables. 
+  All global variable nodes have more than one outgoing edge. Conversely all local 
+  variable nodes have only a single outgoing edge. Fig.~\ref{f:sellar graph} contains 
+  three global variables that are not present in the problem formulation given by 
+  Eq.~\ref{eqn:simple_fpf}: $x_1^*$, $z_1^*$, and $z_2^*$. The presence of the 
+  new nodes is required in order to represent the equality of the given variables that
+  was implied by their shared names in Eq.~\ref{eqn:simple_fpf}. 
 
-%  The set of global nodes, $V_\txt{g}$, is the collection of all nodes with more than 
-%  one outgoing connection edge. (())
-%
-%  \begin{equation}
-%    V_{\txt{g}} = \{V_{\txt{var}} \st \txt{deg}^+(v)>1\}
-%    \label{e:global_definition}
-%  \end{equation}
-
-%  Following our definition any variable node that had multiple 
-%  outgoing edges, is global. In Fig. \ref{f:sellar_graph_full} 
-%  the variable nodes for $x_1^*$, $z_1^*$, and $z_2^*$ have multiple outgoing 
-%  edges and would be considered global. 
-In the Sellar problem (Fig.~\ref{f:sellar graph}) the variable nodes $x_1^*$, $z_1^*$, and $z_2^*$ have multiple outgoing edges and are therefore considered global inputs. 
-  The variable $x_1$ is usually refered to as 
-  a local variable, which is contradicted by the given graph ((DP: can we cite someone calling this local?)). This discrepancy 
+  The variable $x_1$ is usually refered to as a local variable, which is 
+  contradicted by the given graph \cite{sellar1996}. This discrepancy 
   arises from the explicit treatment of objectives and constraints as separate 
-  expression blocks. This variable is often considered a local 
+  expression blocks. This variable is could be considered a local 
   variable because it directly affects only analysis block $A_1$. However, by expanding
   $F$ into an expression block with its own inputs, $F$ maintains its own local 
   copy of the $x_1$ variable. This formulation necessitates the creation of the global 
   node $x_1^*$ in the graph with two outgoing edges to link the two $x_1$ inputs nodes 
   in the respective blocks. 
 
-This classification of $x_1^*$ in the Sellar problem
-  as a global variable agrees with the structure of the Collaborative 
+  This classification of $x_1^*$ in the Sellar problem
+  as a global variable works well within the structure of the Collaborative 
   Optimization (CO) archtiecture \cite{braun1996thesis}. The rules for constructing 
   a problem with CO require that each discipline be given an independent local 
   copy of all global variables. All local variables are retained uniquely 
@@ -317,61 +297,26 @@ This classification of $x_1^*$ in the Sellar problem
   nodes, no such exception for local variables in global expressions is 
   necessary. Whenever a variable is included in an expression block, 
   it forces the creation of a global variable node in the graph which will 
-automatically result in the correct CO structure.
+  automatically result in the correct CO structure.
 
-  Analysis and expression blocks are also regarded local or global but the 
-  criteria for determining this is slightly different than for variable nodes---both incoming and outgoing edges must be considered.
-%  In this case, you consider the set of connection edges for the block
-%  (e.g. from all the variable nodes within the block) as a set. Additionally, 
-%, whereas for variables
-%  only outgoing connection edges are relevant. 
-  An analysis block is local if all incoming edges are from exactly one analysis 
-  block and all outgoing edges are from exactly one other analysis block. A global 
-  analysis block is defined as a block with incoming edges or outgoing edges 
-  to more than one analysis block.   In the Sellar problem, the expression blocks for each constraint, 
-  $G_1$ and $G_2$, are local to their respective analysis 
-  blocks, whereas the expression block for $F$ has incoming edges from $A_1$ and 
-  $A_2$, therefore it is considered global. 
-
-  Catagorizing any node or analysis block with incoming or outgoing edges
-  from more than one source as global neglects a more 
-  subtle aspect of some MDAO problems. Namley the locality of any node in a graph is 
-  a relative property. For instance, a single node might have outgoing edges 
-  to two separate analysis blocks, $A$ and $B$, but none to a third, $C$. This 
-  node was global with respect to $A$ and $B$ separately, but local 
-  to the group $A,B$. This situation produces a natural hierarchy in a graph, 
-  from which one could form ever smaller groups as the problem is segmented into 
-  finer localities.
-
-  When solving a problem using a hierarchical decomposition approach, 
-  there are various techniques for partitioning a problem into hierarchical 
-  localities that are effective in different scenarios 
-  \cite{krishnamachari1997optimal,michelena1997hypergraph,sobieszczanski1997,Perez2004,allison2009optimal}. 
-  Tosserams \textit{et al.} proposed a language based-syntax for describing the 
-  partitioning of problems, named $\Psi$\cite{tosserams2010specification}. 
-  $\Psi$ provides an opposing perspective to this work, where they compose 
-  hierarchies from the bottom up, into larger and larger groups. However, 
-  $\Psi$ provides a compiler that can produce a standard problem representation 
-  of the assembled problem and a number of example converters from that 
-  standard representation to application specific formats. 
+  
 
 \subsection{Coupling Between Analyses}
-In MDAO, coupling is the mutual dependence the outputs of two or more analysis codes. In this graph-based syntax, coupling is described by the presence of a cycle between two or more analysis blocks. 
-%A path, given by $P=(V_\txt{path},E_\txt{path})$, contains a cycle if at least two edges in the path refrence the same node,  $E = \{(x_0,x_1),(x_1,x_2),\ldots,(x_{k-1},x_k),(x_k,x_0)\}$. 
-%Cycles decribe the reciprical dependence of a set of two or more analyses on each other's outputs. 
-In the Sellar problem from Eqn \ref{eqn:simple_fpf} the two 
-  coupling constraints, $H_1$ and $H_2$, provide a reciprical dependence between 
-  $A_1$ and $A_2$. In a graph, these constraints appear as connection edges between 
-  the outputs of each analysis block. The edges belonging to a cycle in the Sellar problem are highlighted in 
-  Fig. \ref{f:sellar cycles}, where they form ((sentence is unfinished))
+  In MDAO, coupling is the mutual dependence the outputs of two or more analysis 
+  codes. In this graph-based syntax, coupling is described by the presence of a 
+  cycle between two or more analysis blocks. In the Sellar problem from Eqn \ref{eqn:simple_fpf} 
+  a reciprical dependence between $D_1$ and $D_2$ exists through the variabled $y_1$ and $y_2$. 
+  The edges belonging to a cycle in the Sellar problem are highlighted in 
+  Fig. \ref{f:sellar cycles} where they form a closed path between analysis blocks $D_1$ and $D_2$.
 
- \begin{figure}[htb!]
-  \begin{center}
-    \includegraphics[width=4.0in]{images/sellar_cycles}
-  \end{center}
-  \caption{Sellar problem graph with dashed edges indicating participation in a cycle.}
-\label{f:sellar cycles}
-\end{figure} 
+  \begin{figure}[htb!]
+    \begin{center}
+      \includegraphics[width=4.0in]{images/sellar_cycles}
+    \end{center}
+    \caption{Sellar problem graph with dashed edges indicating participation in a cycle.
+    \label{f:sellar cycles}
+    }
+  \end{figure} 
 
   Coupling cycles do not contain driver nodes in the MCG or FPG representation. 
   Solvers, optimizers, and other iterative processes are not invovled in the coupling 
@@ -404,13 +349,13 @@ In the Sellar problem from Eqn \ref{eqn:simple_fpf} the two
 
 \subsection{Multi-fidelity Problems}
   \label{ss:multi-fideliy problems}
-  A multi-fidelity MDAO problem can be characterized by a formulation in which two or more different analyses 
-  each calculating the same data. Multi-fidelity is represented in a graph by a variable node having an indegree greater than one, which means that multiple connection edges are directed into it. When the upper indegree limit of a variable node is set above one, then the node is implied to allow multiple fidelity instances of the variable. When the lower indegree limit of a variable node is set above one, then multiple fidelity instances are required..
-%  variables, $V_{mf}$, is given as: 
-%
-%  \begin{equation}
-%    V_{\txt{mf}} = \{ V_{\txt{var}} \st 1 < \txt{deg}^-(v) \leq \txt{deg}^-_u(v) \}
-%  \end{equation}
+  A multi-fidelity MDAO problem can be characterized by a formulation in which 
+  two or more different analyses each calculating the same data. Multi-fidelity 
+  is represented in a graph by a variable node having an indegree greater than 
+  one, which means that multiple connection edges are directed into it. When the 
+  upper indegree limit of a variable node is set above one, then the node is 
+  implied to allow multiple fidelity instances of the variable. When the lower 
+  indegree limit of a variable node is set above one, then multiple fidelity instances are required.
 
   In a multi-fidelity problem, a given variable node may have multiple incoming 
   edges without implying a collision as defined by by Eq.~\ref{e:collision}. 

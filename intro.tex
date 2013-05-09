@@ -67,7 +67,7 @@ The approach begins by
     interconnections between the analysis tools proposed by the engineers. Graph operations are then
     conducted to reduce the MCG down to a \emph{fundamental problem graph (FPG)} that describes the set of analysis
     tools needed to solve the specified system-level design problem.
-    any particular solution procedure for the problem; any relevant MDO solution architecture, e.g. MDF,
+    Any particular solution procedure for the problem; any relevant MDO solution architecture, e.g. MDF,
     IDF, CO, BLISS, could be selected \emph{post facto} to implement the system-level optimization by
     constructing a \emph{problem solution graph (PSG)} and the corresponding problem solution approach.
     The concept of the FPG and the identification of feasible FPGs are the main contributions of the paper.
@@ -84,10 +84,39 @@ The approach begins by
 \section{Motivation}
 \subsection{Specific vs Fundamental Problem Formulation }
 	\label{s:specific vs fundamental}
-    The Fundamental Problem Formulation (FPF) is our terminology for a statement of the overall system-level optimization problem that does not depend on the choice of solution-specifc elements such as the MDAO framework, optimization algorithm, iterative solver, or execution sequence
+    The Fundamental Problem Formulation (FPF) is our terminology for a 
+    statement of the overall system-level optimization problem that does not 
+    depend on the choice of solution-specifc elements such as the MDAO 
+    framework, optimization algorithm, iterative solver, or execution sequence
     used to solve the problem. The FPF contrasts with problem statements that are written without 
     reference to a specific solution strategy, but that still imply a specific execution sequence.
-    For example, consider the Sellar test problem \cite{AIAA:sellar}: 
+    For example, consider the Sellar test problem \cite{AIAA:sellar}, with an FPF given as follows:
+
+    \begin{align}
+        \txt{given} & \ \ y_1 = D_1(x_1,y_2,z_1,z_2) \notag
+        \\      & \ \ y_2 = D_2(y_1,z_1,z_2) \notag
+        \\\txt{min.} &\ \ F(x_1,y_1,y_2,z_2) \notag
+        \\\txt{w.r.t.} & \ \ x_1,y_1,y_2,z_1,z_2 \notag
+        \\\txt{s.t.} & \ \ G_1(y_1) \geq 0 \notag
+        \\     & \ \ G_2(y_2) \geq 0
+        \label{eqn:simple_fpf}
+    \end{align}
+
+    
+    In Eq. \ref{eqn:simple_fpf}, $y_1$ is an output of $D_1$ as well as an input 
+    to $D_2$. Similarly, $y_2$ is an output of $D_2$ as well as an input 
+    to $D_1$. This implies that $D_1$ and $D_2$ are coupled together by means 
+    of their reciprical dependence. However no information is given as to weather
+    $D_1$ or $D_2$ should be run before the other. Given Eq \ref{eqn:simple_fpf}, 
+    it would be equally valid to run $D_1$ first, $D_2$ first, or both simultaneously. 
+
+    Eq. \ref{eqn:simple} gives a modified problem formulation where $D_1$ is run 
+    first. A new variable is introduced, $\hat{y_2}$, to break the dependence of
+    $D_1$ on $D_2$. Also a new coupling constraint, $H$, to enforce the consistency
+    that would otherwise be lost due to $\hat{y_2}$. Equation \ref{eqn:simple} is 
+    a specific alternative expression of the more fundamental problem description 
+    given in Eq. \ref{eqn:simple_fpf}.
+
     \begin{align}
         \txt{given} & \ \ y_1 = D_1(x_1,\hat{y_2},z_1,z_2) \notag
         \\      & \ \ y_2 = D_2(y_1,z_1,z_2) \notag
@@ -99,82 +128,23 @@ The approach begins by
         \label{eqn:simple}
     \end{align}
 
-    Here, $D_1$ and $D_2$ represent analysis tools, $F$, $G_1$, and $G_2$ are the objective 
-    and constraint functions respectively, and $H$ is the coupling constraint. 
-    Equation \ref{eqn:simple} implies the execution 
-    order for the problem. Analysis $D_1$ outputs $y_1$, which is an input to $D_2$. 
-    Hence, $D_1$ should be run before $D_2$ with with $y_2$ iterating
-    to convergence with $\hat{y_2}$. A slightly different formulation 
-    is equally valid and still represents the same problem: 
-
-    \begin{align}
-        \txt{given} & \ \ y_2 = D_2(\hat{y_1},z_1,z_2) \notag
-        \\      & \ \ y_1 = D_1(x_1,y_2,z_1,z_2) \notag
-        \\\txt{min.} &\ \ F(x_1,y_1,y_2,z_2) \notag
-        \\\txt{w.r.t.} & \ \ x_1,\hat{y_1},y_2,z_1,z_2 \notag
-        \\\txt{s.t.} & \ \ H(y_1,\hat{y_1}) = 0 \notag 
-        \\     & \ \ G_1(y_1) \geq 0 \notag
-        \\     & \ \ G_2(y_2) \geq 0
-        \label{eqn:simple2}
-    \end{align}
-
-    Equation \ref{eqn:simple2} differs only slightly from Eq. \ref{eqn:simple}. 
-    Notice that the formulation from Eq. \ref{eqn:simple} includes 
-    $\hat{y_2}$, while Eq. \ref{eqn:simple2} includes $\hat{y_1}$. The result is that
-    $D_1$ is now dependent on the output of $D_2$, and $y_1$ will be iterated on to 
-    convergence with $\hat{y_1}$. Now the problem has to be solved by running $D_2$ first 
-    and then $D_1$. 
-
-Equations \ref{eqn:simple} and 
-    \ref{eqn:simple2}  are specific alterative expressions of a more fundamental problem description 
-    that we call the FPF:
-
-    \begin{align}
-        \txt{given} & \ \ y_1 = D_1(x_1,\hat{y_2},z_1,z_2) \notag
-        \\      & \ \ y_2 = D_2(\hat{y_1},z_1,z_2) \notag
-        \\\txt{min.} &\ \ F(x_1,y_1,y_2,z_2) \notag
-        \\\txt{w.r.t.} & \ \ x_1,\hat{y_1},\hat{y_2},z_1,z_2 \notag
-        \\\txt{s.t.} & \ \ H_1(y_1,\hat{y_1}) = 0 \notag
-        \\     & \ \ H_2(y_2,\hat{y_2}) = 0 \notag 
-        \\     & \ \ G_1(y_1) \geq 0 \notag
-        \\     & \ \ G_2(y_2) \geq 0
-        \label{eqn:simple_fpf}
-    \end{align}
-
-    The formulation of Eq. \ref{eqn:simple_fpf} differs from both Eq. \ref{eqn:simple} 
-    and Eq. \ref{eqn:simple2} because it includes two coupling constraints. 
-The result is that Eq. \ref{eqn:simple_fpf} requires the presence of both 
-    $\hat{y_1}$ and $\hat{y_2}$, which means that $D_1$ and $D_2$ each now operate with 
-    their own local copies of the coupling variables. This formulation fully decouples the problem so that 
-    either $D_1$ or $D_2$ could be run first or both could be run simultaneously. 
-\begin{comment}
-    Alexandrov and Lewis, in their work with REMS, assert that fully decoupling 
-    the analyses is key to achieving reconfigurability in the problem 
-    formulation\cite{alexandrov2004}. The key feature they identify to allow this decoupling 
-    is the creation of independent variables for each analysis. Tosserams et. al. 
-    in their development of the $\psi$ language for heirarchical problem composition
-    make the same requirement that all analyses get their own local copies of 
-    variables in order to use them as the fundamental building blocks for 
-    problems\cite{tosserams2010specification}. Martins and Hwang derive the same requirement,
-    from a different perspective, in their work on computing analytic derivatives 
-    for MDAO problems\cite{Martins2012}. They determined that local copies of all variables 
-    allows for derivation of all relevant methods for calculating analytic derivatives 
-    from the basic chain rule.
-\end{comment}
-
-Figure \ref{f:sellar graph} depicts the Sellar problem given by Eq.~\ref{eqn:simple_fpf} in the graph-based syntax which will be presented in this paper. This example will serve to highlight the features of the syntax as they are introduced.
-\begin{figure}[htb!]
-  \begin{center}
-    \includegraphics[width=4.0in]{images/sellar}
-  \end{center}
-  \caption{Sellar problem represented as a graph.}
-\label{f:sellar graph}
-\end{figure} 
+    Figure \ref{f:sellar graph} depicts the Sellar problem given by 
+    Eq.~\ref{eqn:simple_fpf} in the graph-based syntax which will be presented 
+    in this paper. This example will serve to highlight the features of the 
+    syntax as they are introduced.
+    \begin{figure}[htb!]
+      \begin{center}
+        \includegraphics[width=4.0in]{images/sellar}
+      \end{center}
+      \caption{Sellar problem represented as a graph.}
+    \label{f:sellar graph}
+    \end{figure} 
 
 
 \subsection{Existing Graph-Based Syntax}
 	\label{s:existing syntax}
-    As indicated in the examples in Sec.~\ref{s:specific vs fundamental}, the mathematical language for specifying problem formulations is very general and can be used both for 
+    As indicated in the examples in Sec.~\ref{s:specific vs fundamental}, the mathematical 
+    language for specifying problem formulations is very general and can be used both for 
     fundamental and specific problem formulations. Tedford and Martins used this mathematical syntax to specify the 
     FPF for a set of test problems and also to describe specific formulations for solving them with a 
     number of optimization architectures\cite{Tedford2009}. Their work demonstrates how multiple specific 
@@ -193,7 +163,9 @@ Figure \ref{f:sellar graph} depicts the Sellar problem given by Eq.~\ref{eqn:sim
     row operations on the DSM matrix and yields multiple specific problem 
     formulations which all solve the same FPF. 
     
-    A DSM by itself is insufficient to describe complete problem formulations because it captures only information about data dependency between analyses; objective and constraint information is missing from the DSM description of the problem. 
+    A DSM by itself is insufficient to describe complete problem formulations because it 
+    captures only information about data dependency between analyses; objective and 
+    constraint information is missing from the DSM description of the problem. 
     An alternative matrix-based syntax, called a Functional Dependency Table (FDT), was proposed by Wagner and Papalambros. 
     FDT represents the relationship between functions, including objectives and constraints, and specific variables that affect 
     them\cite{Wagner1993}. Similar to DSM, FDT also describes an adjacency matrix of a graph. Unlike the DSM graph, 
@@ -203,21 +175,21 @@ Figure \ref{f:sellar graph} depicts the Sellar problem given by Eq.~\ref{eqn:sim
     more efficient optimization problem decompositions\cite{Michelena1997}. While FDT succeeds at capturing the 
     information about objectives and constraints, its lack of directed edges 
     implies that it cannot capture the coupled data dependency that a DSM captures. 
-For example, the objective, $f$, from the FPF in Eq. \ref{eqn:simple_fpf} is dependent on 
-    output $m$ of analysis $A$ ((BG: I don't quite get this)). The dependence of $m$ on $A$ is now captured 
-    in FDT in Fig. \ref{fig:FDT_simple} alone. This missing information implies 
+    The FDT in Fig. \ref{fig:FDT_simple} shows that $D_1$ is dependent on $y_2$ and 
+    that $D_2$ is dependent on $y_1$, but you can not infer their coupled dependence from 
+    that information alone. This missing information implies 
     that, while FDT is very useful for partitioning problems, it is also not 
     sufficient to completely describe a problem formulation. 
     \begin{figure}[htb!]
         \begin{center}
         \begin{tabular}{|c|c|c|c|c|c|c|}
             \hline
-                 & $x$ & $y$ & $y^t$ & $z$ & $z^t$ & m \\ \hline
-            $A$  & 1  & 1    &       &     &       &   \\ \hline
-            $B$  & 1  &      &       & 1   &       &   \\ \hline
-            $f$  &    &      &       &     &       & 1 \\ \hline
-            $g1$ &    &      &       & 1   & 1     &   \\ \hline
-            $g2$ &    & 1    & 1     &     &       &   \\
+                   & $x_1$ & $y_1$ & $y_2$ & $z_1$ & $z_2$ \\ \hline
+            $D_1$  & 1     &       & 1     & 1     & 1     \\ \hline
+            $D_2$  &       & 1     &       & 1     & 1     \\ \hline
+            $F$    & 1     & 1     & 1     &       & 1     \\ \hline
+            $G_1$  &       & 1     &       &       &       \\ \hline
+            $G_2$  &       &       & 1     &       &       \\
             \hline
         \end{tabular}
         \caption{Functional Dependency Table (FDT) for Eq. \ref{eqn:simple_fpf} \label{fig:FDT_simple}}
@@ -250,7 +222,8 @@ For example, the objective, $f$, from the FPF in Eq. \ref{eqn:simple_fpf} is dep
     \begin{figure}
         \begin{center}
         \includegraphics[height=.25\textheight]{XDSM/simple}
-        \caption{XDSM for Eq. \ref{eqn:simple}, with a Gauss-Seidel iteration and MDF solution architecture. \label{fig:XDSM_simple}}
+        \caption{XDSM for Eq. \ref{eqn:simple}, with a Gauss-Seidel iteration 
+          and MDF solution architecture. \label{fig:XDSM_simple}}
         \end{center}
     \end{figure}
 
@@ -258,7 +231,7 @@ For example, the objective, $f$, from the FPF in Eq. \ref{eqn:simple_fpf} is dep
     requires the use of solver and optimizer blocks to represent 
     the relationship between design variables and objectives/constraints. 
     By introducing solver or optimizer blocks, XDSM automatically implies a strategy. 
-The XDSM for Eq. \ref{eqn:simple} is 
+    The XDSM for Eq. \ref{eqn:simple} is 
     given in Figure \ref{fig:XDSM_simple}. This diagram is shown with an 
     assumed Gauss-Seidel iteration scheme and an MDF solution architecture. 
 
