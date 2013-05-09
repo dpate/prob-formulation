@@ -93,12 +93,7 @@ Figure \ref{f:sellar types} demonstrates the usage of these node and edge types 
   with modern MDAO framework terminology. The present work adds one additional 
   node type and two additional edge types to the syntax to allow descriptive
   graphs for all three phases of the design problem formulation process indicated in Figs.~\ref{f:tree} and \ref{f:hourglass}.
-\begin{comment}
-In addition, we introduce the 
-  concept of fixed vs. free connection edges to represent the
-  static relationship between variable and model nodes from a single analysis, 
-  as opposed to the flexible relationship between variables from different analyses. 
-\end{comment}
+
 
 
 \subsection{Analysis Blocks}
@@ -269,14 +264,14 @@ If the indegree limits are violated by the number of incoming connection edges (
 \subsection{Local vs Global Nodes }
 
   All global variable nodes have more than one outgoing edge. Conversely all local 
-  variable nodes have only a single outgoing edge. Fig.~\ref{f:sellar graph} contains 
+  variable nodes have only a single outgoing edge. Fig.~\ref{f:sellar types} contains 
   three global variables that are not present in the problem formulation given by 
   Eq.~\ref{eqn:simple_fpf}: $x_1^*$, $z_1^*$, and $z_2^*$. The presence of the 
   new nodes is required in order to represent the equality of the given variables that
   was implied by their shared names in Eq.~\ref{eqn:simple_fpf}. 
 
   The variable $x_1$ is usually refered to as a local variable, which is 
-  contradicted by the given graph \cite{sellar1996}. This discrepancy 
+  contradicted by the given graph \cite{Sellar1996}. This discrepancy 
   arises from the explicit treatment of objectives and constraints as separate 
   expression blocks. This variable is could be considered a local 
   variable because it directly affects only analysis block $A_1$. However, by expanding
@@ -324,10 +319,8 @@ If the indegree limits are violated by the number of incoming connection edges (
   Additionally, a coupling cycle has no inherent start or end point. It would be acceptable to select
   node in the cycle as a starting point and proceed around the
   loop until the starting point is reached again. For the Sellar Problem, selecting 
-  $A_1$ as the starting point would yield a problem as given in 
-  Eq.~\ref{eqn:simple}, whereas selecting $A_2$ would yield the problem as given in 
-  Eq.~\ref{eqn:simple2}.
-
+  $D_1$ as the starting point would yield a problem as given in 
+  Eq.~\ref{eqn:simple}.
   Larger problems can contain more complex cycles in their FPG, indicating more 
   complex coupling between analyses. For example, a cycle can involve more than 
    two analysis blocks. Multiple independent cycles could also exist, indicating 
