@@ -4,30 +4,30 @@ We now discuss how the graph-based syntax defined in Sec.~\ref{s:syntax definiti
 
 \subsection{Maximal Connectivity Graph}
     \label{ss:MCG}
-For a specified MDAO problem, the maximal connectivity graph represents every analysis tool, objective, constraint, and global input being considered, as well as every possible interconnection among them.
+For a specified MDAO problem, the maximal connectivity graph represents every analysis tool, objective, constraint, and input being considered, as well as every possible interconnection among them.
 The definition of the MCG is given via construction.
-    To construct the maximal connectivity graph, we presume that a set of analysis tools, global inputs, objectives, and constraints are provided. 
+    To construct the maximal connectivity graph, we presume that a set of analysis tools, inputs, objectives, and constraints are provided. 
     Each of the $m$ analysis codes correspond to an index $i\in I_A$, $I_A=\{1,2,\ldots,m\}$, and are represented by an analysis block graph $G_{A_i}=(V_{A_i},E_{A_i})$.
     Each of the $n$ expression blocks correspond to an index $i\in I_E$, $I_E=\{1,2,\ldots,n\}$, and are represented by an expression block graph $G_{E_i}=(V_{E_i},E_{E_i})$.
-    Finally, the global inputs are represented as a set of variable nodes $V_\txt{in}$.
+    Finally, the inputs are represented as a set of variable nodes $V_\txt{in}$.
     We presume that $V_\txt{in}$, each $G_{A,i}$, and each $G_{E,i}$ are given, and that any potential connection between variables is specified in the form of connection edges in the set $E_{M,\txt{con}}$. One method for defining these connections is to use a consistant variable naming convention.
     We may then construct the maximal connectivity graph $M=(V_M,E_M)$ as
     \begin{IEEEeqnarray*}{rCl}
     V_M & = & V_\txt{in} \cup \left( \bigcup_{i \in I_A} V_{A_i} \right) \cup \left( \bigcup_{i \in I_E} V_{E_i} \right), \\
     E_M & = & E_{M,\txt{con}} \cup \left( \bigcup_{i \in I_A} E_{A_i} \right)  \cup \left( \bigcup_{i \in I_E} E_{E_i} \right).
     \end{IEEEeqnarray*}
-    The MCG $M$ is uniquely determined by the given set of analysis blocks, global inputs, and expression blocks. 
-    In the cases where the set of global inputs is not known a priori, the process of obtaining the FPG will reveal the required inputs, as discussed subsequently.
+    The MCG $M$ is uniquely determined by the given set of analysis blocks, inputs, and expression blocks. 
+    In the cases where the set of inputs is not known a priori, the process of obtaining the FPG will reveal the required inputs, as discussed subsequently.
 
 The nodes and edges in $M$ can be partioned in sets according to their type:
 \begin{equation}
 V_M = V_{M,\txt{var}} \cup V_{M,\txt{mod}}, \ V_{M,\txt{var}} \cap V_{M,\txt{mod}} = \emptyset,
 \end{equation}
-where $V_{M,\txt{var}}$ and $V_{M,\txt{mod}}$ are the sets of variable nodes and model nodes, respecively;
+where $V_{M,\txt{var}}$ and $V_{M,\txt{mod}}$ are the sets of variable nodes and function nodes, respecively;
 \begin{equation}
 E_M = E_{M,\txt{con}} \cup E_{M,\txt{mod}}, \ E_{M,\txt{con}} \cap E_{M,\txt{mod}} = \emptyset,
 \end{equation}
-where $ E_{M,\txt{con}}$ and $E_{M,\txt{mod}}$ are the sets of connection edges and model edges, respectively. These sets will be referenced in the process for obtaining an FPG.
+where $ E_{M,\txt{con}}$ and $E_{M,\txt{mod}}$ are the sets of connection edges and function edges, respectively. These sets will be referenced in the process for obtaining an FPG.
 
 \subsection{Fundamental Problem Graph}
     \label{ss:FPG}
@@ -43,7 +43,7 @@ where $ E_{M,\txt{con}}$ and $E_{M,\txt{mod}}$ are the sets of connection edges 
     \end{enumerate}
     %The set $I_F$ is an index set containing the indices of the analysis blocks in $F$ and it may only include the analysis blocks $A_i$ that meet requirements (2) and (6). 
     %Requirement (2) stipulates that each analysis blocks in $F$ must have at least one local output that is being used. 
-    %Requirement (3) stipulates that only the global inputs that are being used should be included. 
+    %Requirement (3) stipulates that only the inputs that are being used should be included. 
     %Requirements (4) and (5) provide the construction of the sets of nodes and edges, respectively. 
     Condition (1) asserts that only the nodes and edges provided by the maximal connectivity graph can be used in the fundamental problem graph and that every expression block must be included. 
     Condition (2) requires that analysis blocks must be included or excluded in their entirety. 
@@ -59,64 +59,19 @@ where $ E_{M,\txt{con}}$ and $E_{M,\txt{mod}}$ are the sets of connection edges 
     \label{ss:obtaining FPG}
     In general, there may be zero, one, or many graphs that satisfy the FPG conditions in Sec.~\ref{ss:FPG}.
     Here, we describe an algorithm for obtaining an FPG by starting with the MCG and disconnecting connection edges until the FPG conditions are met. 
-    With this approach, the problem is reduced to deciding which connection edges to remove. First, we describe a pruning subroutine used within the algorithm, and next we describe the algorithm itself.
+    With this approach, the problem is reduced to deciding which connection edges to remove. 
 
-    \begin{description}
-    \item[\bf{Subroutine: Pruning}] 
-        Given a digraph $G_1 = (V_1,E_1)$, let the subroutine denoted as $P_\txt{prune}$ operate on $G_1$ to produce a new digraph $G_2$ as
-	\begin{equation}
-	G_2 = P_\txt{prune}(G_1) = (V_2,E_2),
-	\end{equation} 
-	where $G_2$ now satisfies requirements (2) and (4) in Sec.~\ref{ss:FPG}.
-        Pruning is accomplished by first creating the reverse graph of $G_1$, $R = (V_1,E_R)$, where
-	\begin{equation}
-	E_R = \{ (x,y) \st (y,x) \in E_1\}.
-	\end{equation}
-	Next, a new node $b$ is added to $V_1$ and edges directed from this node to each of the expression blocks are added:
-    \begin{equation}
-        \forall i \in I_E,\forall v \in V_{E_i}, \txt{ if } \txt{deg}^+(v)=0 \txt{ then } (b,v) \in E_R
-    \end{equation}
-        The set of nodes that may be reached from $b$ is constructed as
-    \begin{equation}
-        U = \{ v \in V_1 \st \exists P \txt{ a path from $b$ to $v$}, \ P \subset R \}.
-        \end{equation}
-	Because $b$ is directed into only the expression blocks, any path from $b$ necessarily provides a path from at least one expression block, which means the node is being used in the problem formulation.
-
-        The list of analysis blocks with at least one node in $U$ is constructed as
-        \begin{equation}
-        I_2 = \{ i \in I_A \st V_{A_i} \cap U \neq \emptyset \}
-        \end{equation}
-        Any analysis block not in $I_2$ should be removed from the graph because none of its outputs contribute to the problem. Global inputs that are not being used are also removed. The set of nodes to remove is then
-        \begin{equation}
-        N = (V_\txt{in}\setminus U )  \cup \left( \bigcup_{i \notin I_2} V_{A_i} \right),
-        \end{equation}
-and the new set of nodes is created as
-        \begin{equation}
-        V_2 = V_1 \setminus N.
-        \end{equation}
-        Edges involving the removed nodes are also deleted as
-        \begin{equation}
-        E_2 = E_1 \setminus \{ (x,y) \st x \in N \txt{ or } y \in N  \}.
-        \end{equation}
-        The set of connection edges can be extracted by considering only edges whos endpoints are not in the same analysis block:
-        \begin{equation}
-        E_{2,\txt{con}} = \{(x,y) \in V_{2} \st \sim(x \in V_{A_i} \txt{ and } y \in V_{A_i} \txt{ for some } i \in I_2)\}.
-        \end{equation}
-        %which means $C_2 \cap V_{A_i} = \emptyset  \ \forall i \in I_1$, and $E_2 = C_2 \cup \left( \bigcup_{i \in I_1} E_{A_i} \right)$. 
-\end{description}
-
-\noindent The algorithm for obtaining an FPG can now be described as follows:
 \begin{description}
     \item[\bf{Step 1: Holes}] 
         The first step is to detect holes and disconnect the first set of connection edges downstream of them, as indicated in Fig.~\ref{f:hole}. 
         These connection edges are removed because they represent output variables which cannot be determined because the analysis function does not have adequate inputs. 
 
-        To begin the process, an initial graph is created as a pruned copy of the MCG
+        To begin the process, an initial graph is created as a copy of the MCG
         \begin{equation}
-        F_0 = P_\txt{prune}(M),
+        F_0 = M,
         \end{equation}
-        where $F_0 = (V_{F_0},E_{F_0})$, and $C_{F_0,\txt{con}}$ is also obtained as described. 
-        The set of variable nodes which are holes is identified as
+        with $F_0 = (V_{F_0},E_{F_0})$, and $C_{F_0,\txt{con}}$ is the set of connection edges. 
+        The set of variable nodes that are holes is identified as
         \begin{equation}
         H = \{v \in V_{F_0} \st v \in V_{M,\txt{var}} \txt{ and } \txt{deg}^-(v) < \txt{deg}_l^-(v) \},
         \end{equation}
@@ -158,15 +113,6 @@ If this step finishes without finding a hole in an expression block, it is guara
     \end{equation}
         which means that each set $B_j$ is constructed from the set $S_{\txt{edges},j}$ by taking only as many edges as are allowed by the upper and lower indegree limits of $v_j$.  
 The construction of each $B_j$ corresponds to making a decision about which edges to include and which edges not to include. 
-%An upper bound on the number of such decisions that need to be made is 
-%\begin{equation}
-%\prod_{j \in J} 	
-%	\begin{pmatrix}
-%		|S_{\txt{edges},j}| \\
-%		\txt{deg}_u^-(v_j)
-%	\end{pmatrix}
-%\end{equation}
-%where $(:)$ refers to standard $n$-choose-$k$ notation.
 Let the new set of connection edges be
     \begin{equation}
     E_{F_2,\txt{con}} = \{ e \in E_{F_1,\txt{con}} \st e \in B_j \txt{ for some } j \in J\}.
@@ -177,7 +123,7 @@ The set of all edges is created by removing the connection edges not in $E_{F_2,
     \end{equation}
     which gives
     \begin{equation}
-    F_2 = (V_{F_0},E_{F,2}).
+    F_2 = (V_{F_0},E_{F_2}).
     \end{equation}
     \begin{figure}[htb!]
         \begin{center}
@@ -189,43 +135,51 @@ The set of all edges is created by removing the connection edges not in $E_{F_2,
     \end{figure}
 
     \item[\bf{Step 3: Finalize}] 
-        The third and final step is to prune the graph a final time to exclude any analysis blocks that became unneeded after the collisions were resolved:
+        The third and final step is to prune the graph to exclude any analysis blocks that became unneeded after the collisions were resolved.
+        This is accomplished by first creating the reverse graph of $F_2$, $R = (V_R,E_R)$, where
+	\begin{equation}
+	E_R = \{ (x,y) \st (y,x) \in E_{F_2}\}, \ V_R = V_{F_2}
+	\end{equation}
+	Next, a new node $b$ is added to $V_R$ and edges directed from this node to each of the expression blocks are added:
     \begin{equation}
-        F = P_\txt{prune}(F_2),
+        \forall i \in I_E,\forall v \in V_{E_i}, \txt{ if } \txt{deg}^+(v)=0 \txt{ then } (b,v) \in E_R
     \end{equation}
-        with $F = (V_F,E_F)$.
-        The indices of the analysis blocks implemented in the FPG can then be found as
+        The set of nodes that may be reached from $b$ is then constructed as
+    \begin{equation}
+        U = \{ v \in V_R \st \exists P \txt{ a path from $b$ to $v$}, \ P \subset R \}.
+        \end{equation}
+	Because $b$ is directed into only the expression blocks, any path from $b$ necessarily provides a path from at least one expression block, which means the node is being used in the problem formulation.
+
+        The list of analysis blocks with at least one node in $U$ is constructed as
+        \begin{equation}
+        I_F = \{ i \in I_A \st V_{A_i} \cap U \neq \emptyset \}
+        \end{equation}
+        Any analysis block not in $I_F$ should be removed from the graph because none of its outputs contribute to the problem. Inputs that are not being used are also removed. The set of nodes to remove is then
+        \begin{equation}
+        N = (V_\txt{in}\setminus U )  \cup \left( \bigcup_{i \notin I_F} V_{A_i} \right),
+        \end{equation}
+and the new set of nodes is created as
+        \begin{equation}
+        V_F = V_{F_2} \setminus N.
+        \end{equation}
+        Edges involving the removed nodes are also deleted as
+        \begin{equation}
+        E_F = E_{F_2} \setminus \{ (x,y) \st x \in N \txt{ or } y \in N  \}.
+        \end{equation}
+
+The fundamental problem graph is then
+\begin{equation}
+F = (V_F,E_F).
+\end{equation}
+        If desired, the indices of the analysis blocks implemented in the FPG can then be found as
     \begin{equation}
         I_F = \{ i \in I_A \st G_{A_i} \subset F \}.
     \end{equation}
-%       \begin{
-%       \begin{equation}
-%       I_F =  \{i \in I \ | \ \exists v \in V_{A_i} \txt{ such that }  t_\txt{node}(E_{F,2}^{-1}(v))=\txt{`model'} \txt{ and } \txt{deg}^+(v) > 0 \},
-%       \end{equation}
-%       where the degree is calculated with respect to $F_2$. 
-%       This set excludes both the analysis blocks that were unused in the original MCG and those that became unused in step 1 or step 2.
-%
-%       The set of used global inputs is constructed as
-%       \begin{equation}
-%       V_{\txt{in},F} = \big\{v \in V_\txt{in} \ \big| \ |\{(x,y) \in E_{F,2}(v) \st y \in V_{A_i} \txt{ for } i \in I_F  \}| > 1 \big\},
-%       \end{equation}
-%       which requires that at least two edges directed out of the nodes in $V_{\txt{in},F}$ must be to the analysis blocks indexed by $I_F$.
-%
-%       Finally, the set of nodes and edges describing a fundamental problem graph is given by
-%       \begin{equation}
-%       V_F = V_{\txt{in},F} \cup V_\txt{out} \cup \left( \bigcup_{i \in I_F} V_{A_i} \right),
-%       \end{equation}
-%       \begin{equation}
-%       C_{F} = \{ (x,y) \in C_{F,2} \st x,y \in V_F\},
-%       \end{equation}
-%       \begin{equation}
-%       E_F = C_F \cup \left( \bigcup_{i \in I_F} E_{A_i} \right),
-%       \end{equation}
-%       \begin{equation}
-%       F = (V_F,E_F).
-%       \end{equation}
-
-    \end{description}
+        Also, the set of connection edges can be extracted by considering only edges whos endpoints are not in the same analysis block:
+        \begin{equation}
+        E_{F,\txt{con}} = \{(x,y) \in E_{F} \st \sim(x \in V_{A_i} \txt{ and } y \in V_{A_i} \txt{ for some } i \in I_F)\}.
+        \end{equation}
+\end{description}
 
 This algorithm will always provide an FPG if one exists. If an FPG does not exist, the limiting factors preventing a valid formulation are revealed.
 
@@ -233,13 +187,14 @@ This algorithm will always provide an FPG if one exists. If an FPG does not exis
 \label{ss:process}
 Section \ref{ss:obtaining FPG} provided an algorithm for obtaining an FPG from the given MCG. However, if an FPG cannot be obtained, this algorithm can be applied as part of a larger process in which the designer changes the problem or the supplied analyses to attempt to obtain an FPG. The following steps detail the suggested procedure for obtaining an FPG:
 \begin{enumerate}
-\item[\bf{(A)}] Begin with a set of global inputs, analysis codes, objectives, and constraints.
+\item[\bf{(A)}] Begin with a set of inputs, analysis codes, objectives, and constraints.
 \item[\bf{(B)}] Build the MCG as described in Sec.~\ref{ss:MCG}.
 \item[\bf{(C)}] Set indegree limits for variable nodes representing local inputs as described in Sec.~\ref{s:indegree-outdegree} and Table \ref{t:variable node classification}
 \item[\bf{(D)}] Run the FPG algorithm described in Sec.~\ref{ss:obtaining FPG}. If a valid FPG is unattainable:
 		\begin{enumerate}
-\item Change the MCG by adding analysis blocks and/or global inputs, which means identifying new analyses to include in a potential MDAO workflow.
+\item Change the MCG by adding analysis blocks and/or inputs, which means identifying new analyses to include in a potential MDAO workflow.
 \item Change indegree limits (see Table \ref{t:variable node classification}).
 \end{enumerate}
 \item[\bf{(E)}] Repeat from step (A) until an FPG is obtained.
 \end{enumerate}
+This process illustrates how the algorithm for obtaining a valid FPG is to be applied. However, this process also serves to illustrate how a designer may revist the MCG after an FPG was already produced. For example, if a designer wants to change an input to be multi-fidelity, new analysis blocks can be added to the original MCG and indegree limits can be modified accordingly, which corresponds to steps (A)--(C), and then the algorithm can be applied again.

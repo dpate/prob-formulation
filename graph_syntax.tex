@@ -50,18 +50,18 @@ Path $P$ is a \emph{cycle} if $x_0 = x_k$.
   \label{ss:types}
 Along with these fundamentals of graph theory, we categorize nodes and edges into distinct types in order to provide an intuitive approach to MDAO problem formulation. The three node types are
   \begin{description}
-    \item[\bf{variable:}] represents scalar or array data, inputs and outputs,
-    \item[\bf{model:}] represents the computation peformed by analysis tools,
-    \item[\bf{driver:}] control logic capable of managing iterations (PSG),
+    \item[\bf{variable node:}] represents scalar or array data, inputs and outputs,
+    \item[\bf{function node:}] represents the computation peformed by analysis tools,
+    \item[\bf{driver node:}] control logic capable of managing iterations (PSG),
   \end{description}
 and the three edge types are
-%$V_\txt{var}$, $V_\txt{model}$, $V_\txt{driver}$
+
   \begin{description}
   \item[\bf{connection edge:}] exchange of information external to analysis tools,
-  \item[\bf{model edge:}] exchange of information internal to analysis tools,
+  \item[\bf{function edge:}] exchange of information internal to analysis tools,
   \item[\bf{driven edge:}] passing of information from a driver node to a variable node (PSG).
   \end{description}
-Figure \ref{f:sellar types} demonstrates the usage of these node and edge types via the Sellar problem. Model nodes are indicated by squares, variable nodes are indicated by circles, connection edges are indicated by dotted lines, and model edges are indicated by solid lines.
+Figure \ref{f:sellar types} demonstrates the usage of these node and edge types via the Sellar problem. function nodes are indicated by squares, variable nodes are indicated by circles, connection edges are indicated by dotted lines, and function edges are indicated by solid lines.
 \begin{figure}[htb!]
   \begin{center}
     \includegraphics[width=4.0in]{images/sellar_types}
@@ -74,22 +74,18 @@ Figure \ref{f:sellar types} demonstrates the usage of these node and edge types 
   The driver node and the driven edge are allowed to be present only in PSGs, whereas the other node and edge types can be present in any of the three graph types, 
   subject to the following restrictions: 
   \begin{enumerate}
-  \item A model node may have only one edge directed to or from another model node.
-  \item A model node may have only model edges directed in or out.
-  \item A model node must have at least one edge directed in and at least one edge 
+  \item A function node may have only one edge directed to or from another function node.
+  \item A function node may have only function edges directed in or out.
+  \item A function node must have at least one edge directed in and at least one edge 
     directed out.
-  \item If a variable node has an outgoing model edge, then it may not have other outgoing edges.
-  \item If a variable node has an incoming model edge, then it may not have any additional incoming edges.
+  \item If a variable node has an outgoing function edge, then it may not have other outgoing edges.
+  \item If a variable node has an incoming function edge, then it may not have any additional incoming edges.
   \end{enumerate}
 
   In Alexandrov and Lewis's REMS syntax only two node types (variable and function) 
-  and one edge type are included \cite{alexandrov2004}. We have chosen to adopt 
-  the terminology ``model'' node instead of ``function'' node to be consistent 
-  with modern MDAO framework terminology. The present work adds one additional 
+  and one edge type are included \cite{alexandrov2004}. The present work adds one additional 
   node type and two additional edge types to the syntax to allow descriptive
   graphs for all three phases of the design problem formulation process indicated in Figs.~\ref{f:tree} and \ref{f:hourglass}.
-
-
 
 \subsection{Analysis Blocks}
 \label{ss:analysis blocks}
@@ -97,7 +93,7 @@ Analysis tools take in a set of input variables and then calculate
 the values for their respective outputs. We represent this process
 by a digraph called an \emph{analysis block}; a notional analysis block is shown in Fig.~\ref{f:analysis block}. 
 %Each analysis block is a directed graph denoted as $ A=(V_{A},E_{A})$
-As indicated in this figure, analysis blocks comprise three sets of nodes representing the distinct local inputs, the analysis (computation), and the distinct local outputs. The local input and local outputs nodes are variable nodes, while the nodes representing the analysis are model nodes. All of the edges within the analysis block are model edges, and are considered fixed to the analysis block. This graph structure demonstrated by Fig.~\ref{f:analysis block} satisfies the rules listed in Sec.~\ref{ss:types}. Reciprocally, the rules ensure that analysis tools are represented via this analysis block structure.
+As indicated in this figure, analysis blocks comprise three sets of nodes representing the distinct local inputs, the analysis (computation), and the distinct local outputs. The local input and local outputs nodes are variable nodes, while the nodes representing the analysis are function nodes. All of the edges within the analysis block are function edges, and are considered fixed to the analysis block. This graph structure demonstrated by Fig.~\ref{f:analysis block} satisfies the rules listed in Sec.~\ref{ss:types}. Reciprocally, the rules ensure that analysis tools are represented via this analysis block structure.
 \begin{figure}[htb]
     \begin{center}
     \includegraphics[width=3.0in]{images/analysis_block}
@@ -107,27 +103,17 @@ As indicated in this figure, analysis blocks comprise three sets of nodes repres
 \label{f:analysis block}
 \end{figure}
 
-The model edge connecting the two model nodes represents the necessary calculations to map the inputs to the outputs of the analysis. 
+The function edge connecting the two function nodes represents the necessary calculations to map the inputs to the outputs of the analysis. 
 This edge also provides the opportunity to encode computational cost or other characteristics of the analysis code as a weight in a weighted graph formulation. 
 Since all the edges within analysis blocks are fixed, the blocks themselves are fixed sub-graphs within the overall MDAO problem graph. 
 The connectivity of nodes and edges in an analysis block cannot be altered for the purposes of MDAO problem formulation; 
 however, analysis block sub-graphs can be added or removed from the MDAO problem graph as needed.
 Variable nodes in an analysis block can be distinguished as either an input or an output by the manner in which they are connected. 
-As shown in Fig.~\ref{f:analysis block}, inputs are represented as variable nodes that have an outgoing edge into a model node, and outputs are represented as variable nodes that have an incoming edge from a model node. 
+As shown in Fig.~\ref{f:analysis block}, inputs are represented as variable nodes that have an outgoing edge into a function node, and outputs are represented as variable nodes that have an incoming edge from a function node. 
 
-%MDAO problems require that information be passed between sets of analyses ((DP: needs better transition)).
-%For this purpose, connection edges are placed to link analysis blocks
-% 
-%When information from one output of an analysis block is passed to an 
-%input of another analysis block, a new connection edge is added between the two 
-%variable nodes involved in the exchange. 
-%These connection edges are free, and unlike the edges within an analysis block, the edges can be added or removed depending on the needs of a given design problem. 
-%In other words, free connection edges are created by engineers linking an output of one tool to an input of another one. 
-%It is allowable for a single output to have outgoing connection edges to multiple downstream inputs. 
-
-\subsection{Objectives, Constraints, and Global Inputs}
+\subsection{Objectives, Constraints, and Inputs}
 \label{ss:objectives and constraints}
-Along with analysis tools, objectives, constraints, and global inputs also need to be represented.
+Along with analysis tools, objectives, constraints, and inputs also need to be represented.
 In the case of objective functions, a single output value generated by an analysis block could be selected, but commonly multiple values are assembeled together to form a composite objective function. 
 Generally, both objective and constraint functions accept a set of inputs and map them to an output value of significance to the overall design problem. 
 
@@ -137,15 +123,16 @@ Although fundamentally no different than an analysis block, for clarity and conv
 Therefore, we use an \emph{expression block} to represent an objective or constraint. 
 These expression block graphs follow the same structure as analysis blocks presented in Sec.~\ref{ss:analysis blocks}.
 
-Inputs to multiple analysis tools are considered global inputs. These are represented in the graph syntax by single variable nodes refered to as global inputs---the definition of global with respect to a node will be defined subsequently.
-%For the sake of consistency of naming conventions $F_j$, $G_j$, and $H_j$ are used to deonte expression blocks for objectives, inequality constraints, and equality constraints. 
-%If the relevant objective and constraint values are direct results from other analysis blocks and composite functions are not needed, then expression blocks may be omitted from the MDAO problem graph. 
-Figure \ref{f:obj-cons} demonstrates the use of global inputs (black circles), analysis blocks (dotted boxes), and expression blocks (dashed boxes), for the Sellar problem graph.
+Finally, inputs to the problem formulation are represented in the graph by individual variable nodes with connection edges directed out to corresponding local inputs of analysis blocks, and they are referred to simply as \emph{inputs}. 
+These nodes serve to indicate that the variable nodes they are connected to represent the same variable in the problem formulation.
+These nodes serve to unify the variable nodes they are connected to. That is, they indicate that these nodes refer to the same input variable.
+
+Figure \ref{f:obj-cons} demonstrates the use of inputs (black circles), analysis blocks (dotted boxes), and expression blocks (dashed boxes), for the Sellar problem graph.
 \begin{figure}[htb!]
   \begin{center}
     \includegraphics[width=4.0in]{images/sellar_obj_and_cons}
   \end{center}
-  \caption{Sellar problem graph indicating global inputs (black circles), analysis blocks (dotted boxes), and expression blocks (dashed boxes).}
+  \caption{Sellar problem graph indicating inputs (black circles), analysis blocks (dotted boxes), and expression blocks (dashed boxes).}
 \label{f:obj-cons}
 \end{figure} 
 
@@ -157,12 +144,6 @@ Figure \ref{f:obj-cons} demonstrates the use of global inputs (black circles), a
   is the number of edges directed out and it is denoted as $\txt{deg}^+(v)$ \cite{Diestel2010}.
   In this paper, the indegree and outdegree of a given node refer only to the number of the connection edges 
   directed into or out of the node, respectively. 
-%The number of driven edges is not considered relevant because any number 
-%  of drivers could be involved in different parts of a solution process. For 
-%  example, in a sequential optimization in which a global optimizer is used first 
-%  followed by a gradient-based optimizer second to refine global optimizer 
-%  result, design variables would have incomming driven edges from both optimizers. 
-%  These driven edges would not affect the indegree of those variable nodes. 
 
   We may now define the \emph{upper indegree limit} 
   \begin{equation}
@@ -216,80 +197,8 @@ If the indegree limits are violated by the number of incoming connection edges (
 \end{equation}A collision represents redundant information being supplied to the variable node from two or more sources. This conflict implies an ambiguity as to which information is to be used as an input for the analysis tool.
   \end{description} 
 
-%For the Sellar problem, there are three design variables: $x_1^*$, $z_1^*$, and 
-%$z_2^*$. In Fig. \ref{f:designvars} each variable is 
-%annotated with the lower indegree limit, and the three design variables are identified 
-%in bold((DP:check)). 
-%
-%\begin{figure}[htb!]
-%  \begin{center}
-%    [Graph Here....]
-%    \includegraphics[width=.6\textwidth]{images/design_vars_graph}
-%  \end{center}
-%  \caption{Sellar problem graph with lower indegree limits for all variables \label{f:designvars}}
-%\end{figure}
-%
-%In Fig. \ref{f:designvars}, the design variable are void of incoming edges. 
-%For a valid PSG, design variables could have one or more incoming driven edges representing a value determined by an optimizer. 
-
-
   The presence of holes and collisions in a graph represent conflicts that will give
-  rise to an invalid problem formulation. It is expected that a maximal connectivity graph will posess these conflicts, whereas a fundamental problem graph will not.
-
-%However, if the graph remains unchanged while the user changes the lower indegree limit of the node to now be zero, then the node becomes a design variable.
-
-%In some cases, the distinction between a hole and a design variable is rather subtle. Both have no incoming connection edges, but 
-%
-%
-%Note that although there are no incoming edges, design variables are not holes 
-%in the graph as defined by Eq. \ref{e:hole}. Since they have $\txt{deg}_l^-(v)=0$ 
-%having no incoming connection edges does not violate their lower indegree limit. 
-%However, the concept of holes can be useful for identifying potential design variables
-%given an arbitrary MCG. If you first set $\txt{deg}_l^-(v)=1$ for all variable nodes, 
-%and then find the resulint holes, you will have a list of variable nodes that 
-%could potentially be design variables. Some variables will be true design variables, 
-%while others might represent missing information in the problem formulation. For 
-%instance, if there is a hole for a drag input of an aircraft mission analysis code 
-%then this is not likely a good choice for a design variable. So it is up to the designer to 
-%examine each hole and decide if it's an appropriate design variable. If 
-%the variable should become a design variable then set $\txt{deg}_l^-(v)=0$. 
-%If a variable should not be a design variable, then leave it as a hole which 
-%needs to be addressed in a manner discussed in section \ref{ss:obtaining FPG}.
-
-\subsection{Local vs Global Nodes }
-
-  All global variable nodes have more than one outgoing edge. Conversely all local 
-  variable nodes have only a single outgoing edge. Fig.~\ref{f:sellar types} contains 
-  three global variables that are not present in the problem formulation given by 
-  Eq.~\ref{eqn:simple_fpf}: $x_1^*$, $z_1^*$, and $z_2^*$. The presence of the 
-  new nodes is required in order to represent the equality of the given variables that
-  was implied by their shared names in Eq.~\ref{eqn:simple_fpf}. 
-
-  The variable $x_1$ is usually refered to as a local variable, which is 
-  contradicted by the given graph \cite{Sellar1996}. This discrepancy 
-  arises from the explicit treatment of objectives and constraints as separate 
-  expression blocks. This variable is could be considered a local 
-  variable because it directly affects only analysis block $D_1$. However, by expanding
-  $F$ into an expression block with its own inputs, $F$ maintains its own local 
-  copy of the $x_1$ variable. This formulation necessitates the creation of the global 
-  node $x_1^*$ in the graph with two outgoing edges to link the two $x_1$ inputs nodes 
-  in the respective blocks. 
-
-This classification of $x_1^*$ in the Sellar problem
-  as a global variable works well within the structure of the Collaborative 
-  Optimization (CO) archtiecture \cite{braun1996thesis}. The rules for constructing 
-  a problem with CO require that each discipline be given an independent local 
-  copy of all global variables. All local variables are retained uniquely 
-  within their respective disciplines, except when a local design variable appears 
-  explicitely in the objective or global constraint. In this case, a global 
-  variable is created and the analysis block is again assigned an 
-  independent local copy of it. Following our definition of global and local variable 
-  nodes, no such exception for local variables in global expressions is 
-  necessary. Whenever a variable is included in an expression block, 
-  it forces the creation of a global variable node in the graph which will 
-automatically result in the correct CO structure.
-
-  
+  rise to an invalid problem formulation. It is expected that a maximal connectivity graph could indicate these conflicts, whereas a fundamental problem graph will not.
 
 \subsection{Coupling Between Analyses}
   In MDAO, coupling is the mutual dependence the outputs of two or more analysis 
@@ -347,19 +256,19 @@ automatically result in the correct CO structure.
 
   In a multi-fidelity problem, a given variable node may have multiple incoming 
   edges without implying a collision as defined by by Eq.~\ref{e:collision}. 
-  Fig.~\ref{f:collision_example} shows a modified version of the Sellar problem 
-  with a new analysis, $D_0$, representing a low fidelity version of $D_1$. 
-  In this modified graph, the annotations indicate the upper indegree limit. For 
-  $D_2$, $\txt{deg}^-_u(D_2.y_1) = 2$ which avoids a collsion. A  
-  $\txt{deg}^-_u(v) > 1$ for any variable in a graph represents a decision to 
+An  upper indegree limit above unity for any variable in a graph represents a decision to 
   allow multiple fidelities to interact at that part of the graph in order to allieviate
-  a conflict. In section \ref{ss:obtaining FPG} we present an algorithm for finding 
+  a conflict. 
+  Figure \ref{f:collision_example} shows a modified version of the Sellar problem 
+  with a new analysis, $D_0$, representing a low fidelity version of $D_1$. 
+  In this modified version, the variable nodes with an upper indegree limit of two are highlighted in gray, and changing these upper degree limits for the variable nodes representing $y_1$ in $D_2$, $F$, and $G_1$ avoids a collision.
+In section \ref{ss:obtaining FPG} we present an algorithm for finding 
   conflicts within a given MCG so that a designer can make the necessary decisisons about each 
   one in turn. 
   \begin{figure}
     \begin{center}
       \includegraphics[width=4in]{images/sellar_mulfi}
-    \caption{Graph of the modified Sellar, multi-fidelity problem with $\txt{deg}^-_u(v)$ annotations on variable nodes\label{f:collision_example}}
+    \caption{Graph of the modified Sellar problem with multi-fidelity nodes highlighed in gray.\label{f:collision_example}}
   \end{center}
   \end{figure}
 
