@@ -54,7 +54,7 @@ it is also very possible that it will be different in significant ways.
 By repeating downselection algorithm from the MCG you allow for any new interdisciplinary couplings and  
 information conflicts to play a role in selecting the most appropriate FPG. 
 
-Once a desired FPG is identified, the graph syntax described in the paper can be 
+Once a desired FPG is identified, the driver node and driven edge described in the paper can be 
 leveraged to formulate a Problem Solution Graph (PSG). This graph includes all of the 
 same information from the FPG while additionally describing the particular MDAO 
 solution architecture, e.g. MDF, IDF, BLISS, ATC, that will be used to solve the problem.  
@@ -62,13 +62,21 @@ Many possible PSGs could be formulated to solve a problem corresponding to a
 specified FPG. The application of the syntax to PSGs has not been illustrated in the paper, 
 but the basic concept of applying multiple solution strategies to a given problem 
 formulation has been well established by a number of MDAO architecture 
-benchmarking efforts\cite{Tedford2009,gray2013}. Furthermore the validity of applying 
+benchmarking efforts. Furthermore the validity of applying 
 graph syntax to the description of specific problem solutions has been demonstrated 
 by XDSM. 
 
-For simple problems with few analysis tools and variables, the formulation of a valid problem description is straightforward.  
-However, MDAO problems continue to grow in scale and complexity.  
-As the numbers of analysis tools and variables have increased, it has become increasingly challenging and time consuming for engineering teams to determine how the multiple analysis tools can be interconnected to produce valid problem formulations, to know when other tools must be introduced, and to determine the number of free variables in the problem that can or should be varied by the designer or an optimizer.  
-The graph formalism presented in this paper is intended to offer value in this context of increasing problem complexity by providing a formal approach to identify and resolve missing and redundant data in order to create valid MDAO problem formulations.  
+For simple problems with few analysis tools and variables, the formulation of a 
+valid problem description is straightforward.  However, MDAO problems continue to 
+grow in scale and complexity. As the numbers of analysis tools and variables have 
+increased, it has become increasingly challenging and time consuming for engineering 
+teams to determine how the multiple analysis tools can be interconnected to produce 
+valid problem formulations. Large complex problems also present signficant challenges
+as the design process evolves requiring the integration of additional and higher-fidelity 
+analysis tools into an existing model. The graph syntax presented in this paper 
+is intended to offer value in this context of increasing problem complexity by 
+providing a formal approach to identify and resolve data conflicts in a set of interconnected
+analysis tools and to help arrange those tools into an effective and efficient system model
+where MDAO tools and techniques can be quickly and easily applied.  
 
 
