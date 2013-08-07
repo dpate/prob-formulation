@@ -19,13 +19,13 @@
     The time and expense for setting up 
     analysis models is growing in conjunction with the increasing scope of MDO problems. 
     Multidisciplinary Design Analysis and Optimization (MDAO)
-    frameworks such as OpenMDAO\cite{Gray2012} and {ModelCenter}\textregistered have enabled a new level of analysis tool integration 
+    frameworks such as OpenMDAO \cite{Gray2012} and {ModelCenter}\textregistered have enabled a new level of analysis tool integration 
     and have paved the way for models with more analyses and increasing numbers of interdisciplinary couplings. This 
     new capability has created a new challenge. Even models with tens of analyses could include hundreds or thousands
     of variables that are interdependent and must be linked in the framework. 
     A common situation is that different analyses provide differing values for the 
-    same physical quantity, and these conflicts need to be resolved. These differing values 
-    may not even be in the same format. These occurrences are particularly acute when analysis tools have differing fidelities. For
+    same physical quantity, often in different data formats, and these conflicts need to be resolved. 
+   These occurrences are particularly acute in situations in which analysis tools have differing fidelities. For
     example, an abstracted aerodynamic analysis such as an empirical drag buildup model may return only
     integrated drag, whereas a CFD tool may return pressure and shear stress distributions across the entire
     surface grid. If an analysis downstream of the aerodynamics tool needs only integrated drag as an input,
@@ -59,36 +59,30 @@
     interconnectivity, we base our approach on the representations and techniques of graph theory.
     The approach begins by constructing the \emph{maximal connectivity graph (MCG)} describing all possible
     interconnections between the analysis tools proposed by the engineers. Graph operations are then
-    conducted to reduce the MCG down to a \emph{fundamental problem graph (FPG)} that describes the set of analysis
+    conducted to reduce the MCG to a \emph{fundamental problem graph (FPG)} that describes the set of analysis
     tools needed to solve the specified system-level design problem.
-    Any particular solution procedure for the problem; any relevant MDO solution architecture, e.g. MDF,
-    IDF, CO, BLISS, could be selected \emph{post facto} to implement the system-level optimization by
-    constructing a \emph{problem solution graph (PSG)} and the corresponding problem solution approach.
-    The concept of the FPG and the identification of feasible FPGs are the main contributions of the paper.
+    Any particular solution procedure for the problem, such as the choice of an MDO architecture, e.g. MDF,
+    IDF, CO, BLISS, could then be described by
+    constructing a \emph{problem solution graph (PSG)}.
+    The concept of the FPG and the identification of feasible FPGs from an MCG are the main contributions of the paper.
 
     The paper is organized as follows. First, we describe the differences between a fundamental problem
     formulation, which is based only on the system-level optimization problem statement that the
     engineers desire to solve and on the available analysis tools, and a specific problem formulation, which
-    additionally presumes a specific MDO solution approach to the problem. Next, we survey the literature in applying
+    additionally presumes a specific MDO solution approach to the problem. Next, we survey the literature related to
     graph theoretic and formal language approaches to multidisciplinary design problem formulation. 
     We then discuss our graph syntax and representation of MDO problems and describe the procedures for 
     determining the MCG and FPG. Finally, we present an example problem based on an MDO analysis of a 
-    commercial aircraft and discuss additional applications enabled by our approach.
+    commercial aircraft.
 
 \section{Motivation}
 \subsection{Specific vs Fundamental Problem Formulation }
 	\label{s:specific vs fundamental}
-    The Fundamental Problem Formulation (FPF) is our terminology for a 
-    statement of the overall system-level optimization problem that contains only 
-    information about analysis tools, design variables, objectives, and constraints without any 
-    information about how to solve the problem. It does not depend on the choice 
-    of solution-specific elements such as the MDAO framework, optimization 
-    algorithm, iterative solver, or execution sequence. This description represents 
-    the problem from the point of view of a engineer specifying the details of a design problem 
-    without constrainig how it should be solved. The lack of solution information 
-    in the FPF contrasts with problem statements that are written with reference 
-    to a specific solution strategy or with implication of a specific execution sequence.
-    For example, consider the Sellar test problem \cite{AIAA:sellar}, with an FPF given as follows:
+    The Fundamental Problem Formulation (FPF) is our terminology for a statement of the overall system-level optimization problem that contains only  information about analysis tools, design variables, objectives, and constraints without reference to a solution approach. 
+In particular, the FPF does not depend on the choice of solution-specific elements such as the MDAO framework, optimization algorithm, iterative solver, or execution sequence. 
+This description represents  the problem from the point of view of an engineer specifying the design problem that he/she desires to solve without specifying how the problem should be solved. 
+The lack of solution information in the FPF contrasts with optimization problem statements that are written with reference to a specific solution strategy or with implication of a specific execution sequence. 
+For example, consider the Sellar test problem \cite{AIAA:sellar}, with an FPF given as follows:
 
     \begin{align}
         \txt{given} & \ \ y_1 = D_1(x_1,y_2,z_1,z_2) \notag
@@ -104,25 +98,25 @@
     In Eq.~\ref{eqn:simple_fpf}, $y_1$ is an output of $D_1$ as well as an input 
     to $D_2$. Similarly, $y_2$ is an output of $D_2$ as well as an input 
     to $D_1$. This implies that $D_1$ and $D_2$ are coupled together by means 
-    of their reciprical dependence. However no information is given as to weather
-    $D_1$ or $D_2$ should be run before the other. Given Eq \ref{eqn:simple_fpf}, 
+    of their mutual dependence. However no information is given as to weather
+    $D_1$ or $D_2$ should be run before the other. Given Eq.~\ref{eqn:simple_fpf}, 
     it would be equally valid to run $D_1$ first, $D_2$ first, or both simultaneously. 
+Any MDAO root finding method or compatibility constraint formulation could be implemented to achieve consistency between $D_1$ and $D_2$.
     
-    The Sellar problem is very simple. There is only a single coupling interaction 
-    between the two disciplines and there are a very limited set of variables. 
-    That makes it relatively easy to describe the problem given in 
-    Eq.~\ref{eqn:simple_fpf}. However, for larger more complex problems, 
-    it is much harder to identify the fundamental problem formulation. Interdisciplinary 
-    couplings are not always obvious and the set of analsyis tools and variables are 
-    much larger. To further compount the problem engineers may already have some 
-    solution strategy or execution order they are used to applying to problems. 
-    Hence, it is common to see problem formulations given in a less general form 
-    as in Eq. \ref{eqn:simple}. Here $D_1$ must be run 
-    first. A new variable is introduced, $\hat{y_2}$, to break the dependence of
-    $D_1$ on $D_2$. Also a new coupling constraint, $H$, is added to enforce the 
-    consistency that would otherwise be lost due to $\hat{y_2}$. Equation \ref{eqn:simple} is 
-    a more specific, but equally valid, expression of the Sellar problem that could easily be 
-    generated through an incremental approach to constructing the problem. 
+    The Sellar problem is simple, with only a single coupling interaction 
+    between the two disciplines and a very limited set of variables. 
+ However, for larger and more complex problems, 
+    it is much more difficult to identify the fundamental problem formulation. Interdisciplinary 
+    couplings are not always apparent and the set of analysis tools and variables are 
+    much larger. 
+
+An example of a more specific problem statement for the Sellar problem is presented in Eq. 2.  
+In this formulation, the implication is that  $D_1$ must be run 
+    first. A new variable, $\hat{y_2}$, is introduced to break the direct dependence of
+    $D_1$ on $D_2$, and a new coupling constraint, $H$, is added to enforce 
+    consistency. Equation \ref{eqn:simple} is 
+    an equally valid expression of the Sellar problem that could be 
+    generated  based on a preferred solution approach.
 
     \begin{align}
         \txt{given} & \ \ y_1 = D_1(x_1,\hat{y_2},z_1,z_2) \notag
@@ -136,52 +130,53 @@
     \end{align}
 
 
-\subsection{Existing Graph-Based Syntax}
+\subsection{Background in Graph-Based Descriptions of MDAO Problems}
 	\label{s:existing syntax}
     As indicated in the examples in Sec.~\ref{s:specific vs fundamental}, the mathematical 
-    language for specifying problem formulations is very general and can be used both for 
-    fundamental and specific problem formulations. Tedford and Martins used this mathematical syntax to specify the 
+    language for specifying optimization problem formulations is very general and can be used both for 
+    fundamental and specific problem formulations. Tedford and Martins used this syntax to specify the 
     FPF for a set of test problems and also to describe specific formulations for solving them with a 
-    number of optimization architectures\cite{Tedford2009}. This enabled them to produce a set of 
-    results benchmarking the performance of different optimziation architectures against a fixed set of 
-    problems. Gray et al. also benchmarked the performance of a set of MDAO architectures\cite{Gray2013}. 
-    This work looked at a larger set of architectures and proposed the use of OpenMDAO as a platform to begin 
-    building a larger community developed set of test problems and architectures. Both benchmarking efforts 
-    demonstrate how multiple specific problem formulations can relate to a common FPG and prove the 
+    number of optimization architectures \cite{Tedford2009}. By solving different specific problem statements corresponding to the same FPF, they were able to  benchmark the performance of different optimization architectures against a fixed set of 
+    problems. Gray et al. also benchmarked the performance of a set of MDAO architectures  with a similar approach \cite{Gray2013}. 
+    This work examined a larger set of architectures and proposed the use of OpenMDAO as a platform to build a larger community-developed set of test problems and architectures. Both of these benchmarking efforts 
+    demonstrate how multiple specific problem formulations can relate to a common FPF and indicate the 
     value of a common problem descrition. The challenge with this 
-    traditional mathematical syntax is that it is not easily manipulated or analyzed. 
+    traditional syntax is that it is not easily manipulated or analyzed with automatic procedures to explore alternate problem formulations. 
 
     A number of graph-based methods have been used successfully to translate the 
     mathematical syntax into a more useful computational form. 
     Steward's Design Structure Matrix (DSM) is a square adjacency matrix which captures the relationship between analysis tools.
-    Off-diagonal elements of the matrix indicate coupling\cite{Steward1981}. Since a DSM describes a square adjacency matrix, 
+    Off-diagonal elements of the matrix indicate coupling \cite{Steward1981}. Since a DSM describes a square adjacency matrix, 
     it can be represented in an equivalent directed graph in which nodes represent analysis tools and 
     edges represent information dependence between those tools. The ordering of elements in a DSM can be used to indicate 
     execution order.  For more complex problems, choosing the proper order to run analysis tools is a challenging task. 
     Rogers et al.~developed DeMAID to manipulate a DSM to find an ordering for analysis tools that 
-    reduces the cost of solving highly coupled systems\cite{rogers1996,rogers1996demaid}. This re-ordering is done through 
-    row operations on the DSM matrix and yields multiple specific problem 
+    reduces the cost of solving highly coupled systems \cite{rogers1996,rogers1996demaid}. This re-ordering is done through 
+    operations on the DSM matrix and yields multiple specific problem 
     formulations which all solve the same FPF. 
     
-    A DSM by itself is insufficient to describe complete problem formulations because it 
+    A DSM itself is insufficient to describe complete optimization problem formulations because it 
     captures only information about data dependency between analyses; objective and 
     constraint information is missing from the DSM description of the problem. 
     An alternative matrix-based syntax, called a Functional Dependency Table (FDT), was proposed by Wagner and Papalambros. 
-    FDT represents the relationship between functions, including objectives and constraints, and specific variables that affect 
-    them\cite{Wagner1993}. Similar to DSM, FDT also describes an adjacency matrix of a graph. Unlike the DSM graph, 
+    The FDT represents the relationship between functions, including objectives and constraints, and specific variables that affect 
+    them \cite{Wagner1993}. Similar to DSM, FDT also describes an adjacency matrix of a graph. Unlike the DSM graph, 
     however, the FDT graph is undirected and nodes can represent analysis tools, objectives, 
     or constraints. Edges between nodes represent a dependence on the same 
     variable. Michelena and Papalambros made use of the FDT to solve a graph partitioning problem that yielded 
-    more efficient optimization problem decompositions\cite{Michelena1997}. Allison 
-    extended this work to couple adjacency matrix information with the FDT to 
-    account for system coupling in an automated partitioning scheme\cite{Allison2008} While FDT succeeds at capturing the 
+    more efficient optimization problem decompositions \cite{Michelena1997}. Allison 
+    extended this work to incorporate adjacency matrix information with the FDT to 
+    account for system coupling in an automated partitioning scheme \cite{Allison2008}. 
+
+While FDT succeeds at capturing the 
     information about objectives and constraints, its lack of directed edges 
-    implies that it cannot capture the coupled data dependency that a DSM captures. 
-    The FDT in Fig. \ref{fig:FDT_simple} shows that $D_1$ is dependent on $y_2$ and 
-    that $D_2$ is dependent on $y_1$, but you can not infer their coupled dependence from 
+    implies that it cannot describe the coupled data dependency that a DSM captures. 
+Figure \ref{fig:FDT_simple}  shows the FDT for the Sellar problem described by Eq.~\ref{eqn:simple_fpf}.
+    The FDT shows that $D_1$ is dependent on $y_2$ and 
+    that $D_2$ is dependent on $y_1$, but the coupled dependence cannot be inferred from 
     that information alone. This missing information implies 
-    that, while FDT is very useful for partitioning problems, it is also not 
-    sufficient to completely describe a problem formulation. 
+    that, although FDT is very useful for partitioning problems, it is not 
+    sufficient to completely describe the data flows in a problem formulation. 
 
     \begin{figure}[htb!]
         \begin{center}
@@ -201,28 +196,28 @@
 
     Alexandrov and Lewis introduced a graph based syntax called REMS which 
     incorporates objectives and constraints into a graph, effectively combining 
-    FDT and DSM\cite{alexandrov2004}. REMS retains the square adjacency 
+    FDT and DSM \cite{alexandrov2004}. REMS retains the square adjacency 
     matrix form from DSM, but by adding the objectives and constraints, it partially 
     combines a traditional DSM with an FDT. This formulation allows REMS to represent data 
     dependency between multiple analysis tools as well as between analysis tools and
-    objective/constraint functions. Additionaly, REMS address the need to be able to 
-    transition between multiple solution strategies while keeping a constant 
+    objective/constraint functions. Additionaly, REMS address the need to
+    transition between multiple solution strategies while maintaining a single consistent  
     graph representation of the fundamental problem formulation. REMS provides
     syntax for variables and functions but does not facilitate inclusion 
     of solvers or optimizers in the graph.  The 
-    proposed graph syntax is closely related to REMS. The syntax proposed here should 
-    be viewed as an extention to REMS with the goal of allowing the graphs to more 
+     graph syntax proposed in this paper could  
+    be viewed as an extention to REMS with the goal of allowing the graphs to  describe analysis couplings and more 
     closely interact with existing design processes and MDAO frameworks. 
 
     Lamb and Martins also included objectives and constraint functions as nodes 
     in an Extended DSM (XDSM) in order to capture a more complete description 
-    of solution strategies for MDAO problems\cite{Lambe2012}. Unlike REMS, 
-    XDSM also includes nodes for solvers and optimziers to enable complete 
+    of solution strategies for MDAO problems \cite{Lambe2012}. Unlike REMS, 
+    XDSM also includes nodes for solvers and optimizers to enable complete 
     definition of MDAO architectures. Martins uses XDSM to describe 13 different 
     optimization architectures in a survey paper that provides a novel 
     classification of the different techniques \cite{Lambe2011}. With the 
     additional information included in an XDSM, Lu and Martins applied both 
-    ordering and partitioning algorithms on an MDAO test problem termed the 
+    ordering and partitioning algorithms to an MDAO test problem termed the 
     Scalable Problem \cite{Lu2012}. 
 
     \begin{figure}
@@ -236,22 +231,19 @@
     Although XDSM captures many of the functional aspects of FDT, it 
     requires the use of solver and optimizer blocks to represent 
     the relationship between design variables and objectives/constraints. 
-    By introducing solver or optimizer blocks, XDSM automatically implies a strategy. 
+    By introducing solver or optimizer blocks, XDSM automatically implies a solution strategy. 
     The XDSM for Eq. \ref{eqn:simple} is given in Figure \ref{fig:XDSM_simple}. 
     This diagram is shown with an 
     assumed Gauss-Seidel iteration scheme and an MDF solution architecture. 
 
-    Of these methods, REMS can describe most aspects of a fundamental 
-    problem formulation, but lacks the ability to represent optimizers and 
-    solvers in more specific problem formulations. XDSM relies on the provision of  
-    optimizers and constraints and is not formulated  
-    for a more fundamental problem statement. We propose a new graph syntax that 
-    combines the relevant features of REMS and XDSM while retaining the flexiblity to 
+In this paper, we propose a new graph syntax that 
+    combines certain features of REMS and XDSM. 
+The approach allows interactions and couplings of analysis tools and objective and constraint functions to be described while retaining the flexiblity to 
     represent a fundamental problem formulation free of solution specific information. 
 
 \subsection{Requirements for a New Graph Syntax}
   \label{s:requirements}
-  The goal of the new graph-based syntax presented here is to enable the general 
+  The goal of the graph-based syntax presented here is to enable the general 
   structure of an MDAO problem to be described independently of any solution information, 
   while still being able to accomodate the more specific case when a solution 
   strategy is applied. In order to achieve this goal, 
@@ -263,15 +255,14 @@
     \item Multi-fidelity analyses
   \end{itemize}
 
-  The new syntax is intended to represent three phases of the design problem 
+  The syntax is intended to represent three phases of the design problem 
   formulation process. In the initial problem definition phase, the specific 
   analysis tools and design goals are identified. Next, a single formal problem 
   formulation is identified that specifies design variables, constraints, 
   objectives, analysis tools, and all other elements required to represent 
   the overall MDAO problem. Lastly, a specific procedure for solving the problem 
   is selected, e.g. selecting an MDAO optimization architecture. Using 
-  the proposed graph syntax, these phases can be represented with the following 
-  three graphs:
+  the proposed graph syntax, the outcome of these phases can be represented with the following graphs:
   \begin{itemize}
     \item Maximal Connectivity Graph (MCG)
     \item Fundamental Problem Graph (FPG)
@@ -280,23 +271,24 @@
 
   The \emph{maximal connectivity graph} represents the first phase of the problem 
   formulation with all analysis tools being considered and all possible connections 
-  between them also present. The second graph is the \emph{fundamental problem graph}, 
-  which is comprises only the analyses participating to solve the problem. 
-  Finally, a \emph{problem solution graph} may be represented by including additional 
+  between them also present. The second phase of problem formulation results in the \emph{fundamental problem graph}, 
+  which comprises only the analysis tools, objectives, constraints, and variables to solve the problem. 
+  The final phase results in a \emph{problem solution graph} which includes additional 
   edges and nodes to represent the solution strategy being employed to solve the 
   problem. This paper focuses on the MCG and FPG and does not describe the PSG in detail.
 
-  The relationship between these three graphs is depicted in Figs.~\ref{f:tree} and \ref{f:hourglass}. 
-  The tree diagram demonstrates the fact that it is generally possible to obtain 
+  Comparisons of the number and size of each of these graphs are depicted in Figs.~\ref{f:tree} and \ref{f:hourglass}. 
+  The tree diagram illustrates that it is generally possible to obtain 
   multiple FPGs from a single maximal connectivity graph. The multiple FPGs may correspond to 
   different down-selections of analysis tools, different connections between the tools, 
-  or both. Each down-selection shrinks the number of possible FPGs that could be reached 
-  until only one remainins. For a given FPG, different PSGs may be obtained by implementing 
+  or both. Each down-selection reduces the number of possible FPGs that could be reached 
+  until only one remains. For a given FPG, however, different PSGs may be obtained by implementing 
   different solution strategies. Considering the size of a graph to be the sum of all of its
   edges and nodes, the hourglass shape in Fig. \ref{f:hourglass} qualitatively illustrates how
   the FPG is obtained from the MCG by \emph{removing} nodes and edges, 
   and the PSG is obtained from the FPG by \emph{adding} nodes and edges.
-  \begin{figure}[htb!]
+These additions correspond to optimizers, solvers, and compatibility constraints required in particular MDAO solution architectures.
+\begin{figure}[htb!]
     \centering
     \subfigure[number of possible graphs]{
     \includegraphics[width=1.75in]{images/tree}
