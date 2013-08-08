@@ -1,0 +1,70 @@
+\documentclass{aiaa-tc}
+
+\title{reviewer responses for: \\ A Graph Theoretic Approach to Problem Formulation for 
+Multidisciplinary Design Analysis and Optimization}
+
+\usepackage{color}
+
+\newenvironment{rev}{\vspace{2em}\itshape \textcolor{red}}{}
+
+
+\begin{document}
+\maketitle
+
+\section{Reviewer1}
+
+\rev{As the authors point out the design of a major product, such as a civil airliner, 
+is complex and the level of complexity increases as design requirements change i.e. the 
+need to reduce carbon emissions, the need to reduce maintenance downtime etc. and the 
+number of design teams involved in creating a new product increases in number and 
+distribution. Their paper is, I think, attempting to address the need to support 
+design teams in confronting this situation but have not clearly defined where their work 
+fits into the design process \\\\
+Broadly speaking there are three major tasks or steps that have to be worked 
+through when a globally distributed team is setting up a design system that allows it to 
+effectively deploy an MDO methodology to support the design of a product such as a new 
+civil airliner: 
+\\\\1. The team must decide which design tools are required at each stage of the design 
+process as the design proceeds down the time-line this includes the data flow required 
+between the various design centers and the design history preservation requirements,
+\\\\2. This combination of requirements must be converted into a set of interacting tools 
+together with data flow and control programs that constitute a template for a 
+Computational Design Engine (CDE),
+\\\\3. Finally this template has to be instantiated into a usable CDE software system 
+which might take advantage of commercially available software such as that found in Simula etc.
+\\\\The paper is clearly focused on step 2 above and it advances a sound argument for the use 
+of graph theory to establish an appropriate set of outcomes from such a step and, whilst 
+it implies the existence of the other two steps, it does not state this early enough in 
+the paper and with sufficient detail to allow a practicing engineer to understand the 
+role being played by the authors contribution. I would recommend that the authors clearly 
+define the role that their graph theoretic approach plays in this triple set of steps 
+leading to the creation of effective CDE.}
+
+The reviewer has correctly identified the major motivation for this work. The goal is indeed to 
+assist engineers and teams of engineers in the process of building a model out of a set of interconnected 
+tools. 
+
+We believe that the distrinction between phases 1 and 2 from the comments are covered adequately 
+in the bulk of the introduction and especially in the notional problem described there in. 
+
+However, to clarify the disctinction between phases 2 and 3 we hav added the following near 
+line 52, page 3 of the original submission: 
+
+\emph{%
+Our goal is to develop formalism for expressing analysis interconnectivity and for determining feasible
+    analysis tool sets to assist an engineering team conducting this task. Because the problem deals with
+    interconnectivity, we base our approach on the representations and techniques of graph theory.
+    The approach begins by constructing the \emph{maximal connectivity graph (MCG)} describing all possible
+    interconnections between the analysis tools proposed by the engineers. Graph operations are then
+    conducted to reduce the MCG to a \emph{fundamental problem graph (FPG)} that describes the set of analysis
+    tools needed to solve the specified system-level design problem. The concept of the FPG and the identification of feasible FPGs from an MCG are the main contributions of the paper. \\\\
+    This information in an FPG represents the engineering design problem that needs to be solved, but it is not 
+    itself sufficient to actually run a design optimization. It does not provide infomration 
+    about how to solve the problem. Even after the problem is defined an integration platform or framework needs 
+    to be selected and appropriate optimization methods identified. This last step essentially 
+    involves taking the FPG and turning it into a usable model. We breifly consider methods to further 
+    manipulate the FPG into a \emph{problem solution graph (PSG)} which could be usefull in this 
+    task, but that is not the focus of this paper. The work is primarily concerned with applying graph 
+    theory to the creation of an FPG and the benefits to the design process by doing so.}
+
+\end{document}

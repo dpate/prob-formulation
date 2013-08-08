@@ -25,7 +25,7 @@
     of variables that are interdependent and must be linked in the framework. 
     A common situation is that different analyses provide differing values for the 
     same physical quantity, often in different data formats, and these conflicts need to be resolved. 
-   These occurrences are particularly acute in situations in which analysis tools have differing fidelities. For
+    These occurrences are particularly acute in situations in which analysis tools have differing fidelities. For
     example, an abstracted aerodynamic analysis such as an empirical drag buildup model may return only
     integrated drag, whereas a CFD tool may return pressure and shear stress distributions across the entire
     surface grid. If an analysis downstream of the aerodynamics tool needs only integrated drag as an input,
@@ -60,12 +60,16 @@
     The approach begins by constructing the \emph{maximal connectivity graph (MCG)} describing all possible
     interconnections between the analysis tools proposed by the engineers. Graph operations are then
     conducted to reduce the MCG to a \emph{fundamental problem graph (FPG)} that describes the set of analysis
-    tools needed to solve the specified system-level design problem.
-    Any particular solution procedure for the problem, such as the choice of an MDO architecture, e.g. MDF,
-    IDF, CO, BLISS, could then be described by
-    constructing a \emph{problem solution graph (PSG)}.
-    The concept of the FPG and the identification of feasible FPGs from an MCG are the main contributions of the paper.
+    tools needed to solve the specified system-level design problem. The concept of the FPG and the identification of feasible FPGs from an MCG are the main contributions of the paper.
 
+    This information in an FPG represents the engineering design problem that needs to be solved. 
+    However, it does not provide details about how the team should go about 
+    solving it. Even after the problem is defined an integration platform or framework needs 
+    to be selected and appropriate optimization methods identified. This last step essentially 
+    involves taking the FPG and turning it into a usable model. We breifly consider methods to further 
+    manipulate the FPG into a \emph{problem solution graph (PSG)} which could be usefull in this 
+    task, but that is not the focus of this paper. 
+    
     The paper is organized as follows. First, we describe the differences between a fundamental problem
     formulation, which is based only on the system-level optimization problem statement that the
     engineers desire to solve and on the available analysis tools, and a specific problem formulation, which
