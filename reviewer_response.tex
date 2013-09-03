@@ -11,7 +11,130 @@ Multidisciplinary Design Analysis and Optimization}
 \begin{document}
 \maketitle
 
-\section{Reviewer1}
+\section{Reviewer 1}
+
+\rev{This idea of PSG was mentioned but was not covered in 
+the paper. For completeness and value proposition sake, I would recommend to 
+add at least half section to show how it will help and look like. You can 
+take the simplest formulation of your choice and show how MCG and FPG will 
+translate and look as a PSG. A brief discussion of advantages vs 
+disadvantages will be useful. }
+
+
+\rev{ The idea of “holes” and “collision” is explained a few times in the paper. 
+It can be reduced. }
+
+\rev{The review of other graph based techniques is good and highlights their 
+limitations, but I would like to see a discussion of what challenges a 
+practitioner may face while trying to use the approach suggested in this 
+paper. The MCG and FPG will cover lot of information like objectives and 
+constraints, but at what expense. Comparing XDSM with MCG or FPG, one might 
+find XDSM as more easy to read and comprehend. For a similar size problem, 
+FPG looks far more complex and bigger.}
+
+\rev{If PSG is covered even to a small 
+extent (like explained in first comment) I would suggest or like to see the 
+PSG equivalent of problem formulation shown in Figure 2 with XDSM.}
+
+
+\rev{Is it really adding a lot of value to have graphs like MCG or FPG which 
+are very explicit in nature and can become difficult to read}
+
+\rev{Can the graph be compressed in a logical way to reduce the number of nodes 
+and their interconnections while still conveying important and critical 
+information for that stage (MCG stage or FPG stage) ? Reducing cycles is 
+discussed but the graph may still look complex.}
+
+\rev{Looking at these graphs (for example Fig. 8), a node for example Z2 
+appears several times. It may be useful to figure out holes and collision, 
+but once it is resolved, can those nodes be consolidated to provide simpler 
+visualization ?}
+
+\rev{As the problem size increases, how will it affect the size and complexity 
+of such graphs.}
+
+\rev{
+I will assume that creation of such a graph and interconnections will be 
+expected to be done by some kind of software tool or wizard. A brief 
+discussion about why this MCG, FPG and PSG idea is better to lead to such a 
+system can be useful. Although this itself can be a separate research and 
+paper, but why this idea can provide a better foundation can be valuable.
+}
+
+\rev{Minor comments:
+Section 1 Line 46: I think other commercial tools such as iSight, 
+modeFRONTIER should also be mentioned since their usage is more widespread 
+compared to OpenMDAO.}
+
+\rev{Page 13 line 33 column 2: Typo : “Step (D) now PROCEDEDS … “ Page 16 line 38 
+column 2: Typo : “… formulations involving MULTIPLES analysis ….”}
+
+\section{Reviewer 2}
+
+\rev{Page 1, Line 46: 2nd column...check spacing after ``ModelCenter''.}
+
+\rev{Page 2, Line 38: 2nd column...as your motivation was really done in the 
+Introduction section, consider changing the heading on section 2 to 
+``Background'' or something similar.  You don't really provide motivation in 
+this section anyhow.}
+
+\rev{Page 3, Line 19, 1st column: change ``weather'' to ``whether''}
+
+\rev{Page 3, Line 21, 2nd column: change ``descrition'' to ``description''}
+
+\rev{Page 4, Line 37, 1st column: what does ``REMS'' stand for?}
+
+\rev{Page 4, Line 45, 1st column: change ``REMS address'' to ``REMS addresses''}
+
+\rev{Page 4, Lines 35 to 55, 1st column:  This paragraph is a bit awkward in 
+structure.  In the second to last sentence you state, "REMS provides syntax 
+for variables and functions but does not facilitate inclusion of solvers or 
+optimizers in the graph."  The reader then expects your method to address 
+these shortcomings in the next sentence but instead you state, "...the goal 
+of allowing graphs to describe analysis couplings and more closely interact 
+with existing design processes and MDAO frameworks," which you never really 
+called out as a shortcoming of REMS in the first place.  I think you could 
+improve the flow/wording here.}
+
+\rev{Line 10, 1st column, Page 10:  This equation (missing a number) has a LOT of 
+unions, variables, etc...in it.  It would help tremendously to provide a 
+verbal description of at least one of these equations to help with 
+translation into the real world.  This would be similar to what you did 
+following the steps (1) to (4) in the next subsection.}
+
+\rev{Lines 5 - 12, 2nd column, Page 12:  Just a general question spurred by the 
+text here.  What criteria would be applied to determine which FPG is better 
+than another?}
+
+\rev{Line 57, 1st column, Page 13: change ``as a input'' to ``as an input''}
+
+\rev{Now for the request of more significant importance.  This is coming from 
+someone with significant experience in MDO and who uses a lot of the 
+analysis tools you specified in your case study on a daily basis.  I really 
+liked this article but felt it was lacking some punch in the results 
+section.  This was namely in the form of quantitative results.  You vaguely 
+give some in the form of the different resulting connectivity graphs and 
+this was good but to really drive home the value of your research to a 
+potential user I think you could do a bit better with very minimal work. 
+The potential user of this methodology will be concerned with one of two 
+things: 1) minimizing computational time or 2) increasing the accuracy of 
+the results.  I think you've given examples of these two scenarios already 
+in figures 15 and 16, so why not provide a table of the CPU times (1) and/or 
+deviation from higher order analyses (2) for each of these graphs.  Doesn't 
+have to necessarily be these two metrics but something to really tie the 
+output of your methodology to something tangible for comparison purposes. 
+You could even include the metrics for a randomly obtained FPG as a 
+baseline.  Then the person reading the article can say, "Wow, given a set of 
+analysis tools and a general problem, I can employ this method to obtain an 
+FPG that significantly reduces my overall computational time." or "Wow, 
+given a set of analysis tools and a general problem, I can employ this 
+method to obtain an FPG that significantly improves my overall computational 
+accuracy while keeping my computional efficiency as high as possible."}}
+
+\rev{If you are worried about length, I think the conclusions section may be cut 
+in half and still accomplish its intended purpose.}
+
+\section{Reviewer 3}
 
 \rev{As the authors point out the design of a major product, such as a civil airliner, 
 is complex and the level of complexity increases as design requirements change i.e. the 
@@ -57,7 +180,8 @@ Our goal is to develop formalism for expressing analysis interconnectivity and f
     The approach begins by constructing the \emph{maximal connectivity graph (MCG)} describing all possible
     interconnections between the analysis tools proposed by the engineers. Graph operations are then
     conducted to reduce the MCG to a \emph{fundamental problem graph (FPG)} that describes the set of analysis
-    tools needed to solve the specified system-level design problem. The concept of the FPG and the identification of feasible FPGs from an MCG are the main contributions of the paper. \\\\
+    tools needed to solve the specified system-level design problem. The concept of the FPG and 
+    the identification of feasible FPGs from an MCG are the main contributions of the paper. \\\\
     This information in an FPG represents the engineering design problem that needs to be solved, but it is not 
     itself sufficient to actually run a design optimization. It does not provide infomration 
     about how to solve the problem. Even after the problem is defined an integration platform or framework needs 
