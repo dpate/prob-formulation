@@ -31,7 +31,7 @@ The example task is to create an FPG for the conceptual sizing of a single-aisle
 The enumeration of these analysis tools and objectives concludes step (A) in Sec.~\ref{ss:process}.
 
 Step (B) is the production of the MCG.
-	In this example, the MCG is formed by using a consistant variable naming convention and then connecting all variables with the same name with connection edges. 
+	In this example, the MCG is formed by using a consistent variable naming convention and then connecting all variables with the same name with connection edges. 
 	Table \ref{t:ins and outs} presents the full list of variables in the leftmost column and indicates whether the variable is an input or an output of each analysis tool. 
 	Some variables, such as geometry and performance, represent groups of variables that are passed as arrays or other data structures due to their similarity. 
 	This bundling of variables is not fundamental and does not limit the generality of this example; rather, it simplifies the presentation.
@@ -93,7 +93,7 @@ A function edge is created from this function node into a second function node, 
 
 To implement step (C) in Sec.~\ref{ss:process}, the indegree of every variable node is set to unity to reflect a single fidelity analysis for which the design variables have not yet been selected.
 
-Step (D) now procededs by executing the FPG algorithm. 
+Step (D) now proceeds by executing the FPG algorithm. 
 An FPG cannot be obtained because the variable nodes representing the number of engines are holes for NPSS, FLOPSa, and FLOPSb, and the variable nodes representing the mission definition are holes for FLOPSa and FLOPSb. 
 These holes are propagated upstream by the FPG algorithm and create holes in the objectives, thereby preventing a valid FPG.
 
@@ -126,7 +126,7 @@ There are two cycles which arise from each local output from PDCYL being directe
 	\end{figure*}
 
 	Alternatively, it may be desirable to resolve collisions by preferentially choosing analysis tools with favorable properties, such as higher accuracy or minimal run time, whenever possible.
-	One method to implement an FPG in this paradigm is to use a ranking system. Each analysis block is assigned a value by the designer describing how desireable it is for this block to be present in the FPG. The connection edges directed out of each analysis block are then assigned a weight equal to the value assigned to the analysis block. Finally, each collision is resolved by selecting the edges with the highest weights.
+	One method to implement an FPG in this paradigm is to use a ranking system. Each analysis block is assigned a value by the designer describing how desirable it is for this block to be present in the FPG. The connection edges directed out of each analysis block are then assigned a weight equal to the value assigned to the analysis block. Finally, each collision is resolved by selecting the edges with the highest weights.
 For the current example problem, consider the rankings for each analysis code given in Table \ref{t:rankings}.
 	\begin{table}[htbp]
 	  \centering
@@ -159,6 +159,6 @@ For the current example problem, consider the rankings for each analysis code gi
 	Finally, consider a case in which 
 the induced drag input into FLOPSb is a multi-fidelity input, meaning that 
  multiple analysis codes calculate the same variable. 
-	This multi-fidelity formulation is implemented by setting the upper indegree limit for this node as two and then repreating the (automated) process. 
+	This multi-fidelity formulation is implemented by setting the upper indegree limit for this node as two and then repeating the (automated) process. 
 	In this case, both VORLAX and PMARC are retained, resulting in an FPG that omits only FLOPSa.
 

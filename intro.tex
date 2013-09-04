@@ -19,7 +19,7 @@
     The time and expense for setting up 
     analysis models is growing in conjunction with the increasing scope of MDO problems. 
     Multidisciplinary Design Analysis and Optimization (MDAO)
-    frameworks such as OpenMDAO \cite{Gray2012} and {ModelCenter}\textregistered have enabled a new level of analysis tool integration 
+    frameworks such as {ModelCenter}\textregistered, iSigt\textregistered, ModeFrontier\textregistered, and OpenMDAO \cite{Gray2012}and have enabled a new level of analysis tool integration 
     and have paved the way for models with more analyses and increasing numbers of interdisciplinary couplings. This 
     new capability has created a new challenge. Even models with tens of analyses could include hundreds or thousands
     of variables that are interdependent and must be linked in the framework. 
@@ -307,3 +307,20 @@ These additions correspond to optimizers, solvers, and compatibility constraints
     }
   \caption{The relationship between the MCG, FPG, and PSG.}
   \end{figure}
+
+\subsection{Potential Applications}
+
+The syntax proposed here for defining graphs is partially motivated by the unique needs
+of working with very large problems that have thousands of design variables. Such problems are 
+large enough that many traditional design methods stumble simply because the problems 
+are so large that one person can not maintain a complete view of the problem. Hence as problems 
+grow to that size, software tools become needed to manage the complexity of the problem itself. 
+
+Even for small problems, algorithmic exploration of problem structure can yield deeper understanding 
+of problems and more effective solution methods, as demonstrated by the work with the FDT. The syntax 
+described here along with the rules for applying that syntax to the three phases of the design 
+process provides a strong foundation to begin developing new algorithms for analyzing and modifying 
+problem structure. This foundation makes it much easier to incorporate a standard view of 
+problem definition into MDAO frameworks and by extension to implement any new algorithms inside 
+those frameworks. 
+

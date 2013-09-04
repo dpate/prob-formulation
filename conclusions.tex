@@ -10,7 +10,7 @@ To create a valid problem formulation, all holes must be ``filled'' either by as
 
 A collision corresponds to a situation in which two or more analysis tools compute separate instances of the same variable. 
 To create a valid problem formulation, all collisions must be resolved either by removing redundant analysis tools or by introducing logic or solvers into the data flow to choose between or aggregate multiple instances during execution. 
-The identification of collisions in an MCG is especially important for problem formulations involving multiples analysis tools of different fidelities; in this context, a collision represents an opportunity to formulate a multi-fidelity problem that can take best advantage of the efficiency/accuracy tradeoff between different analysis tools. 
+The identification of collisions in an MCG is especially important for problem formulations involving multiple analysis tools of different fidelities; in this context, a collision represents an opportunity to formulate a multi-fidelity problem that can take best advantage of the efficiency/accuracy tradeoff between different analysis tools. 
 Resolving collisions and filling holes in an MCG requires choices by the user to specify the overall MDAO problem that he/she desires to solve, i.e. to produce the required set of system-level outputs given a specified set of design variables. 
 One benefit of a graph theoretic approach is the standard algorithms which can be used to inform the user's decisions, such as cycle detection, minimum spanning trees, and shortest path algorithms.
 

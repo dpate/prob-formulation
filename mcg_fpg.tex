@@ -227,20 +227,20 @@ can be addressed. Similar to the way an MCG can be manipulated into a FPG, an FP
 further manipulated into a PSG. To get from an MCG to an FPG you eliminated analysis blocks and
 connection edges to reduce the problem to something solvable, but to get from an FPG to a PSG you 
 add in driver blocks, driven edges to describe the structure of the solution strategy being applied 
-to the problem. For example, Figure \ref{f:selllar_psg} shows the PSG that solves the Sellar problem 
+to the problem. For example, Figure \ref{f:sellar_psg} shows the PSG that solves the Sellar problem 
 with an MDF solution strategy. There are two driver blocks in this PSG, one for the solver that 
 ensures compatibility and another for the optimizer that picks the design variables. 
 
 \begin{figure}[htb]
     \begin{center}
-    \includegraphics[width=3.0in]{images/sellar_psg}
+    \includegraphics[width=3.0in]{images/sellar_mdf_psg}
     \end{center}
     \vspace{-10pt}
     \caption{Example PSG for solving the Sellar problem with MDF strategy}
     \label{f:sellar_psg}
 \end{figure}
 
-The PSG in figure \ref{f:selllar_psg} can be compared to the XDSM for the same situation 
+The PSG in figure \ref{f:sellar_psg} can be compared to the XDSM for the same situation 
 in Fig. \ref{fig:XDSM_simple}. While the two diagrams contain much of the same information 
 there is a significant difference. The PSG describes the data passing that happens between 
 the drivers and the rest of the problem, but it does not describe when that data passing 
