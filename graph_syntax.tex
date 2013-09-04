@@ -217,8 +217,10 @@ In this figure, function nodes are indicated by squares,
   will always connect a driver node to a variable node (in either direction), but they 
   are not considered when counting the indegree or outdegree of the variable node.
   Hence a single variable node could have multiple incoming driven edges from different 
-  driver blocks. Figure \ref{f:driver block} shows a notional example where a driver block 
-  represents and optimizer solving an unconstrained minimization problem. 
+  driver blocks, e.g. in a sequential optimization strategy, both drivers would at 
+  different times, pick values for the same variable. Figure \ref{f:driver block} shows 
+  a notional example where a driver block represents and optimizer solving an 
+  unconstrained minimization problem. 
 
   \begin{figure}[htb]
     \begin{center}

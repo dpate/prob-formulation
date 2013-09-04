@@ -66,35 +66,43 @@ where $ E_{M,\txt{con}}$ and $E_{M,\txt{fun}}$ are the sets of connection edges 
 
 \begin{description}
     \item[\bf{Step 1: Holes}] 
-        The first step is to detect holes and disconnect the first set of connection edges downstream of them, as indicated in Fig.~\ref{f:hole}. 
-        These connection edges are removed because they represent output variables which cannot be determined because the analysis function does not have adequate inputs. 
+    The first step is to detect holes and disconnect the first set of connection edges 
+    downstream of them, as indicated in Fig.~\ref{f:hole}. 
 
-        To begin the process, an initial graph is created as a copy of the MCG
-        \begin{equation}
-        F_0 = M,
-        \end{equation}
-        where $F_0 = (V_{F_0},E_{F_0})$, and $C_{F_0,\txt{con}}$ is the set of connection edges. 
-        The set of variable nodes that are holes is identified as
-        \begin{equation}
-        H = \{v \in V_{F_0} \st v \in V_{M,\txt{var}} \txt{ and } \txt{deg}^-(v) < \txt{deg}_l^-(v) \},
-        \end{equation}
-        which is the set of variable nodes with fewer incoming edges than are allowed by the lower indegree limit.
-        An updated set of edges is then created by removing the connection edges preceding or succeeding the analysis block:
-\begin{IEEEeqnarray*}{rCl}
-        E_{F_1} = E_{F_0} \setminus &\{& (x,y) \in E_{F_0,\txt{con}} \st x \in V_{A_i} \\
-& &  \txt{ or } y \in V_{A_i}, \txt{ and } H\cap V_{A_i} \neq \emptyset \},
-\end{IEEEeqnarray*}
-and the graph is updated as
-\begin{equation}
-F_1 = (V_{F_0},E_{F_1}).
-\end{equation}
+    To begin the process, an initial graph is created as a copy of the MCG
+    \begin{equation}
+    F_0 = M,
+    \end{equation}
+    where $F_0 = (V_{F_0},E_{F_0})$, and $C_{F_0,\txt{con}}$ is the set of connection edges. 
+    The set of variable nodes that are holes is identified as
+    \begin{equation}
+    H = \{v \in V_{F_0} \st v \in V_{M,\txt{var}} \txt{ and } \txt{deg}^-(v) < \txt{deg}_l^-(v) \},
+    \end{equation}
+    which is the set of variable nodes with fewer incoming edges than are allowed by 
+    the lower indegree limit. An updated set of edges is then created by removing the 
+    connection edges preceding or succeeding the analysis block:
+    \begin{IEEEeqnarray*}{rCl}
+            E_{F_1} = E_{F_0} \setminus &\{& (x,y) \in E_{F_0,\txt{con}} \st x \in V_{A_i} \\
+    & &  \txt{ or } y \in V_{A_i}, \txt{ and } H\cap V_{A_i} \neq \emptyset \},
+    \end{IEEEeqnarray*}
+    and the graph is updated as
+    \begin{equation}
+    F_1 = (V_{F_0},E_{F_1}).
+    \end{equation}
 
+    Because removing these edges can create new holes, this step must be repeated 
+    until no additional holes are found. If the hole identification step identifies a 
+    variable node in an expression block as hole, meaning 
+    $V_{E_i} \cap H \neq \emptyset$ for some $i \in I_E$, then the algorithm terminates 
+    because an FPG cannot be obtained. 
 
-
-Because removing these edges can create new holes, this step must be repeated until no additional holes are found.
-        If the hole identification step identifies a variable node in an expression block as hole, meaning $V_{E_i} \cap H \neq \emptyset$ for some $i \in I_E$, then the algorithm terminates because an FPG cannot be obtained. 
-
-If this step terminates without identifying a hole in an expression block, it is guaranteed that an FPG can be obtained because $F_1$ now satisfies all conditions from Sec.~\ref{ss:FPG} except for (3), which requires that no holes or collisions be present in the graph. Since the graph is free of holes, and collisions can always be resolved without producing a hole, (see Table \ref{t:variable node classification}), then it is guaranteed than an FPG can be obtained.
+    If this step terminates without identifying a hole in an expression block, it is 
+    guaranteed that an FPG can be obtained because $F_1$ now satisfies all conditions 
+    from Sec.~\ref{ss:FPG} except for (3), which requires that no holes or collisions 
+    be present in the graph. Since the graph is free of holes, and collisions can 
+    always be resolved without producing a hole, (see Table 
+    \ref{t:variable node classification}), then it is guaranteed than an FPG can be 
+    obtained.
 
     \begin{figure}[htb!]
         \begin{center}
@@ -219,4 +227,39 @@ can be addressed. Similar to the way an MCG can be manipulated into a FPG, an FP
 further manipulated into a PSG. To get from an MCG to an FPG you eliminated analysis blocks and
 connection edges to reduce the problem to something solvable, but to get from an FPG to a PSG you 
 add in driver blocks, driven edges to describe the structure of the solution strategy being applied 
-to the problem.  
+to the problem. For example, Figure \ref{f:selllar_psg} shows the PSG that solves the Sellar problem 
+with an MDF solution strategy. There are two driver blocks in this PSG, one for the solver that 
+ensures compatibility and another for the optimizer that picks the design variables. 
+
+\begin{figure}[htb]
+    \begin{center}
+    \includegraphics[width=3.0in]{images/sellar_psg}
+    \end{center}
+    \vspace{-10pt}
+    \caption{Example PSG for solving the Sellar problem with MDF strategy}
+    \label{f:sellar_psg}
+\end{figure}
+
+The PSG in figure \ref{f:selllar_psg} can be compared to the XDSM for the same situation 
+in Fig. \ref{fig:XDSM_simple}. While the two diagrams contain much of the same information 
+there is a significant difference. The PSG describes the data passing that happens between 
+the drivers and the rest of the problem, but it does not describe when that data passing 
+will occur (the execution order of the blocks). In the proposed graph syntax edges describe 
+the passing of data between one node an another, but they do not define when that 
+communication happens. 
+
+XDSM diagrams do contain information about data passing as well as when that data should be passed. 
+XDSM essentially represents two related, but independent graphs simultaneously. 
+This is accomplished by including two distinct sets of edges, one for data 
+connections and a second indicating execution sequence. As seen in Fig. \ref{fig:XDSM_simple}
+data connections are bold-gray edges and execution connections are numbered-black edges. The
+execution edges, the back edges, in XDSM represent and additional graph that
+follows a completely different set of rules and behaviors from the data connections graph. 
+On the other hand the data described by the gray edges, 
+the data passing information, is equivalent to the information in the PSG. XDSM presents this 
+information in a more compact and human readable manner by aggregating groups of related variables
+into combined nodes. The more verbose form presented in a PSG is less human readable, but more easily 
+machine readable as a consequence of a more consistent structure. 
+
+
+

@@ -41,7 +41,7 @@
     problem could approach the cost and time requirements of creating any of the discipline 
     analyses themselves. For these large scale MDO problems, the couplings between the 
     analyses begin to dominate the effort required in setting up the model. It is this problem of 
-    determining sets of analysis tools and their interconnectivities to form realistic
+    determining sets of analysis tools and their inter-connectivities to form realistic
     multidisciplinary problems that is the subject of this paper. We are motivated by the following notional
     but realistic problem of organizing an MDO study for a complex system:
 
@@ -63,11 +63,11 @@
     tools needed to solve the specified system-level design problem. The concept of the FPG and the identification of feasible FPGs from an MCG are the main contributions of the paper.
 
     This information in an FPG represents the engineering design problem that needs to be solved, but it is not 
-    itself sufficient to actually run a design optimization. It does not provide infomration 
+    itself sufficient to actually run a design optimization. It does not provide information 
     about how to solve the problem. Even after the problem is defined an integration platform or framework needs 
     to be selected and appropriate optimization methods identified. This last step essentially 
-    involves taking the FPG and turning it into a usable model. We breifly consider methods to further 
-    manipulate the FPG into a \emph{problem solution graph (PSG)} which could be usefull in this 
+    involves taking the FPG and turning it into a usable model. We briefly consider methods to further 
+    manipulate the FPG into a \emph{problem solution graph (PSG)} which could be useful in this 
     task, but that is not the focus of this paper. The work is primarily concerned with applying graph 
     theory to the creation of an FPG and the benefits to the design process by doing so. 
     
@@ -145,7 +145,7 @@ In this formulation, the implication is that  $D_1$ must be run
     problems. Gray et al. also benchmarked the performance of a set of MDAO architectures  with a similar approach \cite{Gray2013}. 
     This work examined a larger set of architectures and proposed the use of OpenMDAO as a platform to build a larger community-developed set of test problems and architectures. Both of these benchmarking efforts 
     demonstrate how multiple specific problem formulations can relate to a common FPF and indicate the 
-    value of a common problem descrition. The challenge with this 
+    value of a common problem description. The challenge with this 
     traditional syntax is that it is not easily manipulated or analyzed with automatic procedures to explore alternate problem formulations. 
 
     A number of graph-based methods have been used successfully to translate the 
@@ -173,10 +173,10 @@ In this formulation, the implication is that  $D_1$ must be run
     extended this work to incorporate adjacency matrix information with the FDT to 
     account for system coupling in an automated partitioning scheme \cite{Allison2008}. 
 
-While FDT succeeds at capturing the 
+    While FDT succeeds at capturing the 
     information about objectives and constraints, its lack of directed edges 
     implies that it cannot describe the coupled data dependency that a DSM captures. 
-Figure \ref{fig:FDT_simple}  shows the FDT for the Sellar problem described by Eq.~\ref{eqn:simple_fpf}.
+    Figure \ref{fig:FDT_simple}  shows the FDT for the Sellar problem described by Eq.~\ref{eqn:simple_fpf}.
     The FDT shows that $D_1$ is dependent on $y_2$ and 
     that $D_2$ is dependent on $y_1$, but the coupled dependence cannot be inferred from 
     that information alone. This missing information implies 
@@ -205,13 +205,12 @@ Figure \ref{fig:FDT_simple}  shows the FDT for the Sellar problem described by E
     matrix form from DSM, but by adding the objectives and constraints, it partially 
     combines a traditional DSM with an FDT. This formulation allows REMS to represent data 
     dependency between multiple analysis tools as well as between analysis tools and
-    objective/constraint functions. Additionaly, REMS address the need to
+    objective/constraint functions. Additionally, REMS address the need to
     transition between multiple solution strategies while maintaining a single consistent  
     graph representation of the fundamental problem formulation. REMS provides
     syntax for variables and functions but does not facilitate inclusion 
-    of solvers or optimizers in the graph.  The 
-     graph syntax proposed in this paper could  
-    be viewed as an extention to REMS with the goal of allowing the graphs to  describe analysis couplings and more 
+    of solvers or optimizers in the graph.  The graph syntax proposed in this paper could  
+    be viewed as an extension to REMS with the goal of allowing the graphs to  describe analysis couplings and more 
     closely interact with existing design processes and MDAO frameworks. 
 
     Lamb and Martins also included objectives and constraint functions as nodes 
@@ -238,21 +237,24 @@ Figure \ref{fig:FDT_simple}  shows the FDT for the Sellar problem described by E
     the relationship between design variables and objectives/constraints. 
     By introducing solver or optimizer blocks, XDSM automatically implies a solution strategy. 
     The XDSM for Eq. \ref{eqn:simple} is given in Figure \ref{fig:XDSM_simple}. 
-    This diagram is shown with an 
-    assumed Gauss-Seidel iteration scheme and an MDF solution architecture. 
+    This diagram is shown with an assumed Gauss-Seidel iteration scheme and an MDF solution architecture. 
 
-In this paper, we propose a new graph syntax that 
-    combines certain features of REMS and XDSM. 
-The approach allows interactions and couplings of analysis tools and objective and constraint functions to be described while retaining the flexiblity to 
-    represent a fundamental problem formulation free of solution specific information. 
+    In this paper, we propose a new graph syntax that combines certain features of REMS and XDSM. 
+    Despite sharing some features with both of these other graph based approaches, the syntax
+    proposed here has a fundamentally different goal which is complimentary to both of them. 
+    REMS and XDSM provide excellent human readable formats for an MDAO problem description. This 
+    syntax is designed to provide a more effective machine readable format for MDAO problem definition. 
+    In the interest of making it easier to algorithmically operate on the graphs, the specified 
+    format is both more verbose and less visually informative. The benefit is a more consistent 
+    and easily utilized graph from a algorithm perspective. 
 
 \subsection{Requirements for a New Graph Syntax}
   \label{s:requirements}
   The goal of the graph-based syntax presented here is to enable the general 
   structure of an MDAO problem to be described independently of any solution information, 
-  while still being able to accomodate the more specific case when a solution 
+  while still being able to accommodate the more specific case when a solution 
   strategy is applied. In order to achieve this goal, 
-  the graph syntax needs to accomodate a number of MDAO problem constructs: 
+  the graph syntax needs to accommodate a number of MDAO problem constructs: 
   \begin{itemize}
     \item Analysis tools and their interconnections
     \item Design variables, objectives, and constraints

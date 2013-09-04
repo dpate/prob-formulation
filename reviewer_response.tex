@@ -31,8 +31,26 @@ together distinguish a PSG from and FPG.  We have also added added section 5.5
 which gives an example of a simple PSG and compares a PSG with its close relative
 and XDSM diagram. 
 
+It is our conclusion that the PSG represents a sub-set of the information in the XDSM
+diagram, but that for data connectivity part of the graphs XDSM and PSG represent 
+equivalent graphs. It would be interesting future work to consider incorporating a new
+process edge type into the PSG to make it functionally equivalent to a complete XDSM, 
+however that would be a significant amount of extra work and worth of it's own paper. 
+To do that topic justice, the original XDSM work would need to be converted for every 
+case considered into the proposed syntax to ensure that they were completely equivalent.
+
 \rev{ The idea of “holes” and “collision” is explained a few times in the paper. 
 It can be reduced. }
+
+Searching the paper, the concepts is discussed often, but only formally defined once 
+in section 4.1. In 5.3 a mathematical description of the set of nodes that meet
+the criteria for holes and edges is given, but this is different than the definition. 
+
+We have checked both sections and removed the gross reducency, but feel that keeping 
+both equations makes for a clearer message in the paper. The concept is a bit subtle 
+since a node can be either a design variable or a hole, but not both. Similarlly, 
+a collision can occur when a variable has two incomming edges or not if the problem 
+is multi-fidelity. So a little extra explanation helps to keep this clear. 
 
 \rev{The review of other graph based techniques is good and highlights their 
 limitations, but I would like to see a discussion of what challenges a 
@@ -41,6 +59,22 @@ paper. The MCG and FPG will cover lot of information like objectives and
 constraints, but at what expense. Comparing XDSM with MCG or FPG, one might 
 find XDSM as more easy to read and comprehend. For a similar size problem, 
 FPG looks far more complex and bigger.}
+
+We agree that XDSM is more visually informative and consise. However this was not the 
+goal of the new syntax. Instead, the goal was to make a graph structure that 
+was easier to operate on algorithmically. As a consequence the graph grows larger and 
+less human readable. This trade is acceptable for two reasons: 
+
+\begin{enumerate}
+    \item It should be possible to convert between the XDSM format and the proposed syntax 
+    in a lossless manner. This is true for the gray lines of XDSM but not the black ones.
+    Only data connections are shown in current syntax. 
+    \item Algorithmic methods are a useful way of analyzing problem structure and it makes 
+    sense to have a graph structure that works well for this use, even at the expense 
+    of human readability. 
+\end{enumerate}
+
+See the revised end of the introduction (section 1) where this is more clearly stated. 
 
 \rev{If PSG is covered even to a small 
 extent (like explained in first comment) I would suggest or like to see the 
