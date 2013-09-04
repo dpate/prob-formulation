@@ -1,4 +1,4 @@
-\section{The MCG and FPG}
+\section{The MCG, FPG, and PSG}
     \label{s:building graphs}
 We now discuss how the graph-based syntax defined in Secs.~\ref{s:syntax definition} and \ref{s:graph representation}  is used to represent an MDAO problem in its entirety. This discussion is based on the MCG and the FPG.
 
@@ -210,3 +210,13 @@ The algorithm can be applied as part of a broader process in which the designer 
 \item[\bf{(E)}] Repeat from step (A) until an FPG is obtained.
 \end{enumerate}
 This process illustrates how the algorithm for obtaining a valid FPG can be applied. However, the process also serves to illustrate how a designer may revist the MCG after an FPG has already been produced. For example, if a designer desires to change an input to be multi-fidelity, new analysis blocks can be added to the original MCG, the indegree limits can be modified accordingly, and the algorithm can be applied again.
+
+
+
+\subsection{Problem Solution Graph}
+Once a suitable FPG has been obtained the issue of how to structure a solution strategy 
+can be addressed. Similar to the way an MCG can be manipulated into a FPG, an FPG can be
+further manipulated into a PSG. To get from an MCG to an FPG you eliminated analysis blocks and
+connection edges to reduce the problem to something solvable, but to get from an FPG to a PSG you 
+add in driver blocks, driven edges to describe the structure of the solution strategy being applied 
+to the problem.  
