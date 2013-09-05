@@ -19,7 +19,7 @@
     The time and expense for setting up 
     analysis models is growing in conjunction with the increasing scope of MDO problems. 
     Multidisciplinary Design Analysis and Optimization (MDAO)
-    frameworks such as {ModelCenter}\textregistered, iSigt\textregistered, ModeFrontier\textregistered, and OpenMDAO \cite{Gray2012}and have enabled a new level of analysis tool integration 
+    frameworks such as iSight\textsuperscript{\textregistered},\\ ModelCenter\textsuperscript{\textregistered}, ModeFrontier\textsuperscript{\textregistered}, and OpenMDAO\cite{Gray2012} and have enabled a new level of analysis tool integration 
     and have paved the way for models with more analyses and increasing numbers of interdisciplinary couplings. This 
     new capability has created a new challenge. Even models with tens of analyses could include hundreds or thousands
     of variables that are interdependent and must be linked in the framework. 
@@ -80,7 +80,7 @@
     determining the MCG and FPG. Finally, we present an example problem based on an MDO analysis of a 
     commercial aircraft.
 
-\section{Motivation}
+\section{Background}
 \subsection{Specific vs Fundamental Problem Formulation }
 	\label{s:specific vs fundamental}
     The Fundamental Problem Formulation (FPF) is our terminology for a statement of the overall system-level optimization problem that contains only  information about analysis tools, design variables, objectives, and constraints without reference to a solution approach. 
@@ -103,7 +103,7 @@ For example, consider the Sellar test problem \cite{AIAA:sellar}, with an FPF gi
     In Eq.~\ref{eqn:simple_fpf}, $y_1$ is an output of $D_1$ as well as an input 
     to $D_2$. Similarly, $y_2$ is an output of $D_2$ as well as an input 
     to $D_1$. This implies that $D_1$ and $D_2$ are coupled together by means 
-    of their mutual dependence. However no information is given as to weather
+    of their mutual dependence. However no information is given as to whether
     $D_1$ or $D_2$ should be run before the other. Given Eq.~\ref{eqn:simple_fpf}, 
     it would be equally valid to run $D_1$ first, $D_2$ first, or both simultaneously. 
 Any MDAO root finding method or compatibility constraint formulation could be implemented to achieve consistency between $D_1$ and $D_2$.
@@ -199,19 +199,17 @@ In this formulation, the implication is that  $D_1$ must be run
         \end{center}
     \end{figure}
 
-    Alexandrov and Lewis introduced a graph based syntax called REMS which 
-    incorporates objectives and constraints into a graph, effectively combining 
-    FDT and DSM \cite{alexandrov2004}. REMS retains the square adjacency 
+    Alexandrov and Lewis introduced a graph based syntax called Reconfigurability in 
+    MDO Problem Synthesis (REMS) which incorporates objectives and constraints 
+    into a graph, effectively combining FDT and DSM \cite{alexandrov2004}. REMS retains the square adjacency 
     matrix form from DSM, but by adding the objectives and constraints, it partially 
     combines a traditional DSM with an FDT. This formulation allows REMS to represent data 
     dependency between multiple analysis tools as well as between analysis tools and
-    objective/constraint functions. Additionally, REMS address the need to
+    objective/constraint functions. Additionally, REMS addresses the need to
     transition between multiple solution strategies while maintaining a single consistent  
-    graph representation of the fundamental problem formulation. REMS provides
-    syntax for variables and functions but does not facilitate inclusion 
-    of solvers or optimizers in the graph.  The graph syntax proposed in this paper could  
-    be viewed as an extension to REMS with the goal of allowing the graphs to  describe analysis couplings and more 
-    closely interact with existing design processes and MDAO frameworks. 
+    graph representation of the fundamental problem formulation. However REMS does not provide 
+    a mechanism for inclusion of solvers or optimizers in the graph. This fundamentally limits REMS 
+    from describing the specifics of a different solution strategies as applied to a specific problem. 
 
     Lamb and Martins also included objectives and constraint functions as nodes 
     in an Extended DSM (XDSM) in order to capture a more complete description 

@@ -174,19 +174,25 @@ column 2: Typo : “… formulations involving MULTIPLES analysis ….”}
 \section{Reviewer 2}
 
 \rev{Page 1, Line 46: 2nd column...check spacing after ``ModelCenter''.}
+Fixed 
 
 \rev{Page 2, Line 38: 2nd column...as your motivation was really done in the 
 Introduction section, consider changing the heading on section 2 to 
 ``Background'' or something similar.  You don't really provide motivation in 
 this section anyhow.}
+Section title changed
 
 \rev{Page 3, Line 19, 1st column: change ``weather'' to ``whether''}
+fixed
 
 \rev{Page 3, Line 21, 2nd column: change ``descrition'' to ``description''}
+fixed
 
 \rev{Page 4, Line 37, 1st column: what does ``REMS'' stand for?}
+"Reconfigurability in MDO Problem Synthesis". Full name added to the paper. 
 
 \rev{Page 4, Line 45, 1st column: change ``REMS address'' to ``REMS addresses''}
+fixed
 
 \rev{Page 4, Lines 35 to 55, 1st column:  This paragraph is a bit awkward in 
 structure.  In the second to last sentence you state, "REMS provides syntax 
@@ -198,17 +204,36 @@ with existing design processes and MDAO frameworks," which you never really
 called out as a shortcoming of REMS in the first place.  I think you could 
 improve the flow/wording here.}
 
+This paragraph was poorly worded. We have re-worded it to attempt 
+to make the issue with REMS more clear and to address more bluntly 
+what it fails to allow. 
+
 \rev{Line 10, 1st column, Page 10:  This equation (missing a number) has a LOT of 
 unions, variables, etc...in it.  It would help tremendously to provide a 
 verbal description of at least one of these equations to help with 
 translation into the real world.  This would be similar to what you did 
 following the steps (1) to (4) in the next subsection.}
 
+equation numbers were added, see new equations 8 and 9. Also, verbal descriptions
+were added to accompany the set notations. 
+
+
 \rev{Lines 5 - 12, 2nd column, Page 12:  Just a general question spurred by the 
 text here.  What criteria would be applied to determine which FPG is better 
 than another?}
 
+We chose not to address the issue of seleting one FPG over another. The answer 
+to this quetion depends heavily on specific situation. If you're short on time, 
+a smaller FPG with less cycles and less variables may be preferable. If you're trying
+to resolve some small issue with nacelle-wing interference then you may choose to go with a
+more high fidelity and computationally expensive FPG. 
+
+Our main point was that the MCG provides a good foundation for deriving the FPG, and that 
+it can be revisited later in the design process as things change. You are not stuck modifying the 
+FPG you initally select. 
+
 \rev{Line 57, 1st column, Page 13: change ``as a input'' to ``as an input''}
+fixed 
 
 \rev{Now for the request of more significant importance.  This is coming from 
 someone with significant experience in MDO and who uses a lot of the 
@@ -233,8 +258,26 @@ given a set of analysis tools and a general problem, I can employ this
 method to obtain an FPG that significantly improves my overall computational 
 accuracy while keeping my computational efficiency as high as possible."}
 
+We agree that this sort of quantitative data would be very valuable. However, we 
+contend that this data needs to be larger in scope than just that which could be obtained 
+by executing the example problem given here. Instead we think that to do that topic 
+justice, you would need to address a wide range of problems with different graph structural 
+characteristics. The challenge is that any quantitative measures given are inherantly 
+dependent on particular details of a problem. So to address this question fully you 
+would need a range of problems to consider. This work, while very valuable, would 
+fill an entire paper in it's own right and it's something we will consider in future 
+work. 
+
+
 \rev{If you are worried about length, I think the conclusions section may be cut 
 in half and still accomplish its intended purpose.}
+
+Althought the length of the paper was not excessive, we agree that the conclusion 
+could be more concise. We have shortened the conclusion and re-woreded it to make 
+it more clear. 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 \section{Reviewer 3}
 

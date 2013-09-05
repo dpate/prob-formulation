@@ -12,11 +12,15 @@ The definition of the MCG is given via construction.
     Finally, the inputs are represented as a set of variable nodes $V_\txt{in}$.
     We presume that $V_\txt{in}$, each $G_{A_i}$, and each $G_{E_i}$ are given, and that any potential connection between variables is specified in the form of connection edges in the set $E_{M,\txt{con}}$. One method for defining these connections is to use a consistant variable naming convention.
 
-    We may then construct the maximal connectivity graph $M=(V_M,E_M)$ as
-    \begin{IEEEeqnarray*}{rCl}
-    V_M & = & V_\txt{in} \cup \left( \bigcup_{i \in I_A} V_{A_i} \right) \cup \left( \bigcup_{i \in I_E} V_{E_i} \right), \\
-    E_M & = & E_{M,\txt{con}} \cup \left( \bigcup_{i \in I_A} E_{A_i} \right)  \cup \left( \bigcup_{i \in I_E} E_{E_i} \right).
-    \end{IEEEeqnarray*}
+    We may then construct the maximal connectivity graph $M=(V_M,E_M)$. $V_M$ is 
+    the union of the sets of variable nodes from the inputs, analysis blocks, and expression blocks. 
+    \begin{equation}
+    V_M = V_\txt{in} \cup \left( \bigcup_{i \in I_A} V_{A_i} \right) \cup \left( \bigcup_{i \in I_E} V_{E_i} \right)
+    \end{equation}
+    $E_M$ is the union of all connection and fixed edges from the all the analysis blocks and expression blocks. 
+    \begin{equation}
+    E_M = E_{M,\txt{con}} \cup \left( \bigcup_{i \in I_A} E_{A_i} \right)  \cup \left( \bigcup_{i \in I_E} E_{E_i} \right)
+    \end{equation}
     The MCG $M$ is uniquely determined by the given set of analysis blocks, inputs, and expression blocks. 
     In the cases where the set of inputs is not known a priori, the process of obtaining the FPG will reveal the required inputs, as discussed subsequently.
 
