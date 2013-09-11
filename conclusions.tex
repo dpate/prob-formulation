@@ -12,12 +12,10 @@ what are all of the variable interconnections between them that could be establi
 The MCG provides a structured formalism to identify \textit{holes} and 
 \textit{collisions} in interconnections between the set of analysis tools. 
 In order to achieve a valid problem formulation, all of the holes and collisions must 
-be resolved. We present an algorithm to perform this resolution which gurantees that you 
-will find an FPG if one exists. In some cases this algorithm still relies on some input from the 
+be resolved. We present an algorithm to perform this resolution which guarantees that an FPG will be found if one exists. In some cases, this algorithm relies on additional input from the 
 designers to make decisions. One benefit of a graph theoretic approach is the standard 
-algorithms which can be used to inform the user's decisions, such as cycle detection, 
+algorithms that can be used to inform the user's decisions, such as cycle detection, 
 minimum spanning trees, and shortest path algorithms.
-
 
 The FPG is a graph that describes a data connection structure corresponding 
 to an MDAO problem formulation free of collisions and holes. 
@@ -31,7 +29,6 @@ formulate valid MDAO problems. In Sec.~\ref{s:example problem},
 we provide an example application of formulating multiple FPGs from an MCG 
 for a commercial aircraft design problem. 
 
-
 For simple problems with few analysis tools and variables, the formulation of a 
 valid problem description is straightforward. However, MDAO problems continue to 
 grow in scale and complexity. As the numbers of analysis tools and variables have 
@@ -41,5 +38,5 @@ valid problem formulations, to know when other tools must be introduced, and to
 determine the number of free variables in the problem that can or should be 
 varied by the designer or an optimizer. The graph formalism presented in this 
 paper is intended to offer value in this context of increasing problem complexity by 
-providing a formal approach to programatically identify and resolve missing and 
+providing a formal approach to systematically identify and resolve missing and 
 redundant data in order to create valid MDAO problem formulations.  

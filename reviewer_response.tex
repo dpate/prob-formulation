@@ -1,7 +1,7 @@
 \documentclass{aiaa-tc}
 
-\title{reviewer responses for: \\ A Graph Theoretic Approach to Problem Formulation for 
-Multidisciplinary Design Analysis and Optimization}
+\title{A Graph Theoretic Approach to Problem Formulation for 
+Multidisciplinary Design Analysis and Optimization \\  (Reviewer comments appear below in red text and the authors' responses appear in black text)}
 
 \usepackage{color}
 
@@ -20,37 +20,25 @@ take the simplest formulation of your choice and show how MCG and FPG will
 translate and look as a PSG. A brief discussion of advantages vs 
 disadvantages will be useful. }
 
-We agree that this was too quickly addressed in the paper. While we feel that 
-discussion of the PSG in any significant depth is too big of a topic to fit into 
-this paper, it does warrant a more complete description than was given in the 
+We agree that the PSG was too quickly addressed in the paper. Although we feel that 
+discussion of the PSG in significant depth would be too lengthy for the present paper, we agree that the topic does warrant a more complete discussion than that provided in the 
 original draft. 
 
-We have added sections 3.5, 4.4 in the appropriate 
-parts of the paper to address the the driver nodes and driven edges which 
-together distinguish a PSG from and FPG.  We have also added added section 5.5
-which gives an example of a simple PSG and compares a PSG with its close relative
-and XDSM diagram. 
-
-It is our conclusion that the PSG represents a sub-set of the information in the XDSM
-diagram, but that for data connectivity part of the graphs XDSM and PSG represent 
-equivalent graphs. It would be interesting future work to consider incorporating a new
-process edge type into the PSG to make it functionally equivalent to a complete XDSM, 
-however that would be a significant amount of extra work and worth of it's own paper. 
-To do that topic justice, the original XDSM work would need to be converted for every 
-case considered into the proposed syntax to ensure that they were completely equivalent.
+We have added subsections 3.5 and 4.4  to address the the driver nodes and driven edges which 
+together distinguish a PSG from an FPG.  We have also added subsection 5.5,
+which provides an example of a simple PSG and compares and contrasts it with an XDSM diagram. 
 
 \rev{ The idea of “holes” and “collision” is explained a few times in the paper. 
 It can be reduced. }
 
-Searching the paper, the concepts is discussed often, but only formally defined once 
-in section 4.1. In 5.3 a mathematical description of the set of nodes that meet
-the criteria for holes and edges is given, but this is different than the definition. 
+In reviewing the paper, the authors agree that the concepts of holes and collisions are discussed perhaps too often.  The terms are formally defined only once 
+in section 4.1. Section 5.3 provides a mathematical description of the set of nodes that meet
+the criteria for holes and edges  in the context of the FPG algorithm, but it is our opinion that this discussion should stand separately from the definitions. 
 
-We have checked both sections and removed the gross reducency, but feel that keeping 
-both equations makes for a clearer message in the paper. The concept is a bit subtle 
-since a node can be either a design variable or a hole, but not both. Similarlly, 
-a collision can occur when a variable has two incomming edges or not if the problem 
-is multi-fidelity. So a little extra explanation helps to keep this clear. 
+We have checked sections 4.1 and 5.3 and removed many instances of redundancy, including informal definitions repeated several times in the text.  Nonetheless, we feel that preserving the separate mathematical discussions in sections 4.1 and 5.3 makes for a clearer message in the paper. The concept is somewhat subtle 
+since, in our definitions, a node can be either a design variable or a hole, but not both. Similarly, 
+a collision can occur when a variable has two incomming edges if the problem is single fidelity but not if the problem 
+is multi-fidelity. The additional discussion is intended to clarify theses subtleties. 
 
 \rev{The review of other graph based techniques is good and highlights their 
 limitations, but I would like to see a discussion of what challenges a 
@@ -60,85 +48,67 @@ constraints, but at what expense. Comparing XDSM with MCG or FPG, one might
 find XDSM as more easy to read and comprehend. For a similar size problem, 
 FPG looks far more complex and bigger.}
 
-We agree that XDSM is more visually informative and consise. However this was not the 
-goal of the new syntax. Instead, the goal was to make a graph structure that 
-was easier to operate on algorithmically. As a consequence the graph grows larger and 
-less human readable. This trade is acceptable for two reasons: 
+We agree that XDSM is more visually informative and concise. However, an easily human-readable format was not the 
+goal of the new syntax. Instead, the goal is to make a graph structure that 
+was easier to operate on algorithmically to achieve feasible MDO data flows. As a consequence of this goal, the graph grows larger and becomes
+less human readable. We believe that this tradeoff is acceptable for two reasons: 
 
 \begin{enumerate}
-    \item It should be possible to convert between the XDSM format and the proposed syntax 
-    in a lossless manner. This is true for the gray lines of XDSM but not the black ones.
-    Only data connections are shown in current syntax. 
-    \item Algorithmic methods are a useful way of analyzing problem structure and it makes 
-    sense to have a graph structure that works well for this use, even at the expense 
+    \item It should be possible to convert between the gray lines of the XDSM format and the proposed syntax 
+    in a lossless manner. 
+    It is our conclusion that the PSG in our syntax represents a subset of the information in the XDSM diagram; namely, the data connectivity elements of XDSM and PSG are equivalent graphs.  The implication is that it would be possible to write an algorithm and associated code to "abstract" the FPG into a partial XDSM diagram that could then be elaborated by the user to add the solution-specific elements.  It may then be possible to write a PSG from an XDSM, if the additional information about all of the individual variable connections from the FPG graph were preserved in the background.
+    (This is true for the gray lines of XDSM but not the black ones.
+    Only data connections are shown in new syntax.) 
+    \item Algorithmic methods are a useful way for analyzing MDO problem structure, so it seems appropriate to have a graph structure that works well for this use, even at the expense 
     of human readability. 
 \end{enumerate}
 
-See the revised end of the introduction (section 1) where this is more clearly stated. 
+Please see the revised end of the introduction (Section 1) in which the algorithmic purpose of the new graph syntax is now stated more clearly. 
 
 \rev{If PSG is covered even to a small 
 extent (like explained in first comment) I would suggest or like to see the 
 PSG equivalent of problem formulation shown in Figure 2 with XDSM.}
 
-See new Fig. 8 and Fig. 13 
+We have added  Fig. 8 and Fig. 13 and associated discussion to address this request.
 
 
 \rev{Is it really adding a lot of value to have graphs like MCG or FPG which 
 are very explicit in nature and can become difficult to read}
 
-Their value is not derived from their ability to represent the data in a human readable 
-form, but in it's power as a machine readable one. Section 5.3 introduces an 
-algorithm for testing if graphs are in fact reduced down to fundamental problems and 
-to reduce them to one if they are not. As problems grow larger and more complex, 
-this kind of algorithm becomes ever more valuable. 
+As discussed above, we believe that the value of the MCG and FPG is not derived from their ability to represent the data in a human readable 
+form, but in their straightforward translation to machine readable formats. Section 5.3 introduces an 
+algorithm for testing whether MDO data connectivity graphs are FPGs and for reducing graphs to FPGs. As problems grow larger and more complex, 
+this type of algorithm is expected to become ever more valuable. 
 
-It could be implemented into a framework or stand alone tool to help teams develop the
-specifics of a design problem before they started working to code the modules and such. 
+Such an algorithm could be implemented into a framework or stand-alone tool to help teams to develop the
+specifics of a design problem before they begin detailed development work. 
 Section 6 shows that for even simple problems, the graph (as viewed by an algorithm) is 
 non-trivial. It also shows that there are multiple ways to solve problems. As 
-problems grow even a small amount from the size given in the example it's clear that 
-algorithmic analysis useful. The graph syntax derives its usefulness from 
-the effectiveness of describing the graph to a computer. 
+problems grow even a small amount from the size of the example becomes invaluable. In sum, it is our belief that the graph syntax derives its usefulness from 
+its effectiveness in describing MDO problem graphs in computational syntax. 
 
 \rev{Can the graph be compressed in a logical way to reduce the number of nodes 
 and their interconnections while still conveying important and critical 
 information for that stage (MCG stage or FPG stage) ? Reducing cycles is 
 discussed but the graph may still look complex.
-
+\\ \indent
 Looking at these graphs (for example Fig. 8), a node for example Z2 
 appears several times. It may be useful to figure out holes and collision, 
 but once it is resolved, can those nodes be consolidated to provide simpler 
 visualization ?}
 
-There are a number of ways the graph could be simplified down to make it more 
-human readable, but this was not the primary goal of the work. You could combine 
-variables or remove them all together and just represent component to component 
-connections like a pure DSM. 
+There are a number of ways the graph could be simplified to make it more human readable. Variables could be combined, or they could be removed altogether such that the graph represents only component to component connections like a traditional DSM. 
 
-It should be possible to convert the entire PSG graph into the that used by the 
-data-connectivity part of an XDSM. You would have all the information in a more 
-compact and visually insightful form. You could always convert that back into the 
-more verbose syntax here as well. We would argue that the XDSM is more human readable, 
-but this syntax is a closer representation of how a framework would view the problem. 
+As discussed in the response above, it should be possible to convert the entire PSG graph into the data-connectivity part of an XDSM. This would present all of the information in a more compact and visually insightful form, e.g. an XDSM. By preserving the variable connectivity information, one could always convert back into the more verbose PSG syntax  if needed.  We would argue that the XDSM is more human readable, but the new syntax is a representation of how a framework tool, e.g. OpenMDAO or ModelCenter, could view the problem. 
 
 Given our goals, the verbose nature of the graphs is a necessary side effect. 
 
 \rev{As the problem size increases, how will it affect the size and complexity 
 of such graphs.}
 
-The answer to this question is not trivial, as it depends on a number of factors 
-such as the number of analyses and the number of variables in those analyses. 
-However, speaking roughly, you could measure the complexity of a graph by the total 
-number of nodes and edges. 
+The answer to this question is not trivial, as it depends on a number of factors such as the number of analyses and the number of variables in those analyses. However, roughly speaking, one could measure the complexity of a graph by the total number of nodes and edges. The number of nodes grows roughly linearly with the number of analysis tools and the number of variables. The number of fixed edges grows linearly with the number of variables as well. The number of connection edges depends entirely on the specifics of the problem, but, since any variable will have only a small finite number of incoming edges (usually 1, but maybe 2 or 3 in multi-fidelity case) one can avoid an unbounded growth. Therefore, very roughly speaking, the graph will grow as O(N+M) where N is the number of variables and M is the number of analyses. 
 
-So the number of nodes will grow roughly linearly with the number of analysis tools 
-and the number of variables. The number of fixed edges will grow linearly with the number of variables as well. The number of connection edges depends entirely on the specifics of the problem, but since any variable can only have a finite number of incoming edges (usually 1, but maybe 2 or 3 in multi-fidelity case) you can avoid an unbounded 
-growth there. So very roughly speaking, the graph will grow O(N+M) where N is the number 
-of variables and M is the number of analyses. 
-
-If you assume large problems have hundreds of components and millions of variables, 
-you're talking about graphs with a few million nodes and edges. These are very large, but 
-not outside the relm of what is manageable by todays graph libraries. 
+If one assumes that large problems have hundreds of components and millions of variables, then graphs with a few million nodes and edges are possible. These numbers are very large, but are not outside of the realm of what is readily manageable and rapidly evaluated by today's graph libraries in common programming languages. 
 
 \rev{
 I will assume that creation of such a graph and interconnections will be 
@@ -150,49 +120,54 @@ paper, but why this idea can provide a better foundation can be valuable.
 
 See the new section 2.4 for a short section describing our envisioned usage 
 of the graph language. 
-
-[TODO: Brian and David can flush this out better than me...]
+We have also mentioned in Section 5.3 that the algorithm can be directly implemented in any programming language capable of managing lists, such as Python.
 
 \rev{Minor comments:
 Section 1 Line 46: I think other commercial tools such as iSight, 
 modeFRONTIER should also be mentioned since their usage is more widespread 
 compared to OpenMDAO.}
 
-Agreed. Done and incorporated into Section 1. 
+Agreed. We have now mentioned this tools alongside OpenMDAO in  Section 1. 
 
 \rev{Page 13 line 33 column 2: Typo : “Step (D) now PROCEDEDS … “}
 
-fixed. 
+Fixed. 
 
 \rev{Page 16 line 38 
 column 2: Typo : “… formulations involving MULTIPLES analysis ….”}
 
-
+((let's discuss))
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 \section{Reviewer 2}
 
 \rev{Page 1, Line 46: 2nd column...check spacing after ``ModelCenter''.}
+
 Fixed 
 
 \rev{Page 2, Line 38: 2nd column...as your motivation was really done in the 
 Introduction section, consider changing the heading on section 2 to 
 ``Background'' or something similar.  You don't really provide motivation in 
 this section anyhow.}
-Section title changed
+
+Section title changed to "Background", as suggested.
 
 \rev{Page 3, Line 19, 1st column: change ``weather'' to ``whether''}
-fixed
+
+Fixed
 
 \rev{Page 3, Line 21, 2nd column: change ``descrition'' to ``description''}
-fixed
+
+Fixed
 
 \rev{Page 4, Line 37, 1st column: what does ``REMS'' stand for?}
-"Reconfigurability in MDO Problem Synthesis". Full name added to the paper. 
+
+``Reconfigurability in MDO Problem Synthesis''. The full name has been added to the paper. 
 
 \rev{Page 4, Line 45, 1st column: change ``REMS address'' to ``REMS addresses''}
-fixed
+
+Fixed
 
 \rev{Page 4, Lines 35 to 55, 1st column:  This paragraph is a bit awkward in 
 structure.  In the second to last sentence you state, "REMS provides syntax 
@@ -204,9 +179,8 @@ with existing design processes and MDAO frameworks," which you never really
 called out as a shortcoming of REMS in the first place.  I think you could 
 improve the flow/wording here.}
 
-This paragraph was poorly worded. We have re-worded it to attempt 
-to make the issue with REMS more clear and to address more bluntly 
-what it fails to allow. 
+The authors agree that this paragraph was poorly worded. We have re-worded it to attempt 
+to make the issue with REMS more clear. The text now states (last two sentences, first column of p. 4): ``... REMS does not provide a mechanism for inclusion of solvers or optimizers in the graph. This fundamentally limits REMS from describing the specifics of different solution strategies as applied to a particular problem.''  We have removed the oddly juxtaposed statement about the goal of our graph syntax that was noted by the reviewer from the paragraph.  However, based on the comments by Reviewer 1 noted above, we have now added an additional description of how our method can capture optimizers and solvers in the context of the problem solution graph (PSG).
 
 \rev{Line 10, 1st column, Page 10:  This equation (missing a number) has a LOT of 
 unions, variables, etc...in it.  It would help tremendously to provide a 
@@ -214,26 +188,23 @@ verbal description of at least one of these equations to help with
 translation into the real world.  This would be similar to what you did 
 following the steps (1) to (4) in the next subsection.}
 
-equation numbers were added, see new equations 8 and 9. Also, verbal descriptions
-were added to accompany the set notations. 
+The authors agree.  We have added equation numbers (now Eqns. 8 and 9). We have also provided verbal descriptions to accompany the set notations. 
 
 
 \rev{Lines 5 - 12, 2nd column, Page 12:  Just a general question spurred by the 
 text here.  What criteria would be applied to determine which FPG is better 
 than another?}
 
-We chose not to address the issue of seleting one FPG over another. The answer 
-to this quetion depends heavily on specific situation. If you're short on time, 
-a smaller FPG with less cycles and less variables may be preferable. If you're trying
-to resolve some small issue with nacelle-wing interference then you may choose to go with a
-more high fidelity and computationally expensive FPG. 
+After considerable deliberation, we chose not to address the issue of how one should select one FPG in preference to another  in the context of the present paper. The answer 
+to this question depends heavily on the specific situation. If one is limited by run-time of the MDO workflow, 
+a smaller FPG with fewer cycles and variables may be preferable. If one is trying to resolve a detailed physical question, e.g. subtle design changes associated with nacelle-wing interference, then it may be preferable  to select a
+more high fidelity and computationally expensive FPG. These notions are introduced in the example problem, but further development was beyond the scope of the paper.
 
-Our main point was that the MCG provides a good foundation for deriving the FPG, and that 
-it can be revisited later in the design process as things change. You are not stuck modifying the 
-FPG you initally select. 
+The MCG provides a good foundation for finding the only FPG or indicate multiple possible FPGs. The user can then select the best FPG for the present stage of the design process, but this decision can  be revisited later in the process as the design goals change.
 
 \rev{Line 57, 1st column, Page 13: change ``as a input'' to ``as an input''}
-fixed 
+
+Fixed 
 
 \rev{Now for the request of more significant importance.  This is coming from 
 someone with significant experience in MDO and who uses a lot of the 
@@ -258,23 +229,21 @@ given a set of analysis tools and a general problem, I can employ this
 method to obtain an FPG that significantly improves my overall computational 
 accuracy while keeping my computational efficiency as high as possible."}
 
-We agree that this sort of quantitative data would be very valuable. However, we 
-contend that this data needs to be larger in scope than just that which could be obtained 
-by executing the example problem given here. Instead we think that to do that topic 
-justice, you would need to address a wide range of problems with different graph structural 
-characteristics. The challenge is that any quantitative measures given are inherantly 
-dependent on particular details of a problem. So to address this question fully you 
-would need a range of problems to consider. This work, while very valuable, would 
-fill an entire paper in it's own right and it's something we will consider in future 
-work. 
+We agree that this sort of quantitative comparison would be very valuable. However, we 
+believe that, in order not to be misleading, this comparison needs to be larger in scope than just that which could be obtained 
+by executing the example problem given currently presented in the paper. We believe that one would need to address a wide range of problems with different graph structural 
+characteristics and different inherent nonlinear features in the analyses in order to make statements that are more generalizable. The challenge is that quantitative measures are inherently 
+dependent on particular details of a problem. 
+For example, for coupled analyses, total CPU time is highly dependent on the number of iterations required to converge the system of nonlinear functions to a consistent solution within a specified tolerance.  This convergence is tied very closely to the specifics of the coupling and the nonlinearity.  We had previously considered the idea of selecting ``optimal FPGs'' in terms of aggregate metrics that could be specified \textit{a priori} as meta-data for a particular analysis, but defining these metrics without considering problem coupling and nonlinearity proved especially challenging.
+To address this issue well would therefore necessitate the evaluation of many example problems with different characteristics.  This work, while very valuable, would 
+likely require an entire paper in its own right. We thank the reviewer for this suggestion, and we consider it to be a great topic for future work in this area.
 
 
 \rev{If you are worried about length, I think the conclusions section may be cut 
 in half and still accomplish its intended purpose.}
 
-Althought the length of the paper was not excessive, we agree that the conclusion 
-could be more concise. We have shortened the conclusion and re-woreded it to make 
-it more clear. 
+We agree that the conclusion section
+could be more concise. We have shortened it by two paragraphs  and improved the wording.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -311,29 +280,10 @@ leading to the creation of effective CDE.}
 The reviewer has correctly identified the major motivation for this work. The goal is indeed to 
 assist engineers and teams of engineers in the process of building a model out of a set of interconnected 
 tools. 
+We believe that the distinction between phases 1 and 2 in the reviewer's  comments are covered adequately 
+in the the introduction and especially in the notional problem described in the indented text on p. 2.
+However, to clarify the distinction between phases 2 and 3 indicated by the reviewer, we modified the text following the indented text at the bottom of p. 2 to read as follows:
 
-We believe that the distrinction between phases 1 and 2 from the comments are covered adequately 
-in the bulk of the introduction and especially in the notional problem described there in. 
-
-However, to clarify the disctinction between phases 2 and 3 we hav added the following near 
-line 52, page 3 of the original submission: 
-
-\emph{%
-Our goal is to develop formalism for expressing analysis interconnectivity and for determining feasible
-    analysis tool sets to assist an engineering team conducting this task. Because the problem deals with
-    interconnectivity, we base our approach on the representations and techniques of graph theory.
-    The approach begins by constructing the \emph{maximal connectivity graph (MCG)} describing all possible
-    interconnections between the analysis tools proposed by the engineers. Graph operations are then
-    conducted to reduce the MCG to a \emph{fundamental problem graph (FPG)} that describes the set of analysis
-    tools needed to solve the specified system-level design problem. The concept of the FPG and 
-    the identification of feasible FPGs from an MCG are the main contributions of the paper. \\\\
-    This information in an FPG represents the engineering design problem that needs to be solved, but it is not 
-    itself sufficient to actually run a design optimization. It does not provide infomration 
-    about how to solve the problem. Even after the problem is defined an integration platform or framework needs 
-    to be selected and appropriate optimization methods identified. This last step essentially 
-    involves taking the FPG and turning it into a usable model. We breifly consider methods to further 
-    manipulate the FPG into a \emph{problem solution graph (PSG)} which could be usefull in this 
-    task, but that is not the focus of this paper. The work is primarily concerned with applying graph 
-    theory to the creation of an FPG and the benefits to the design process by doing so.}
+\emph{ ((copy and paste the last two paragraphs of Section 2.3))}
 
 \end{document}

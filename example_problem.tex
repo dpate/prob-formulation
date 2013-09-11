@@ -110,9 +110,9 @@ The new MCG is shown in Fig.~\ref{f:MCG}.
 	\end{figure*}
 
 	Although an FPG may now be obtained, this process has not provided a method to decide which edges to retain when resolving a collision, and these decisions will likely determine which analysis tools are included in the FPG. These decisions are left to the discretion of the designer in the context of the specific implementation. 
-	However, the graph-based approach presented in this paper enables standard graph algorithms to be employed to automate these decisions based on considerations of metrics related to the graph or other data related to the analysis. 
+	However, the graph-based approach presented in this paper enables standard graph algorithms to be employed to automate these decisions based on considerations of metrics related to the graph or other data related to the analyses. 
 	An example is a metric to obtain an FPG with the fewest possible number of cycles. 
-In this example, the FPG with the fewest cycles is shown in Fig.~\ref{f:FPG fewest cycles}, in which the edges belonging to a cycle are inticated by dashed lines. 
+In this example, the FPG with the fewest cycles is shown in Fig.~\ref{f:FPG fewest cycles}, in which the edges belonging to a cycle are indicated by dashed lines. 
 For this example problem, the cycles were detected using the implementation of Johnson's algorithm \cite{Johnson1975} in the Python package NetworkX. 
 There are two cycles which arise from each local output from PDCYL being directed into FLOPSa and then back into PDCYL. 
 

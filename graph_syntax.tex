@@ -11,7 +11,7 @@
   For a \emph{directed graph} (or \emph{digraph}) we construct $E$ as a set of ordered pairs instead 
   of a set of sets. Each ordered pair represents an edge starting at the node 
   indicated by the first entry and directed to the node indicated by the second 
-  entry. An edge $e$ = $(x,y)$ may simply be referred to as $xy$. The edges 
+  entry. The edges 
   directed out from node $v$ are denoted by $E(v)$ and the edges directed into $v$ are denoted 
   by $E^{-1}(v)$. $E(v)$ may be the empty set, a single edge, or a set of edges, and likewise for $E^{-1}(v)$.
   \begin{figure}[htb!]
@@ -22,7 +22,7 @@
   \caption{Example directed graph.}
   \label{f:example directed graph}
   \end{figure}
-  As an example, for the directed graph shown in Fig.~\ref{f:example directed graph} we have
+  As an example, for the directed graph shown in Fig.~\ref{f:example directed graph}, we have
   \begin{IEEEeqnarray*}{rCl}
   V & = & \{1,2,3,4,5\}, \\
   E & = & \big\{(2,1),(3,2),(1,3),(3,4)\big\}.
@@ -44,7 +44,7 @@
   \bigcup_{i \in I} A_i = \bigcup_{A \in \mathcal A} A = \{x \st x \in A \txt{ for some } A \in \mathcal A\}.
   \end{equation}
 
-  Lastly, the cardinality of a set $B$ is the number of elements in $B$ and is denoted as $|B|$.
+  Lastly, the cardinality of a set $B$ is the number of elements in $B$ and is denoted as $|B|$, and the set difference is denoted with a backslash, i.e. $A \setminus B = \{x \in A \st x \notin B\}$.
 
 \subsection{Node and Edge Types}
   \label{ss:types}
@@ -62,7 +62,7 @@ We categorize nodes and edges
   \begin{description}
   \item[\bf{connection edge:}] represents exchange of information external to analysis tools,
   \item[\bf{function edge:}] represents exchange of information internal to analysis tools,
-  \item[\bf{driven edge:}] represents passing of information from a driver node to a 
+  \item[\bf{driven edge:}] represents passing of information between a driver node and a 
   variable node (present only in a PSG).
   \end{description}
   Figure \ref{f:sellar types} demonstrates the usage of these node and edge 
@@ -101,7 +101,7 @@ In this figure, function nodes are indicated by squares,
 
 \subsection{Analysis Blocks}
 \label{ss:analysis blocks}
-  Analysis tools take in a set of input variables and calculate 
+  Analysis tools accept a set of input variables and calculate 
   the values for their respective outputs. We represent this process
   by a digraph called an \emph{analysis block}; a notional analysis block is shown 
   in Fig.~\ref{f:analysis block}. 
@@ -111,7 +111,7 @@ In this figure, function nodes are indicated by squares,
   distinct local outputs. The local input and local output nodes are variable 
   nodes, while the nodes representing the analysis are function nodes. All of 
   the edges within the analysis block are function edges, and are considered 
-  fixed to the analysis block. This graph structure demonstrated by 
+  fixed to the analysis block. The graph structure demonstrated by 
   Fig.~\ref{f:analysis block} satisfies the rules listed in Sec.~\ref{ss:types}. 
   Conversely, the rules ensure that analysis tools are represented via this analysis 
   block structure.
@@ -203,23 +203,23 @@ In this figure, function nodes are indicated by squares,
 
 
   \subsection{Driver Nodes and Driven Edges}
-  Within this syntax, all iterative processes are represented with Driver nodes. 
+  Within this syntax, all iterative processes are represented with driver nodes. 
   The driver node shares some basic qualities with the model node. It can have incoming 
   and outgoing function edges to and from variable nodes. For example, many optimizers take 
-  convergence tolerance as input and output iteration counts and final objective value. 
-  With respect to variable nodes and function edges, drivers behave exactly the same as
+  convergence tolerance as input, and they output iteration counts and the final objective value. 
+  With respect to variable nodes and function edges, drivers behave similarly to
   model nodes and are subject to the same rules governing their use in the graph. In this
-  context, driver nodes can be part of driver blocks which behave just like analysis 
+  context, driver nodes can be part of driver blocks, which behave identically to analysis 
   blocks. 
 
   Driven edges are the distinguishing characteristic associated with driver nodes and
-  driver blocks. Driven edges don't follow the same rules as other edges. Driven edges  
-  will always connect a driver node to a variable node (in either direction), but they 
+  driver blocks. Driven edges do not follow the same rules as other edges: they  
+   always connect a driver node to a variable node (in either direction), but they 
   are not considered when counting the indegree or outdegree of the variable node.
-  Hence a single variable node could have multiple incoming driven edges from different 
-  driver blocks, e.g. in a sequential optimization strategy, both drivers would at 
-  different times, pick values for the same variable. Figure \ref{f:driver block} shows 
-  a notional example where a driver block represents and optimizer solving an 
+  Hence, a single variable node could have multiple incoming driven edges from different 
+  driver blocks. This accommodates a sequential optimization strategy in which both drivers, at 
+  different times, select values for the same variable. Figure \ref{f:driver block} shows 
+  a notional example in which a driver block represents an optimizer solving an 
   unconstrained minimization problem. 
 
   \begin{figure}[htb]
@@ -227,7 +227,7 @@ In this figure, function nodes are indicated by squares,
     \includegraphics[width=3.0in]{images/driver_block}
     \end{center}
     \vspace{-10pt}
-  \caption{Example driver block with node types labeled.}
+  \caption{Example driver block implementation. The driver, analysis, and expression blocks are dash-dotted, dotted, and dashed, respectively. The driver nodes are represented by rotated squares.}
   \label{f:driver block}
   \end{figure}
 
@@ -240,7 +240,7 @@ In this figure, function nodes are indicated by squares,
 
 \subsection{Design Variables, Holes, and Collisions}
   Design variables are input variables whose values are free to be 
-  changed by the designer or by an optimizer in an MDAO study. In the graph-based 
+  changed by the designer or an optimizer in an MDAO study. In the graph-based 
   syntax, a node corresponds to a design variable if the indegree limits of the node are 
   prescribed as zero.
 
@@ -265,7 +265,7 @@ In this figure, function nodes are indicated by squares,
         the variable node from two or more sources. This conflict implies an 
         ambiguity as to which information is to be used as an input for the analysis tool.
 	In multifidelity problems (discussed subsequently), the upper indegree limit could be 
-  specified as $deg_u^- > 2$, which implies that a collision is not noted in the case of 
+  specified as $\txt{deg}_u^- > 2$, which implies that a collision is not noted in the case of 
   multiple inputs.
   \end{description} 
 
@@ -275,11 +275,11 @@ In this figure, function nodes are indicated by squares,
 
 \subsection{Coupling Between Analyses}
   In MDAO, coupling is the mutual dependence between two or more analysis 
-  tools and their respective outputs. In this graph-based syntax, coupling is 
+  tools and their respective outputs. In our graph-based syntax, coupling is 
   described by the presence of a cycle between two or more analysis blocks. In the Sellar 
-  problem from Eq.~\ref{eqn:simple_fpf} 
+  problem from Eq.~\ref{eqn:simple_fpf}, 
   a mutual dependence between $D_1$ and $D_2$ exists through the variables $y_1$ and $y_2$. 
-  The edges belonging to a cycle in the Sellar problem are highlighted in 
+  The edges belonging to this cycle in the Sellar problem are highlighted in 
   Fig. \ref{f:sellar cycles}.  These edges collectively form a closed path between 
   analysis blocks $D_1$ and $D_2$.
 
@@ -291,23 +291,26 @@ In this figure, function nodes are indicated by squares,
     participation in a cycle.\label{f:sellar cycles}}
   \end{figure} 
 
-  Coupling cycles do not contain driver node or driven edgess since these 
+  Coupling cycles do not contain driver nodes or driven edges since these 
   are not allowed in the MCG or FPG representations. 
-  Solvers, optimizers, and other iterative processes are not invovled in the coupling 
+  Solvers, optimizers, and other iterative processes are not involved in the coupling 
   definition; however, one or more solvers will be required to build a valid PSG from a 
-  given FPG  that includes cycles. Additionally, a coupling cycle has no inherent 
+  given FPG  that includes cycles. 
+  
+  Additionally, a coupling cycle has no inherent 
   start or end point. It would be acceptable to select a
   node in the cycle as a starting point and proceed around the
-  loop until the starting point is reached again. For the Sellar Problem, selecting 
-  $D_1$ as the starting point would yield a problem as given in 
+  loop until the starting point is reached again. For the Sellar problem, selecting 
+  $D_1$ as the starting point would yield the form of the stated in 
   Eq.~\ref{eqn:simple}.
-  Larger problems can involve more complex cycles in their FPG, indicating more 
-  complex coupling between analyses. For example, a cycle can involve more than 
+  
+  Larger problems can involve more complex cycles in their corresponding FPG, indicating more 
+  complex coupling between analyses. For example, a cycle could incorporate more than 
    two analysis blocks. Multiple independent cycles could also exist, indicating 
-  independent coupling relationships. Cycles can also overlap, meaning that the same analysis 
-  blocks are involved in multiple different coupling cycles. All of these situations
-  arise naturally as the size of problems grows, and managing this coupling may
-  become difficult. In the present work, Sec.~\ref{s:example problem}
+  independent coupling relationships. Cycles could also overlap, meaning that the same analysis 
+  blocks belong to multiple different coupling cycles. All of these situations
+  arise naturally as problems grow in size, and managing these increasingly complex  couplings is particularly challenging. 
+  In the present work, Sec.~\ref{s:example problem}
   demonstrates how building an FPG from an MCG provides an opportunity to 
   identify and potentially reduce the number of cycles in a graph. 
 
@@ -322,7 +325,7 @@ In this figure, function nodes are indicated by squares,
 
 \subsection{Multi-fidelity Problems}
   \label{ss:multi-fideliy problems}
-  A multi-fidelity MDAO problem can be characterized by a formulation in which 
+  A multi-fidelity MDAO problem can be characterized as a formulation in which 
   two or more different analyses each calculate the same data. Multi-fidelity 
   is represented in a graph by a variable node having an indegree greater than 
   one, which means that multiple connection edges are directed into it. When the 
@@ -347,7 +350,7 @@ In this figure, function nodes are indicated by squares,
   \end{figure}
 
   Multi-fidelity problems are always characterized by graphs in which at least some of the variable 
-  nodes that have an $\txt{deg}^-_u(v) > 1$. These problems require 
+  nodes have an $\txt{deg}^-_u(v) > 1$. These problems require 
   special techniques for resolving the conflicting edges by introducing some mechanism
   to manage when each of the different fidelity analyses are 
   run \cite{march2012provably,alexandrov2001approximation,Huang_Allen_Notz_Miller_2006}.
@@ -357,7 +360,7 @@ In this figure, function nodes are indicated by squares,
 
 Table \ref{t:variable node classification} summarizes the classification of a variable 
 node as a hole, design variable, single valid input (nominal), collision, or 
-multi-fidelity node.
+multi-fidelity node in relation to the indegree limits.
 
 \begin{table}[htbp]
   \centering
@@ -367,7 +370,7 @@ multi-fidelity node.
     $\txt{deg}^-_l(v)$ & $\txt{deg}^-_u(v)$ & $\txt{deg}^-(v)$ & valid & classification \\
     \midrule
     0     & 0     & 0     & yes   & design variable \\
-    0     & 0     & 1     & yes   & collision \\
+    0     & 0     & 1     & no   & collision \\
     0     & 1     & 0     & yes   & design variable \\
     0     & 1     & 1     & yes   & single input \\
     1     & 1     & 0     & no    & hole \\
@@ -385,17 +388,14 @@ multi-fidelity node.
 
 
 \subsection{Iterative Control: Drivers}
-  There are many iterative processes that are used to help solve MDAO problems such as 
-  solvers, optimizers, and Design of Experiment (DOE). Abstractly, even a human picking 
-  values guided by experience and trend could be viewed as an iterative process. 
-  These processes represent the control structures that govern how a design problem 
-  marches toward a solution but they do not fundamentally impact the definition of the 
-  problem to be solved. e.g. which optimizer you choose does not change the problem you 
-  are solving but will change the path you follow to solve it. Hence, as a rule, driver 
-  nodes and driven edges are excluded from both the MCG and FPG which deal exclusively 
-  with problem formulation. They only come into play with in the PSG where the issue of 
-  how to solve a specific problem is addressed. In fact, at least one driver block is 
-  required to be present in any PSG in order to select values for the design variables. 
+  There are many iterative processes  such as 
+  solvers, optimizers, and designs of experiments that are used to solve MDAO problems. 
+  These processes represent the control structures that govern the path toward a solution, but they do not fundamentally impact the definition of the 
+  problem to be solved. Hence, driver 
+  nodes and driven edges are excluded from both the MCG and FPG, which deal exclusively 
+  with problem formulation. These nodes and edges are used only in the PSG, in which the issue of 
+  how to solve a specific problem is addressed. Indeed, at least one driver block is 
+  required to be present in any PSG in order to select values for the design variables during the optimization process. 
 
 
 
